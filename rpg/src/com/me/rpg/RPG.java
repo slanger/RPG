@@ -6,15 +6,42 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class RPG implements ApplicationListener
 {
 	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
-	private Texture texture;
-	private float x, y;
+	private Sprite sprite;
+	private TextureRegion rightIdle, leftIdle, upIdle, downIdle;
+	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation, downWalkAnimation;
+	private Direction direction;
+	private boolean moving = false;
+	private float stateTime = 0f;
+	
+	private enum Direction
+	{
+		RIGHT	(0),
+		LEFT	(1),
+		UP		(2),
+		DOWN	(3);
+		
+		int index;
+		
+		Direction(int index)
+		{
+			this.index = index;
+		}
+		
+		public int getIndex()
+		{
+			return index;
+		}
+	}
 	
 	@Override
 	public void create()
@@ -24,17 +51,38 @@ public class RPG implements ApplicationListener
 		
 		batch = new SpriteBatch();
 		
-		texture = new Texture(Gdx.files.internal("megaman.png"));
-		
-		x = camera.viewportWidth / 2;
-		y = camera.viewportHeight / 2;
+		TextureRegion[][] spritesheet = TextureRegion.split(new Texture(Gdx.files.internal("hero.png")), 16, 16);
+		TextureRegion[] rightWalkFrames = new TextureRegion[2];
+		TextureRegion[] leftWalkFrames = new TextureRegion[2];
+		TextureRegion[] upWalkFrames = new TextureRegion[2];
+		TextureRegion[] downWalkFrames = new TextureRegion[2];
+		for (int i = 0; i < 2; i++)
+		{
+			rightWalkFrames[i] = spritesheet[Direction.RIGHT.getIndex()][i];
+			leftWalkFrames[i] = spritesheet[Direction.LEFT.getIndex()][i];
+			upWalkFrames[i] = spritesheet[Direction.UP.getIndex()][i];
+			downWalkFrames[i] = spritesheet[Direction.DOWN.getIndex()][i];
+		}
+		float duration = 0.15f;
+		rightWalkAnimation = new Animation(duration, rightWalkFrames);
+		leftWalkAnimation = new Animation(duration, leftWalkFrames);
+		upWalkAnimation = new Animation(duration, upWalkFrames);
+		downWalkAnimation = new Animation(duration, downWalkFrames);
+		rightIdle = spritesheet[Direction.RIGHT.getIndex()][0];
+		leftIdle = spritesheet[Direction.LEFT.getIndex()][0];
+		upIdle = spritesheet[Direction.UP.getIndex()][0];
+		downIdle = spritesheet[Direction.DOWN.getIndex()][0];
+		// start sprite facing downward
+		sprite = new Sprite(spritesheet[Direction.DOWN.getIndex()][0]);
+		direction = Direction.DOWN;
+		sprite.setPosition(camera.viewportWidth / 2, camera.viewportHeight / 2);
 	}
 
 	@Override
 	public void dispose()
 	{
 		batch.dispose();
-		texture.dispose();
+		sprite.getTexture().dispose();
 	}
 
 	@Override
@@ -49,34 +97,112 @@ public class RPG implements ApplicationListener
 		batch.begin();
 		
 		// draw stuff here
-		batch.draw(texture, x, y);
+		sprite.draw(batch);
 		
 		batch.end();
 		
 		update();
 	}
 
-	public void update()
+	private void update()
 	{
+		float deltaTime = Gdx.graphics.getDeltaTime();
+		float x = sprite.getX();
+		float y = sprite.getY();
+		moving = false;
+		stateTime += deltaTime;
+		
 		// update x
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
-			x -= 100 * Gdx.graphics.getDeltaTime();
+		{
+			x -= 100 * deltaTime;
+			direction = Direction.LEFT;
+			moving = true;
+		}
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
-			x += 100 * Gdx.graphics.getDeltaTime();
+		{
+			x += 100 * deltaTime;
+			direction = Direction.RIGHT;
+			moving = true;
+		}
 		if (x < 0)
+		{
 			x = 0;
-		if (x > camera.viewportWidth)
-			x = camera.viewportWidth;
+		}
+		if (x > camera.viewportWidth - sprite.getWidth())
+		{
+			x = camera.viewportWidth - sprite.getWidth();
+		}
 		
 		// update y
-		if (Gdx.input.isKeyPressed(Keys.DOWN))
-			y -= 100 * Gdx.graphics.getDeltaTime();
 		if (Gdx.input.isKeyPressed(Keys.UP))
-			y += 100 * Gdx.graphics.getDeltaTime();
+		{
+			y += 100 * deltaTime;
+			direction = Direction.UP;
+			moving = true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			y -= 100 * deltaTime;
+			direction = Direction.DOWN;
+			moving = true;
+		}
 		if (y < 0)
+		{
 			y = 0;
-		if (y > camera.viewportHeight)
-			y = camera.viewportHeight;
+		}
+		if (y > camera.viewportHeight - sprite.getHeight())
+		{
+			y = camera.viewportHeight - sprite.getHeight();
+		}
+		
+		if (moving)
+		{
+			sprite.setPosition(x, y);
+			TextureRegion currentFrame = null;
+			switch (direction)
+			{
+			case RIGHT:
+				currentFrame = rightWalkAnimation.getKeyFrame(stateTime, true);
+				break;
+			case LEFT:
+				currentFrame = leftWalkAnimation.getKeyFrame(stateTime, true);
+				break;
+			case UP:
+				currentFrame = upWalkAnimation.getKeyFrame(stateTime, true);
+				break;
+			case DOWN:
+				currentFrame = downWalkAnimation.getKeyFrame(stateTime, true);
+				break;
+			}
+			if (currentFrame != null)
+			{
+				sprite.setRegion(currentFrame);
+			}
+		}
+		else
+		{
+			TextureRegion currentFrame = null;
+			switch (direction)
+			{
+			case RIGHT:
+				currentFrame = rightIdle;
+				break;
+			case LEFT:
+				currentFrame = leftIdle;
+				break;
+			case UP:
+				currentFrame = upIdle;
+				break;
+			case DOWN:
+				currentFrame = downIdle;
+				break;
+			}
+			if (currentFrame != null)
+			{
+				sprite.setRegion(currentFrame);
+			}
+		}
 	}
 
 	@Override
