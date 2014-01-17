@@ -14,7 +14,7 @@ public class NonplayableCharacter extends Character
 		Timer.schedule(new moveTask(), 1, 1);
 	}
 	
-	protected void update()
+	public void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		float x = sprite.getX();

@@ -13,7 +13,7 @@ public class PlayableCharacter extends Character
 		super(name, spritesheet, width, height, tileWidth, tileHeight, startX, startY, animationDuration);
 	}
 	
-	protected void update()
+	public void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		float x = sprite.getX();

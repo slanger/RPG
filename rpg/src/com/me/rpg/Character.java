@@ -80,9 +80,8 @@ public abstract class Character
 	public void render(SpriteBatch batch)
 	{
 		sprite.draw(batch);
-		update();
 	}
 	
-	protected abstract void update();
+	public abstract void update();
 	
 }
