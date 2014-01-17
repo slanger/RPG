@@ -23,6 +23,12 @@ public class RPG implements ApplicationListener
 	private boolean moving = false;
 	private float stateTime = 0f;
 	
+	// camera scrolling
+	private boolean cameraScrollEnable = false;
+	private Texture background;
+	private float cameraX, cameraY;
+	private float selectDelta = 0.0f;
+	
 	private enum Direction
 	{
 		RIGHT	(0),
@@ -51,6 +57,13 @@ public class RPG implements ApplicationListener
 		
 		batch = new SpriteBatch();
 		
+		// background setup
+		background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
+		cameraX = background.getWidth()/2;
+		cameraY = background.getHeight()/2;
+		
+		// sprite + animation setup begin 
+		
 		TextureRegion[][] spritesheet = TextureRegion.split(new Texture(Gdx.files.internal("hero.png")), 16, 16);
 		TextureRegion[] rightWalkFrames = new TextureRegion[2];
 		TextureRegion[] leftWalkFrames = new TextureRegion[2];
@@ -76,6 +89,8 @@ public class RPG implements ApplicationListener
 		sprite = new Sprite(spritesheet[Direction.DOWN.getIndex()][0]);
 		direction = Direction.DOWN;
 		sprite.setPosition(camera.viewportWidth / 2, camera.viewportHeight / 2);
+		
+		// sprite + animation setup end
 	}
 
 	@Override
@@ -83,6 +98,7 @@ public class RPG implements ApplicationListener
 	{
 		batch.dispose();
 		sprite.getTexture().dispose();
+		// TODO not sure what else we need to dispose of.  maybe all textures, texture regions?
 	}
 
 	@Override
@@ -97,8 +113,9 @@ public class RPG implements ApplicationListener
 		batch.begin();
 		
 		// draw stuff here
+		batch.draw(background, 0, 0, (int)(cameraX - camera.viewportWidth/2), (int)(cameraY - camera.viewportHeight/2), (int)camera.viewportWidth, (int)camera.viewportHeight);
+
 		sprite.draw(batch);
-		
 		batch.end();
 		
 		update();
@@ -107,9 +124,20 @@ public class RPG implements ApplicationListener
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
-		float x = sprite.getX();
-		float y = sprite.getY();
+		float oldX = sprite.getX();
+		float oldY = sprite.getY();
+		float x = oldX;
+		float y = oldY;
 		moving = false;
+		
+		selectDelta += deltaTime;
+		
+		// enable/disable camera scrolling
+		if (Gdx.input.isKeyPressed(Keys.C) && selectDelta > 0.5f) {
+			cameraScrollEnable = !cameraScrollEnable;
+			selectDelta = 0.0f;
+		}
+		
 		stateTime += deltaTime;
 		
 		// update x
@@ -154,6 +182,24 @@ public class RPG implements ApplicationListener
 		if (y > camera.viewportHeight - sprite.getHeight())
 		{
 			y = camera.viewportHeight - sprite.getHeight();
+		}
+		
+		if (cameraScrollEnable) {
+			cameraX += (x - oldX);
+			cameraY -= (y - oldY);
+			if (cameraX < 0)
+				cameraX = 0;
+			else if (cameraX > background.getWidth() - camera.viewportWidth) {
+				cameraX = background.getWidth() - camera.viewportWidth;
+			}
+			if (cameraY < 0) {
+				cameraY = 0;
+			} else if (cameraY > background.getHeight() - camera.viewportHeight) {
+				cameraY = background.getHeight() - camera.viewportHeight;
+			}
+			
+			x = oldX;
+			y = oldY;
 		}
 		
 		if (moving)
