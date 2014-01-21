@@ -16,6 +16,7 @@ public abstract class Character
 	protected Direction direction = Direction.DOWN;
 	protected boolean moving = false;
 	protected float stateTime = 0f;
+	protected float speed = 100f;
 	
 	protected enum Direction
 	{
@@ -77,11 +78,37 @@ public abstract class Character
 		sprite.setPosition(startX, startY);
 	}
 	
+	public void setPosition(float x, float y) {
+		sprite.setPosition(x, y);
+	}
+	
 	public void render(SpriteBatch batch)
 	{
 		sprite.draw(batch);
 	}
 	
-	public abstract void update();
+	/**
+	 * Will modify the currentLocation object to have the new location
+	 * @param deltaTime As reported by Graphics.getDeltaTime()
+	 * @param currentLocation The location of this Character on the current map
+	 * @param mapWidth The map width of the current map
+	 * @param mapHeight The map height of the current map
+	 */
+	public abstract void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight);
+	
+	public float getSpeed() {
+		return speed;
+	}
+	
+	public void setSpeed(float newSpeed) {
+		this.speed = newSpeed;
+	}
+	
+	/**
+	 * May be useful with debugging. Likely will be out of date if Character class is updated.
+	 */
+	public String toString() {
+		return String.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving=%s, stateTime=%lf}", name, sprite, direction, moving, stateTime);
+	}
 	
 }

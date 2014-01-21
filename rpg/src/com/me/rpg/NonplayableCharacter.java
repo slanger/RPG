@@ -1,6 +1,5 @@
 package com.me.rpg;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Timer;
@@ -14,30 +13,30 @@ public class NonplayableCharacter extends Character
 		Timer.schedule(new moveTask(), 1, 1);
 	}
 	
-	public void update()
+	public void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight)
 	{
-		float deltaTime = Gdx.graphics.getDeltaTime();
-		float x = sprite.getX();
-		float y = sprite.getY();
+		float x = currentLocation.getX();
+		float y = currentLocation.getY();
+		float speed = getSpeed();
 		stateTime += deltaTime;
 		
 		TextureRegion currentFrame = null;
 		switch (direction)
 		{
 		case RIGHT:
-			x += 100 * deltaTime;
+			x += speed * deltaTime;
 			currentFrame = moving ? rightWalkAnimation.getKeyFrame(stateTime, true) : rightIdle;
 			break;
 		case LEFT:
-			x -= 100 * deltaTime;
+			x -= speed * deltaTime;
 			currentFrame = moving ? leftWalkAnimation.getKeyFrame(stateTime, true) : leftIdle;
 			break;
 		case UP:
-			y += 100 * deltaTime;
+			y += speed * deltaTime;
 			currentFrame = moving ? upWalkAnimation.getKeyFrame(stateTime, true) : upIdle;
 			break;
 		case DOWN:
-			y -= 100 * deltaTime;
+			y -= speed * deltaTime;
 			currentFrame = moving ? downWalkAnimation.getKeyFrame(stateTime, true) : downIdle;
 			break;
 		}
@@ -47,9 +46,9 @@ public class NonplayableCharacter extends Character
 		{
 			x = 0;
 		}
-		if (x > RPG.camera.viewportWidth - sprite.getWidth())
+		if (x > mapWidth - sprite.getWidth())
 		{
-			x = RPG.camera.viewportWidth - sprite.getWidth();
+			x = mapWidth - sprite.getWidth();
 		}
 		
 		// clamp y
@@ -57,14 +56,15 @@ public class NonplayableCharacter extends Character
 		{
 			y = 0;
 		}
-		if (y > RPG.camera.viewportHeight - sprite.getHeight())
+		if (y > mapHeight - sprite.getHeight())
 		{
-			y = RPG.camera.viewportHeight - sprite.getHeight();
+			y = mapHeight - sprite.getHeight();
 		}
 		
 		if (moving)
 		{
-			sprite.setPosition(x, y);
+			currentLocation.setX(x);
+			currentLocation.setY(y);
 		}
 		if (currentFrame != null)
 		{
