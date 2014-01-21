@@ -105,8 +105,7 @@ public class RPG implements ApplicationListener
 				cameraY = background.getHeight() - camera.viewportHeight;
 			}
 			
-			x = oldX;
-			y = oldY;
+			hero.sprite.setPosition(oldX, oldY);
 		}
 	}
 	
