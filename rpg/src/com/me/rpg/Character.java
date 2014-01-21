@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character
 {
@@ -102,6 +103,14 @@ public abstract class Character
 	
 	public void setSpeed(float newSpeed) {
 		this.speed = newSpeed;
+	}
+	
+	public float getSpriteWidth() {
+		return sprite.getWidth();
+	}
+	
+	public float getSpriteHeight() {
+		return sprite.getHeight();
 	}
 	
 	/**

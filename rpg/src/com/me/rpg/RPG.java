@@ -31,8 +31,8 @@ public class RPG implements ApplicationListener
 		
 		// map setup
 		Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
-		Coordinate centerLeft = new Coordinate(background.getWidth() / 2 - camera.viewportWidth/6, background.getHeight() / 3);
-		Coordinate centerRight = new Coordinate(background.getWidth() / 2 + camera.viewportWidth/6, background.getHeight() / 3);
+		Coordinate centerLeft = new Coordinate(background.getWidth() / 3, background.getHeight() / 2);
+		Coordinate centerRight = new Coordinate(background.getWidth() * 2 / 3, background.getHeight() / 2);
 		map = new Map(hero, centerLeft, background);
 		map.addCharacterToMap(villain, centerRight);
 	}
@@ -49,7 +49,7 @@ public class RPG implements ApplicationListener
 	@Override
 	public void render()
 	{
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		camera.update();

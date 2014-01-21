@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Map {
 	
@@ -40,8 +41,9 @@ public class Map {
 		float focusY = focusedCoordinate.getY();
 		float bottomLeftX = focusX - viewportWidth/2;
 		float bottomLeftY = focusY - viewportHeight/2;
+		int width = Math.min(mapWidth, viewportWidth);
+		int height = Math.min(mapHeight, viewportHeight);
 		
-		// TODO below calculations are valid only if image is bigger than the viewport.
 		if (bottomLeftX > mapWidth - viewportWidth) {
 			bottomLeftX = mapWidth - viewportWidth;
 		}
@@ -55,22 +57,28 @@ public class Map {
 		if (bottomLeftY < 0) {
 			bottomLeftY = 0;
 		}
-		// end disclaimer
+		float offsetX = Math.max(0f, viewportWidth/2 - mapWidth/2);
+		float offsetY = Math.max(0f, viewportHeight/2 - mapHeight/2);
 		
+		int drawnX = (int)bottomLeftX;
+		int drawnY = (mapHeight > viewportHeight ? (mapHeight - viewportHeight) - (int)bottomLeftY : (int)bottomLeftY);
 		// NOTE:  There is a little bit of a flip going on here with the Y axis because the Image has (0,0) in the topleft corner, axis down and right
 		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
-		batch.draw(backgroundImage, 0, 0, (int)bottomLeftX, (mapHeight - viewportHeight) - (int)bottomLeftY, viewportWidth, viewportHeight);
+		batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
 		//System.err.printf("bottomLeftX=%f, bottomLeftRight=%f.  charLoc=%s\n", bottomLeftX, bottomLeftY, focusedCoordinate);
 		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
+		Rectangle cameraBounds = new Rectangle(0f, 0f, viewportWidth, viewportHeight);
 		while (iter.hasNext()) {
 			Entry<Character, Coordinate> entry = iter.next();
 			Character selected = entry.getKey();
 			Coordinate selectedLocation = entry.getValue();
 			float selectedX = selectedLocation.getX();
 			float selectedY = selectedLocation.getY();
+			float charWidth = selected.getSpriteWidth();
+			float charHeight = selected.getSpriteHeight();
+			selected.setPosition(selectedX - bottomLeftX + offsetX - charWidth/2, selectedY - bottomLeftY + offsetY - charHeight/2);
 			// TODO this calculation is not quite right for characters on the edge of what is being drawn as the map.
-			if (bottomLeftX <= selectedX && selectedX <= (bottomLeftX + viewportWidth) && bottomLeftY <= selectedY && selectedY <= (bottomLeftY + viewportHeight)) {
-				selected.setPosition(selectedX - bottomLeftX, selectedY - bottomLeftY);
+			if (selected.sprite.getBoundingRectangle().overlaps(cameraBounds)) {
 				selected.render(batch);
 			}
 		}

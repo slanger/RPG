@@ -15,8 +15,8 @@ public class NonplayableCharacter extends Character
 	
 	public void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight)
 	{
-		float x = currentLocation.getX();
-		float y = currentLocation.getY();
+		float x = currentLocation.getX() - getSpriteWidth()/2;
+		float y = currentLocation.getY() - getSpriteHeight()/2;
 		float speed = getSpeed();
 		stateTime += deltaTime;
 		
@@ -63,8 +63,8 @@ public class NonplayableCharacter extends Character
 		
 		if (moving)
 		{
-			currentLocation.setX(x);
-			currentLocation.setY(y);
+			currentLocation.setX(x + getSpriteWidth()/2);
+			currentLocation.setY(y + getSpriteHeight()/2);
 		}
 		if (currentFrame != null)
 		{
