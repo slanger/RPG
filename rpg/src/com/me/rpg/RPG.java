@@ -2,7 +2,6 @@ package com.me.rpg;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,12 +12,8 @@ public class RPG implements ApplicationListener
 	
 	public static OrthographicCamera camera;
 	public static Character hero, villain;
+	private Map map;
 	private SpriteBatch batch;
-	// camera scrolling
-	private boolean cameraScrollEnable = false;
-	private Texture background;
-	private float cameraX, cameraY;
-	private float selectDelta = 0.0f;
 	
 	@Override
 	public void create()
@@ -30,13 +25,16 @@ public class RPG implements ApplicationListener
 		
 		Texture spritesheet = new Texture(Gdx.files.internal("hero.png"));
 		hero = new PlayableCharacter("Hero", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth / 3), (int)(camera.viewportHeight / 2), 0.15f);
+		hero.setSpeed(1000f);
 		spritesheet = new Texture(Gdx.files.internal("villain.png"));
 		villain = new NonplayableCharacter("Villain", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth * 2 / 3), (int)(camera.viewportHeight / 2), 0.15f);
 		
-		// background setup
-		background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
-		cameraX = background.getWidth() / 2;
-		cameraY = background.getHeight() / 2;
+		// map setup
+		Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
+		Coordinate centerLeft = new Coordinate(background.getWidth() / 3, background.getHeight() / 2);
+		Coordinate centerRight = new Coordinate(background.getWidth() * 2 / 3, background.getHeight() / 2);
+		map = new Map(hero, centerLeft, background);
+		map.addCharacterToMap(villain, centerRight);
 	}
 	
 	@Override
@@ -51,7 +49,7 @@ public class RPG implements ApplicationListener
 	@Override
 	public void render()
 	{
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		camera.update();
@@ -60,9 +58,8 @@ public class RPG implements ApplicationListener
 		batch.begin();
 		
 		// draw stuff here
-		batch.draw(background, 0, 0, (int)(cameraX - camera.viewportWidth/2), (int)(cameraY - camera.viewportHeight/2), (int)camera.viewportWidth, (int)camera.viewportHeight);
-		hero.render(batch);
-		villain.render(batch);
+		map.render(batch, (int)camera.viewportWidth, (int)camera.viewportHeight);
+		// overlays would get drawn after the map
 		
 		batch.end();
 		
@@ -72,6 +69,7 @@ public class RPG implements ApplicationListener
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
+<<<<<<< HEAD
 		float oldX = hero.sprite.getX();
 		float oldY = hero.sprite.getY();
 		
@@ -107,6 +105,9 @@ public class RPG implements ApplicationListener
 			
 			hero.sprite.setPosition(oldX, oldY);
 		}
+=======
+		map.update(deltaTime);
+>>>>>>> 02eef7d1dab2d86ea8e8d652cfa573fc2f820bc3
 	}
 	
 	@Override

@@ -13,24 +13,24 @@ public class PlayableCharacter extends Character
 		super(name, spritesheet, width, height, tileWidth, tileHeight, startX, startY, animationDuration);
 	}
 	
-	public void update()
+	public void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight)
 	{
-		float deltaTime = Gdx.graphics.getDeltaTime();
-		float x = sprite.getX();
-		float y = sprite.getY();
+		float x = currentLocation.getX() - getSpriteWidth()/2;
+		float y = currentLocation.getY() - getSpriteHeight()/2;
+		float speed = getSpeed();
 		moving = false;
 		stateTime += deltaTime;
 		
 		// update x
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
-			x -= 100 * deltaTime;
+			x -= speed * deltaTime;
 			direction = Direction.LEFT;
 			moving = true;
 		}
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
 		{
-			x += 100 * deltaTime;
+			x += speed * deltaTime;
 			direction = Direction.RIGHT;
 			moving = true;
 		}
@@ -38,21 +38,21 @@ public class PlayableCharacter extends Character
 		{
 			x = 0;
 		}
-		if (x > RPG.camera.viewportWidth - sprite.getWidth())
+		if (x > mapWidth - sprite.getWidth())
 		{
-			x = RPG.camera.viewportWidth - sprite.getWidth();
+			x = mapWidth - sprite.getWidth();
 		}
 		
 		// update y
 		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
-			y += 100 * deltaTime;
+			y += speed * deltaTime;
 			direction = Direction.UP;
 			moving = true;
 		}
 		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			y -= 100 * deltaTime;
+			y -= speed * deltaTime;
 			direction = Direction.DOWN;
 			moving = true;
 		}
@@ -60,15 +60,16 @@ public class PlayableCharacter extends Character
 		{
 			y = 0;
 		}
-		if (y > RPG.camera.viewportHeight - sprite.getHeight())
+		if (y > mapHeight - sprite.getHeight())
 		{
-			y = RPG.camera.viewportHeight - sprite.getHeight();
+			y = mapHeight - sprite.getHeight();
 		}
 		
 		TextureRegion currentFrame = null;
 		if (moving)
 		{
-			sprite.setPosition(x, y);
+			currentLocation.setX(x + getSpriteWidth()/2);
+			currentLocation.setY(y + getSpriteHeight()/2);
 		}
 		switch (direction)
 		{
