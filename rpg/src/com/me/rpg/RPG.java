@@ -52,7 +52,9 @@ public class RPG implements ApplicationListener
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+		// update before render
 		camera.update();
+		update();
 		
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
@@ -62,52 +64,12 @@ public class RPG implements ApplicationListener
 		// overlays would get drawn after the map
 		
 		batch.end();
-		
-		update();
 	}
 
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
-<<<<<<< HEAD
-		float oldX = hero.sprite.getX();
-		float oldY = hero.sprite.getY();
-		
-		hero.update();
-		villain.update();
-		
-		float x = hero.sprite.getX();
-		float y = hero.sprite.getY();
-		
-		selectDelta += deltaTime;
-		
-		// enable/disable camera scrolling
-		if (Gdx.input.isKeyPressed(Keys.C) && selectDelta > 0.5f)
-		{
-			cameraScrollEnable = !cameraScrollEnable;
-			selectDelta = 0.0f;
-		}
-		
-		// move camera
-		if (cameraScrollEnable) {
-			cameraX += (x - oldX);
-			cameraY -= (y - oldY);
-			if (cameraX < 0)
-				cameraX = 0;
-			else if (cameraX > background.getWidth() - camera.viewportWidth) {
-				cameraX = background.getWidth() - camera.viewportWidth;
-			}
-			if (cameraY < 0) {
-				cameraY = 0;
-			} else if (cameraY > background.getHeight() - camera.viewportHeight) {
-				cameraY = background.getHeight() - camera.viewportHeight;
-			}
-			
-			hero.sprite.setPosition(oldX, oldY);
-		}
-=======
 		map.update(deltaTime);
->>>>>>> 02eef7d1dab2d86ea8e8d652cfa573fc2f820bc3
 	}
 	
 	@Override

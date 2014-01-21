@@ -23,7 +23,7 @@ public class Map {
 		this.backgroundImage = backgroundImage;
 		mapWidth = backgroundImage.getWidth();
 		mapHeight = backgroundImage.getHeight();
-		charactersOnMap = new HashMap<>();
+		charactersOnMap = new HashMap<Character, Coordinate>();
 		addCharacterToMap(focusedCharacter, focusedCoordinate);
 	}
 	
