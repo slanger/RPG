@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import com.badlogic.gdx.graphics.Texture;
+//import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
@@ -16,7 +16,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Map {
 	
-	private Texture backgroundImage;
+	//private Texture backgroundImage;
 	private Character focusedCharacter;
 	private Coordinate focusedCoordinate;
 	private int mapWidth;
@@ -35,10 +35,10 @@ public class Map {
 		return tiledMap;
 	}
 	
-	public Map(Character focusedCharacter, Coordinate focusedCoordinate, Texture backgroundImage, TiledMap tiledMap, SpriteBatch batch) {
+	public Map(Character focusedCharacter, Coordinate focusedCoordinate, TiledMap tiledMap, SpriteBatch batch) {
 		this.focusedCharacter = focusedCharacter;
 		this.focusedCoordinate = focusedCoordinate;
-		this.backgroundImage = backgroundImage;
+		//this.backgroundImage = backgroundImage;
 		charactersOnMap = new HashMap<Character, Coordinate>();
 		addCharacterToMap(focusedCharacter, focusedCoordinate);
 		
@@ -76,8 +76,8 @@ public class Map {
 		float focusY = focusedCoordinate.getY();
 		float bottomLeftX = focusX - viewportWidth/2;
 		float bottomLeftY = focusY - viewportHeight/2;
-		int width = Math.min(mapWidth, viewportWidth);
-		int height = Math.min(mapHeight, viewportHeight);
+		//int width = Math.min(mapWidth, viewportWidth);
+		//int height = Math.min(mapHeight, viewportHeight);
 		
 		if (bottomLeftX > mapWidth - viewportWidth) {
 			bottomLeftX = mapWidth - viewportWidth;
@@ -96,8 +96,8 @@ public class Map {
 		//float offsetX = Math.min(something, mapWidth/2);
 		//float offsetY = Math.min(something, mapHeight/2);
 		
-		int drawnX = (int)bottomLeftX;
-		int drawnY = (mapHeight > viewportHeight ? (mapHeight - viewportHeight) - (int)bottomLeftY : (int)bottomLeftY);
+		//int drawnX = (int)bottomLeftX;
+		//int drawnY = (mapHeight > viewportHeight ? (mapHeight - viewportHeight) - (int)bottomLeftY : (int)bottomLeftY);
 		// NOTE:  There is a little bit of a flip going on here with the Y axis because the Image has (0,0) in the topleft corner, axis down and right
 		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
 		//batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
@@ -113,7 +113,7 @@ public class Map {
 		
 		//System.err.printf("bottomLeftX=%f, bottomLeftRight=%f.  charLoc=%s\n", bottomLeftX, bottomLeftY, focusedCoordinate);
 		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
-		Rectangle cameraBounds = new Rectangle(focusX-viewportWidth/2, focusY-viewportHeight/2, viewportWidth, viewportHeight);
+		Rectangle cameraBounds = new Rectangle(focusX - viewportWidth/2, focusY - viewportHeight/2, viewportWidth, viewportHeight);
 		while (iter.hasNext()) {
 			Entry<Character, Coordinate> entry = iter.next();
 			Character selected = entry.getKey();

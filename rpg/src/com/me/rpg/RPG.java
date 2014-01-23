@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -23,6 +24,7 @@ public class RPG implements ApplicationListener
 	public static OrthographicCamera camera;
 	
 	private SpriteBatch batch;
+	private BitmapFont debugFont;
 	
 	private Map map;
 	private Character player, npc;
@@ -36,6 +38,8 @@ public class RPG implements ApplicationListener
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		batch = new SpriteBatch();
+		debugFont = new BitmapFont();
+		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 		
 		Texture spritesheet = manager.get(playerTexturePath);
 		player = new PlayableCharacter("Player", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth / 3), (int)(camera.viewportHeight / 2), 0.15f);
@@ -44,7 +48,7 @@ public class RPG implements ApplicationListener
 		npc = new NonplayableCharacter("NPC", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth * 2 / 3), (int)(camera.viewportHeight / 2), 0.15f);
 		
 		// map setup
-		Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
+		//Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
 		//Coordinate centerLeft = new Coordinate(background.getWidth() / 3, background.getHeight() / 2);
 		//Coordinate centerRight = new Coordinate(background.getWidth() * 2 / 3, background.getHeight() / 2);
 		TiledMap tiledMap = manager.get(mapTmxPath, TiledMap.class);
@@ -58,7 +62,7 @@ public class RPG implements ApplicationListener
 		
 		Coordinate centerLeft = new Coordinate(width / 3, height / 2);
 		Coordinate centerRight = new Coordinate(width * 2 / 3, height / 2);
-		map = new Map(player, centerLeft, background, tiledMap, batch);
+		map = new Map(player, centerLeft, tiledMap, batch);
 		map.addCharacterToMap(npc, centerRight);
 	}
 	
@@ -68,7 +72,9 @@ public class RPG implements ApplicationListener
 		batch.dispose();
 		player.sprite.getTexture().dispose();
 		npc.sprite.getTexture().dispose();
+		debugFont.dispose();
 		// TODO not sure what else we need to dispose of. Maybe all textures, texture regions?
+		// --> Anything that implements Disposable needs to call dispose() here  -SML
 	}
 	
 	@Override
@@ -81,14 +87,18 @@ public class RPG implements ApplicationListener
 		camera.update();
 		update();
 		
-		//batch.setProjectionMatrix(camera.combined);
-		//batch.begin();
-		
-		// draw stuff here
+		// render map
 		map.render(batch, (int)camera.viewportWidth, (int)camera.viewportHeight);
-		// overlays would get drawn after the map
 		
-		//batch.end();
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		
+		// render HUD and overlays
+		float fpsX = camera.position.x - camera.viewportWidth / 2 + 15;
+		float fpsY = camera.position.y + camera.viewportHeight / 2 - 15;
+		debugFont.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), fpsX, fpsY);
+		
+		batch.end();
 	}
 
 	private void update()
