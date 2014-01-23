@@ -1,0 +1,40 @@
+
+input1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+example
+  rotate: false
+  xy: 0, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+example
+  rotate: false
+  xy: 0, 258
+  size: 384, 192
+  orig: 384, 192
+  offset: 0, 0
+  index: 4
+example
+  rotate: false
+  xy: 258, 0
+  size: 32, 40
+  orig: 32, 40
+  offset: 0, 0
+  index: 8
+example
+  rotate: false
+  xy: 258, 42
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 11
+example
+  rotate: false
+  xy: 258, 76
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 14

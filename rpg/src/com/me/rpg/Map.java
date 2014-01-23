@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Map {
@@ -16,15 +18,26 @@ public class Map {
 	private int mapWidth;
 	private int mapHeight;
 	private final HashMap<Character, Coordinate> charactersOnMap;
+	// Tiled map variables
+	private TiledMap tiledMap;
+	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	
-	public Map(Character focusedCharacter, Coordinate focusedCoordinate, Texture backgroundImage) {
+	private final int[] backgroundLayers = new int[] { 0, 1 }; // Tiled layers drawn behind characters
+	private final int[] foregroundLayers = new int[] { 2 }; // Tiled layers drawn in front of characters
+	
+	public Map(Character focusedCharacter, Coordinate focusedCoordinate, Texture backgroundImage, int width, int height, String tiledMapPath, SpriteBatch batch) {
 		this.focusedCharacter = focusedCharacter;
 		this.focusedCoordinate = focusedCoordinate;
 		this.backgroundImage = backgroundImage;
-		mapWidth = backgroundImage.getWidth();
-		mapHeight = backgroundImage.getHeight();
+		//mapWidth = backgroundImage.getWidth();
+		//mapHeight = backgroundImage.getHeight();
+		mapWidth = width;
+		mapHeight = height;
 		charactersOnMap = new HashMap<Character, Coordinate>();
 		addCharacterToMap(focusedCharacter, focusedCoordinate);
+		
+		tiledMap = RPG.manager.get(tiledMapPath);
+		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
 	}
 	
 	/**
@@ -64,7 +77,17 @@ public class Map {
 		int drawnY = (mapHeight > viewportHeight ? (mapHeight - viewportHeight) - (int)bottomLeftY : (int)bottomLeftY);
 		// NOTE:  There is a little bit of a flip going on here with the Y axis because the Image has (0,0) in the topleft corner, axis down and right
 		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
-		batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
+		//batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
+		
+		RPG.camera.position.set(drawnX, drawnY, 0);
+		RPG.camera.update();
+		tiledMapRenderer.setView(RPG.camera);
+		tiledMapRenderer.setView(RPG.camera.combined, offsetX, offsetY, width, height);
+		tiledMapRenderer.render(backgroundLayers);
+		
+		batch.setProjectionMatrix(RPG.camera.combined);
+		batch.begin();
+		
 		//System.err.printf("bottomLeftX=%f, bottomLeftRight=%f.  charLoc=%s\n", bottomLeftX, bottomLeftY, focusedCoordinate);
 		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
 		Rectangle cameraBounds = new Rectangle(0f, 0f, viewportWidth, viewportHeight);
@@ -77,11 +100,15 @@ public class Map {
 			float charWidth = selected.getSpriteWidth();
 			float charHeight = selected.getSpriteHeight();
 			selected.setPosition(selectedX - bottomLeftX + offsetX - charWidth/2, selectedY - bottomLeftY + offsetY - charHeight/2);
-			// TODO this calculation is not quite right for characters on the edge of what is being drawn as the map.
+			// TODO this calculation is not quite right for characters on the edge of what is being drawn on the map
 			if (selected.sprite.getBoundingRectangle().overlaps(cameraBounds)) {
 				selected.render(batch);
 			}
 		}
+		
+		batch.end();
+		
+		tiledMapRenderer.render(foregroundLayers);
 	}
 	
 	public void update(float deltaTime) {
@@ -97,7 +124,7 @@ public class Map {
 	public void removeCharacterFromMap(Character removeCharacter) {
 		Coordinate oldLocation = charactersOnMap.get(removeCharacter);
 		if (oldLocation == null) {
-			throw new RuntimeException("Character cannot be removed from map - it is not on the map. Data:" + removeCharacter);
+			throw new RuntimeException("Character cannot be removed from map - it is not on the map. Data: " + removeCharacter);
 		}
 		charactersOnMap.remove(removeCharacter);
 		if (focusedCharacter == removeCharacter) {
@@ -115,10 +142,10 @@ public class Map {
 	public void addCharacterToMap(Character newCharacter, Coordinate newLocation) {
 		Coordinate oldLocation = charactersOnMap.get(newCharacter);
 		if (newLocation == null) {
-			throw new RuntimeException("Cannot add the Character to the map - null location passed in.  Data: " + newCharacter);
+			throw new RuntimeException("Cannot add the Character to the map - null location passed in. Data: " + newCharacter);
 		}
 		if (oldLocation != null) {
-			throw new RuntimeException("Cannot add the Character to the map - it is already on the map. Data: OldLoc:" + oldLocation + " " + newCharacter + " " + newLocation);
+			throw new RuntimeException("Cannot add the Character to the map - it is already on the map. Data: OldLoc: " + oldLocation + " " + newCharacter + " " + newLocation);
 		}
 		charactersOnMap.put(newCharacter, newLocation);
 	}
@@ -126,7 +153,7 @@ public class Map {
 	public void setFocusedCharacter(Character newFocus) {
 		Coordinate oldLocation = charactersOnMap.get(newFocus);
 		if (oldLocation == null) {
-			throw new RuntimeException("Cannot set character to be focus if it is not already on the map.  Data: " + newFocus);
+			throw new RuntimeException("Cannot set character to be focus if it is not already on the map. Data: " + newFocus);
 		}
 		focusedCharacter = newFocus;
 		focusedCoordinate = oldLocation;
