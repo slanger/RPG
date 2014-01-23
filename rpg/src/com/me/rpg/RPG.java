@@ -49,8 +49,8 @@ public class RPG implements ApplicationListener
 		Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
 		//Coordinate centerLeft = new Coordinate(background.getWidth() / 3, background.getHeight() / 2);
 		//Coordinate centerRight = new Coordinate(background.getWidth() * 2 / 3, background.getHeight() / 2);
-		Coordinate centerLeft = new Coordinate(camera.viewportWidth / 3, camera.viewportHeight / 2);
-		Coordinate centerRight = new Coordinate(camera.viewportWidth * 2 / 3, camera.viewportHeight / 2);
+		Coordinate centerLeft = new Coordinate(MAP_WIDTH / 3, MAP_HEIGHT / 2);
+		Coordinate centerRight = new Coordinate(MAP_WIDTH * 2 / 3, MAP_HEIGHT / 2);
 		map = new Map(player, centerLeft, background, MAP_WIDTH, MAP_HEIGHT, mapTmxPath, batch);
 		map.addCharacterToMap(npc, centerRight);
 	}

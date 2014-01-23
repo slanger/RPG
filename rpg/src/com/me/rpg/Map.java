@@ -70,8 +70,9 @@ public class Map {
 		if (bottomLeftY < 0) {
 			bottomLeftY = 0;
 		}
-		float offsetX = Math.max(0f, viewportWidth/2 - mapWidth/2);
-		float offsetY = Math.max(0f, viewportHeight/2 - mapHeight/2);
+		
+		//float offsetX = Math.min(something, mapWidth/2);
+		//float offsetY = Math.min(something, mapHeight/2);
 		
 		int drawnX = (int)bottomLeftX;
 		int drawnY = (mapHeight > viewportHeight ? (mapHeight - viewportHeight) - (int)bottomLeftY : (int)bottomLeftY);
@@ -79,10 +80,10 @@ public class Map {
 		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
 		//batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
 		
-		RPG.camera.position.set(drawnX, drawnY, 0);
-		RPG.camera.update();
+		RPG.camera.position.set(focusX, focusY, 0);
+		//RPG.camera.update();
 		tiledMapRenderer.setView(RPG.camera);
-		tiledMapRenderer.setView(RPG.camera.combined, offsetX, offsetY, width, height);
+		//tiledMapRenderer.setView(RPG.camera.combined, 50, 50, width, height);
 		tiledMapRenderer.render(backgroundLayers);
 		
 		batch.setProjectionMatrix(RPG.camera.combined);
@@ -90,7 +91,7 @@ public class Map {
 		
 		//System.err.printf("bottomLeftX=%f, bottomLeftRight=%f.  charLoc=%s\n", bottomLeftX, bottomLeftY, focusedCoordinate);
 		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
-		Rectangle cameraBounds = new Rectangle(0f, 0f, viewportWidth, viewportHeight);
+		Rectangle cameraBounds = new Rectangle(focusX-viewportWidth/2, focusY-viewportHeight/2, viewportWidth, viewportHeight);
 		while (iter.hasNext()) {
 			Entry<Character, Coordinate> entry = iter.next();
 			Character selected = entry.getKey();
@@ -99,7 +100,7 @@ public class Map {
 			float selectedY = selectedLocation.getY();
 			float charWidth = selected.getSpriteWidth();
 			float charHeight = selected.getSpriteHeight();
-			selected.setPosition(selectedX - bottomLeftX + offsetX - charWidth/2, selectedY - bottomLeftY + offsetY - charHeight/2);
+			selected.setPosition(selectedX - charWidth/2, selectedY - charHeight/2);
 			// TODO this calculation is not quite right for characters on the edge of what is being drawn on the map
 			if (selected.sprite.getBoundingRectangle().overlaps(cameraBounds)) {
 				selected.render(batch);
