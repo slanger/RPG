@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -25,19 +26,28 @@ public class Map {
 	private final int[] backgroundLayers = new int[] { 0, 1 }; // Tiled layers drawn behind characters
 	private final int[] foregroundLayers = new int[] { 2 }; // Tiled layers drawn in front of characters
 	
-	public Map(Character focusedCharacter, Coordinate focusedCoordinate, Texture backgroundImage, int width, int height, String tiledMapPath, SpriteBatch batch) {
+	public TiledMap getTiledMap()
+	{
+		return tiledMap;
+	}
+	
+	public Map(Character focusedCharacter, Coordinate focusedCoordinate, Texture backgroundImage, TiledMap tiledMap, SpriteBatch batch) {
 		this.focusedCharacter = focusedCharacter;
 		this.focusedCoordinate = focusedCoordinate;
 		this.backgroundImage = backgroundImage;
-		//mapWidth = backgroundImage.getWidth();
-		//mapHeight = backgroundImage.getHeight();
-		mapWidth = width;
-		mapHeight = height;
 		charactersOnMap = new HashMap<Character, Coordinate>();
 		addCharacterToMap(focusedCharacter, focusedCoordinate);
 		
-		tiledMap = RPG.manager.get(tiledMapPath);
+		//tiledMap = RPG.manager.get(tiledMapPath);
+		this.tiledMap = tiledMap;
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
+		
+		// get map width and height from .tmx file
+		MapProperties mapProperties = tiledMap.getProperties();
+		int tileWidth = (Integer) mapProperties.get("tilewidth");
+		int tileHeight = (Integer) mapProperties.get("tileheight");
+		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
+		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
 	}
 	
 	/**

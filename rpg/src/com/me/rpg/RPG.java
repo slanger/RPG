@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
@@ -17,9 +18,6 @@ public class RPG implements ApplicationListener
 	private final String mapTmxPath = "maps/example.tmx";
 	private final String playerTexturePath = "hero.png";
 	private final String npcTexturePath = "villain.png";
-	
-	private final int MAP_WIDTH = 640;
-	private final int MAP_HEIGHT = 640;
 	
 	public static AssetManager manager = new AssetManager();
 	public static OrthographicCamera camera;
@@ -41,7 +39,7 @@ public class RPG implements ApplicationListener
 		
 		Texture spritesheet = manager.get(playerTexturePath);
 		player = new PlayableCharacter("Player", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth / 3), (int)(camera.viewportHeight / 2), 0.15f);
-		player.setSpeed(1000f);
+		player.setSpeed(200f);
 		spritesheet = manager.get(npcTexturePath);
 		npc = new NonplayableCharacter("NPC", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth * 2 / 3), (int)(camera.viewportHeight / 2), 0.15f);
 		
@@ -49,9 +47,18 @@ public class RPG implements ApplicationListener
 		Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
 		//Coordinate centerLeft = new Coordinate(background.getWidth() / 3, background.getHeight() / 2);
 		//Coordinate centerRight = new Coordinate(background.getWidth() * 2 / 3, background.getHeight() / 2);
-		Coordinate centerLeft = new Coordinate(MAP_WIDTH / 3, MAP_HEIGHT / 2);
-		Coordinate centerRight = new Coordinate(MAP_WIDTH * 2 / 3, MAP_HEIGHT / 2);
-		map = new Map(player, centerLeft, background, MAP_WIDTH, MAP_HEIGHT, mapTmxPath, batch);
+		TiledMap tiledMap = manager.get(mapTmxPath, TiledMap.class);
+		
+		// get map width and height
+		MapProperties mapProperties = tiledMap.getProperties();
+		int tileWidth = (Integer) mapProperties.get("tilewidth");
+		int tileHeight = (Integer) mapProperties.get("tileheight");
+		int width = ((Integer) mapProperties.get("width")) * tileWidth;
+		int height = ((Integer) mapProperties.get("height")) * tileHeight;
+		
+		Coordinate centerLeft = new Coordinate(width / 3, height / 2);
+		Coordinate centerRight = new Coordinate(width * 2 / 3, height / 2);
+		map = new Map(player, centerLeft, background, tiledMap, batch);
 		map.addCharacterToMap(npc, centerRight);
 	}
 	
