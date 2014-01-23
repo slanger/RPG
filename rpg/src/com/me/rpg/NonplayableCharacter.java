@@ -71,12 +71,21 @@ public class NonplayableCharacter extends Character
 		
 		// collision detection with objects on map
 		Rectangle boundingBox = new Rectangle(x, y, getSpriteWidth(), getSpriteHeight());
+		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, getSpriteWidth(), getSpriteHeight());
+		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, getSpriteWidth(), getSpriteHeight());
 		for (RectangleMapObject object : objects)
 		{
-			if (object.getRectangle().overlaps(boundingBox))
+			Rectangle r = object.getRectangle();
+			if (r.overlaps(boundingBox))
 			{
-				x = oldX;
-				y = oldY;
+				if (r.overlaps(boundingBoxWithNewY))
+				{
+					y = oldY;
+				}
+				if (r.overlaps(boundingBoxWithNewX))
+				{
+					x = oldX;
+				}
 			}
 		}
 
@@ -94,8 +103,14 @@ public class NonplayableCharacter extends Character
 			Rectangle r = new Rectangle(location.getX() - selected.getSpriteWidth()/2, location.getY() - selected.getSpriteHeight()/2, selected.getSpriteWidth(), selected.getSpriteHeight());
 			if (r.overlaps(boundingBox))
 			{
-				x = oldX;
-				y = oldY;
+				if (r.overlaps(boundingBoxWithNewY))
+				{
+					y = oldY;
+				}
+				if (r.overlaps(boundingBoxWithNewX))
+				{
+					x = oldX;
+				}
 			}
 		}
 		
