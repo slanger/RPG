@@ -6,7 +6,10 @@ import java.util.Map.Entry;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -19,6 +22,7 @@ public class Map {
 	private int mapWidth;
 	private int mapHeight;
 	private final HashMap<Character, Coordinate> charactersOnMap;
+	private RectangleMapObject[] objects;
 	// Tiled map variables
 	private TiledMap tiledMap;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
@@ -38,7 +42,6 @@ public class Map {
 		charactersOnMap = new HashMap<Character, Coordinate>();
 		addCharacterToMap(focusedCharacter, focusedCoordinate);
 		
-		//tiledMap = RPG.manager.get(tiledMapPath);
 		this.tiledMap = tiledMap;
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
 		
@@ -48,6 +51,15 @@ public class Map {
 		int tileHeight = (Integer) mapProperties.get("tileheight");
 		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
 		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
+		
+		// get collision objects
+		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
+		MapObjects mapObjects = collisionLayer.getObjects();
+		objects = new RectangleMapObject[mapObjects.getCount()];
+		for (int i = 0; i < objects.length; i++)
+		{
+			objects[i] = (RectangleMapObject) mapObjects.get(i);
+		}
 	}
 	
 	/**
@@ -128,7 +140,7 @@ public class Map {
 			Entry<Character, Coordinate> entry = iter.next();
 			Character selected = entry.getKey();
 			Coordinate location = entry.getValue();
-			selected.update(deltaTime, location, mapWidth, mapHeight);
+			selected.update(deltaTime, location, mapWidth, mapHeight, objects, charactersOnMap);
 		}
 	}
 	

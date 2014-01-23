@@ -1,10 +1,13 @@
 package com.me.rpg;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 
 public abstract class Character
 {
@@ -94,7 +97,7 @@ public abstract class Character
 	 * @param mapWidth The map width of the current map
 	 * @param mapHeight The map height of the current map
 	 */
-	public abstract void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight);
+	public abstract void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight, RectangleMapObject[] objects, HashMap<Character, Coordinate> characters);
 	
 	public float getSpeed() {
 		return speed;
@@ -115,6 +118,7 @@ public abstract class Character
 	/**
 	 * May be useful with debugging. Likely will be out of date if Character class is updated.
 	 */
+	@Override
 	public String toString() {
 		return String.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving=%s, stateTime=%lf}", name, sprite, direction, moving, stateTime);
 	}

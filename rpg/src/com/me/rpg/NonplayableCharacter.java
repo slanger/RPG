@@ -1,7 +1,13 @@
 package com.me.rpg;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 
 public class NonplayableCharacter extends Character
@@ -13,10 +19,12 @@ public class NonplayableCharacter extends Character
 		Timer.schedule(new moveTask(), 1, 1);
 	}
 	
-	public void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight)
+	public void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight, RectangleMapObject[] objects, HashMap<Character, Coordinate> characters)
 	{
-		float x = currentLocation.getX() - getSpriteWidth()/2;
-		float y = currentLocation.getY() - getSpriteHeight()/2;
+		float oldX = currentLocation.getX() - getSpriteWidth()/2;
+		float oldY = currentLocation.getY() - getSpriteHeight()/2;
+		float x = oldX;
+		float y = oldY;
 		float speed = getSpeed();
 		stateTime += deltaTime;
 		
@@ -59,6 +67,36 @@ public class NonplayableCharacter extends Character
 		if (y > mapHeight - sprite.getHeight())
 		{
 			y = mapHeight - sprite.getHeight();
+		}
+		
+		// collision detection with objects on map
+		Rectangle boundingBox = new Rectangle(x, y, getSpriteWidth(), getSpriteHeight());
+		for (RectangleMapObject object : objects)
+		{
+			if (object.getRectangle().overlaps(boundingBox))
+			{
+				x = oldX;
+				y = oldY;
+			}
+		}
+
+		// collision detection with characters
+		Iterator<Entry<Character, Coordinate>> iter = characters.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			Entry<Character, Coordinate> entry = iter.next();
+			Character selected = entry.getKey();
+			if (selected.equals(this))
+			{
+				continue;
+			}
+			Coordinate location = entry.getValue();
+			Rectangle r = new Rectangle(location.getX() - selected.getSpriteWidth()/2, location.getY() - selected.getSpriteHeight()/2, selected.getSpriteWidth(), selected.getSpriteHeight());
+			if (r.overlaps(boundingBox))
+			{
+				x = oldX;
+				y = oldY;
+			}
 		}
 		
 		if (moving)

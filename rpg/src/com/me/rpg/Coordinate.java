@@ -31,6 +31,7 @@ public class Coordinate {
 	/**
 	 * Prints the coordinate, X first, then Y
 	 */
+	@Override
 	public String toString() {
 		return String.format("(%f, %f)", x, y);
 	}
