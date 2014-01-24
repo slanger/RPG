@@ -1,6 +1,8 @@
 package com.me.rpg;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character
 {
@@ -23,21 +26,33 @@ public abstract class Character
 	
 	protected enum Direction
 	{
-		RIGHT	(0),
-		LEFT	(1),
-		UP		(2),
-		DOWN	(3);
+		RIGHT	(0,  1,  0),
+		LEFT	(1, -1,  0),
+		UP		(2,  0,  1),
+		DOWN	(3,  0, -1);
 		
-		int index;
+		private int index, dx, dy;
 		
-		Direction(int index)
+		private Direction(int index, int dx, int dy)
 		{
 			this.index = index;
+			this.dx = dx;
+			this.dy = dy;
 		}
 		
 		public int getIndex()
 		{
 			return index;
+		}
+		
+		public int getDx()
+		{
+			return dx;
+		}
+		
+		public int getDy()
+		{
+			return dy;
 		}
 		
 		public static Direction getDirection(int index)
@@ -53,7 +68,7 @@ public abstract class Character
 		}
 	}
 	
-	protected Character(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, int startX, int startY, float animationDuration)
+	protected Character(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
 	{
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth, tileHeight);
 		int columns = sheet[0].length;
@@ -78,10 +93,10 @@ public abstract class Character
 		downIdle = sheet[Direction.DOWN.getIndex()][0];
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
-		sprite.setPosition(startX, startY);
 	}
 	
-	public void setPosition(float x, float y) {
+	public void setPosition(float x, float y)
+	{
 		sprite.setPosition(x, y);
 	}
 	
@@ -97,7 +112,59 @@ public abstract class Character
 	 * @param mapWidth The map width of the current map
 	 * @param mapHeight The map height of the current map
 	 */
-	public abstract void update(float deltaTime, Coordinate currentLocation, int mapWidth, int mapHeight, RectangleMapObject[] objects, HashMap<Character, Coordinate> characters);
+	public abstract void update(float deltaTime, Map currentMap, Coordinate currentLocation);
+	
+	public Coordinate checkCollision(float x, float y, float oldX, float oldY, float width, float height, RectangleMapObject[] objectsOnMap, HashMap<Character, Coordinate> charactersOnMap)
+	{
+		Rectangle boundingBox = new Rectangle(x, y, width, height);
+		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
+		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, width, height);
+		Coordinate returnCoordinate = new Coordinate(x, y);
+		
+		// collision detection with objects on map
+		for (RectangleMapObject object : objectsOnMap)
+		{
+			Rectangle r = object.getRectangle();
+			if (r.overlaps(boundingBox))
+			{
+				if (r.overlaps(boundingBoxWithNewY))
+				{
+					returnCoordinate.setY(oldY);
+				}
+				if (r.overlaps(boundingBoxWithNewX))
+				{
+					returnCoordinate.setX(oldX);
+				}
+			}
+		}
+
+		// collision detection with characters
+		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			Entry<Character, Coordinate> entry = iter.next();
+			Character selected = entry.getKey();
+			if (selected.equals(this))
+			{
+				continue;
+			}
+			Coordinate location = entry.getValue();
+			Rectangle r = new Rectangle(location.getX() - selected.getSpriteWidth()/2, location.getY() - selected.getSpriteHeight()/2, selected.getSpriteWidth(), selected.getSpriteHeight());
+			if (r.overlaps(boundingBox))
+			{
+				if (r.overlaps(boundingBoxWithNewY))
+				{
+					returnCoordinate.setY(oldY);
+				}
+				if (r.overlaps(boundingBoxWithNewX))
+				{
+					returnCoordinate.setX(oldX);
+				}
+			}
+		}
+		
+		return returnCoordinate;
+	}
 	
 	public float getSpeed() {
 		return speed;

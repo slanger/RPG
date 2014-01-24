@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-//import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
@@ -14,15 +13,22 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Map {
+public class Map
+{
 	
-	//private Texture backgroundImage;
 	private Character focusedCharacter;
 	private Coordinate focusedCoordinate;
 	private int mapWidth;
 	private int mapHeight;
 	private final HashMap<Character, Coordinate> charactersOnMap;
-	private RectangleMapObject[] objects;
+	private RectangleMapObject[] objectsOnMap;
+	
+	// split the map into grid spaces to help with collision and context-sensitive actions
+	//private int gridSpaceWidth;
+	//private int gridSpaceHeight;
+	//private int gridWidth; // in number of grid spaces
+	//private int gridHeight; // in number of grid spaces
+	
 	// Tiled map variables
 	private TiledMap tiledMap;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
@@ -30,18 +36,33 @@ public class Map {
 	private final int[] backgroundLayers = new int[] { 0, 1 }; // Tiled layers drawn behind characters
 	private final int[] foregroundLayers = new int[] { 2 }; // Tiled layers drawn in front of characters
 	
+	public int getWidth()
+	{
+		return mapWidth;
+	}
+	
+	public int getHeight()
+	{
+		return mapHeight;
+	}
+	
 	public TiledMap getTiledMap()
 	{
 		return tiledMap;
 	}
 	
-	public Map(Character focusedCharacter, Coordinate focusedCoordinate, TiledMap tiledMap, SpriteBatch batch) {
-		this.focusedCharacter = focusedCharacter;
-		this.focusedCoordinate = focusedCoordinate;
-		//this.backgroundImage = backgroundImage;
-		charactersOnMap = new HashMap<Character, Coordinate>();
-		addCharacterToMap(focusedCharacter, focusedCoordinate);
-		
+	public HashMap<Character, Coordinate> getCharactersOnMap()
+	{
+		return charactersOnMap;
+	}
+	
+	public RectangleMapObject[] getObjectsOnMap()
+	{
+		return objectsOnMap;
+	}
+	
+	public Map(TiledMap tiledMap, SpriteBatch batch)
+	{
 		this.tiledMap = tiledMap;
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
 		
@@ -52,13 +73,21 @@ public class Map {
 		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
 		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
 		
+		// make grid in terms of map's tile width and tile height
+		//gridSpaceWidth = tileWidth;
+		//gridSpaceHeight = tileHeight;
+		//gridWidth = mapWidth / gridSpaceWidth;
+		//gridHeight = mapHeight / gridSpaceHeight;
+		
+		charactersOnMap = new HashMap<Character, Coordinate>();
+		
 		// get collision objects
 		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
 		MapObjects mapObjects = collisionLayer.getObjects();
-		objects = new RectangleMapObject[mapObjects.getCount()];
-		for (int i = 0; i < objects.length; i++)
+		objectsOnMap = new RectangleMapObject[mapObjects.getCount()];
+		for (int i = 0; i < objectsOnMap.length; i++)
 		{
-			objects[i] = (RectangleMapObject) mapObjects.get(i);
+			objectsOnMap[i] = (RectangleMapObject) mapObjects.get(i);
 		}
 	}
 	
@@ -71,11 +100,12 @@ public class Map {
 	 * @param viewportWidth The width of the camera
 	 * @param viewportHeight The height of the camera
 	 */
-	public void render(SpriteBatch batch, int viewportWidth, int viewportHeight) {
+	public void render(SpriteBatch batch, int viewportWidth, int viewportHeight)
+	{
 		float focusX = focusedCoordinate.getX();
 		float focusY = focusedCoordinate.getY();
-		float bottomLeftX = focusX - viewportWidth/2;
-		float bottomLeftY = focusY - viewportHeight/2;
+		float bottomLeftX = focusX - viewportWidth / 2;
+		float bottomLeftY = focusY - viewportHeight / 2;
 		//int width = Math.min(mapWidth, viewportWidth);
 		//int height = Math.min(mapHeight, viewportHeight);
 		
@@ -113,7 +143,7 @@ public class Map {
 		
 		//System.err.printf("bottomLeftX=%f, bottomLeftRight=%f.  charLoc=%s\n", bottomLeftX, bottomLeftY, focusedCoordinate);
 		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
-		Rectangle cameraBounds = new Rectangle(focusX - viewportWidth/2, focusY - viewportHeight/2, viewportWidth, viewportHeight);
+		Rectangle cameraBounds = new Rectangle(focusX - viewportWidth / 2, focusY - viewportHeight / 2, viewportWidth, viewportHeight);
 		while (iter.hasNext()) {
 			Entry<Character, Coordinate> entry = iter.next();
 			Character selected = entry.getKey();
@@ -122,7 +152,7 @@ public class Map {
 			float selectedY = selectedLocation.getY();
 			float charWidth = selected.getSpriteWidth();
 			float charHeight = selected.getSpriteHeight();
-			selected.setPosition(selectedX - charWidth/2, selectedY - charHeight/2);
+			selected.setPosition(selectedX - charWidth / 2, selectedY - charHeight / 2);
 			// TODO this calculation is not quite right for characters on the edge of what is being drawn on the map
 			if (selected.sprite.getBoundingRectangle().overlaps(cameraBounds)) {
 				selected.render(batch);
@@ -140,7 +170,7 @@ public class Map {
 			Entry<Character, Coordinate> entry = iter.next();
 			Character selected = entry.getKey();
 			Coordinate location = entry.getValue();
-			selected.update(deltaTime, location, mapWidth, mapHeight, objects, charactersOnMap);
+			selected.update(deltaTime, this, location);
 		}
 	}
 	
@@ -157,7 +187,7 @@ public class Map {
 	}
 	
 
-	public void addCharacterToMap(Character newCharacter, int x, int y) {
+	public void addCharacterToMap(Character newCharacter, float x, float y) {
 		Coordinate newLocation = new Coordinate(x, y);
 		addCharacterToMap(newCharacter, newLocation);
 	}
@@ -180,6 +210,17 @@ public class Map {
 		}
 		focusedCharacter = newFocus;
 		focusedCoordinate = oldLocation;
+	}
+	
+	public void addFocusedCharacterToMap(Character newFocusedCharacter, float x, float y)
+	{
+		addFocusedCharacterToMap(newFocusedCharacter, new Coordinate(x, y));
+	}
+	
+	public void addFocusedCharacterToMap(Character newFocusedCharacter, Coordinate newLocation)
+	{
+		addCharacterToMap(newFocusedCharacter, newLocation);
+		setFocusedCharacter(newFocusedCharacter);
 	}
 	
 }

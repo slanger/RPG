@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
@@ -42,28 +41,18 @@ public class RPG implements ApplicationListener
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 		
 		Texture spritesheet = manager.get(playerTexturePath);
-		player = new PlayableCharacter("Player", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth / 3), (int)(camera.viewportHeight / 2), 0.15f);
+		player = new PlayableCharacter("Player", spritesheet, 32, 32, 16, 16, 0.15f);
 		player.setSpeed(200f);
 		spritesheet = manager.get(npcTexturePath);
-		npc = new NonplayableCharacter("NPC", spritesheet, 32, 32, 16, 16, (int)(camera.viewportWidth * 2 / 3), (int)(camera.viewportHeight / 2), 0.15f);
+		npc = new NonplayableCharacter("NPC", spritesheet, 32, 32, 16, 16, 0.15f);
 		
 		// map setup
-		//Texture background = new Texture(Gdx.files.internal("ALTTP_bigmap.png"));
-		//Coordinate centerLeft = new Coordinate(background.getWidth() / 3, background.getHeight() / 2);
-		//Coordinate centerRight = new Coordinate(background.getWidth() * 2 / 3, background.getHeight() / 2);
 		TiledMap tiledMap = manager.get(mapTmxPath, TiledMap.class);
 		
-		// get map width and height
-		MapProperties mapProperties = tiledMap.getProperties();
-		int tileWidth = (Integer) mapProperties.get("tilewidth");
-		int tileHeight = (Integer) mapProperties.get("tileheight");
-		int width = ((Integer) mapProperties.get("width")) * tileWidth;
-		int height = ((Integer) mapProperties.get("height")) * tileHeight;
-		
-		Coordinate centerLeft = new Coordinate(width / 3, height / 2);
-		Coordinate centerRight = new Coordinate(width * 2 / 3, height / 2);
-		map = new Map(player, centerLeft, tiledMap, batch);
-		map.addCharacterToMap(npc, centerRight);
+		// create map and place characters on it
+		map = new Map(tiledMap, batch);
+		map.addFocusedCharacterToMap(player, map.getWidth() / 3, map.getHeight() / 2);
+		map.addCharacterToMap(npc, map.getWidth() * 2 / 3, map.getHeight() / 2);
 	}
 	
 	@Override
