@@ -51,7 +51,7 @@ public class RPG implements ApplicationListener
 		
 		// create map and place characters on it
 		map = new Map(tiledMap, batch);
-		map.addFocusedCharacterToMap(player, map.getWidth() / 3, map.getHeight() / 2);
+		map.addFocusedCharacterToMap(player, map.getWidth() *3 / 4, map.getHeight() / 2);
 		map.addCharacterToMap(npc, map.getWidth() * 2 / 3, map.getHeight() / 2);
 	}
 	
@@ -59,9 +59,9 @@ public class RPG implements ApplicationListener
 	public void dispose()
 	{
 		batch.dispose();
-		player.sprite.getTexture().dispose();
-		npc.sprite.getTexture().dispose();
 		debugFont.dispose();
+		manager.dispose();
+		map.dispose();
 		// TODO not sure what else we need to dispose of. Maybe all textures, texture regions?
 		// --> Anything that implements Disposable needs to call dispose() here  -SML
 	}

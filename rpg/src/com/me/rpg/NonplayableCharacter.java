@@ -13,10 +13,11 @@ public class NonplayableCharacter extends Character
 		Timer.schedule(new moveTask(), 1, 1);
 	}
 	
-	public void update(float deltaTime, Map currentMap, Coordinate currentLocation)
+	public void update(float deltaTime, Map currentMap)
 	{
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
+		Coordinate currentLocation = getLocation();
 		float oldX = currentLocation.getX() - spriteWidth / 2;
 		float oldY = currentLocation.getY() - spriteHeight / 2;
 		float x = oldX;
@@ -24,26 +25,26 @@ public class NonplayableCharacter extends Character
 		float speed = getSpeed();
 		int mapWidth = currentMap.getWidth();
 		int mapHeight = currentMap.getHeight();
-		stateTime += deltaTime;
+		addToStateTime(deltaTime);
 		
 		TextureRegion currentFrame = null;
-		switch (direction)
+		switch (getDirection())
 		{
 		case RIGHT:
 			x += speed * deltaTime;
-			currentFrame = moving ? rightWalkAnimation.getKeyFrame(stateTime, true) : rightIdle;
+			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(getStateTime(), true) : getRightIdle();
 			break;
 		case LEFT:
 			x -= speed * deltaTime;
-			currentFrame = moving ? leftWalkAnimation.getKeyFrame(stateTime, true) : leftIdle;
+			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(getStateTime(), true) : getLeftIdle();
 			break;
 		case UP:
 			y += speed * deltaTime;
-			currentFrame = moving ? upWalkAnimation.getKeyFrame(stateTime, true) : upIdle;
+			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(getStateTime(), true) : getUpIdle();
 			break;
 		case DOWN:
 			y -= speed * deltaTime;
-			currentFrame = moving ? downWalkAnimation.getKeyFrame(stateTime, true) : downIdle;
+			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(getStateTime(), true) : getDownIdle();
 			break;
 		}
 		
@@ -72,14 +73,14 @@ public class NonplayableCharacter extends Character
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
 
-		if (moving)
+		if (isMoving())
 		{
 			currentLocation.setX(x + spriteWidth / 2);
 			currentLocation.setY(y + spriteHeight / 2);
 		}
 		if (currentFrame != null)
 		{
-			sprite.setRegion(currentFrame);
+			getSprite().setRegion(currentFrame);
 		}
 	}
 	
@@ -93,12 +94,12 @@ public class NonplayableCharacter extends Character
 			int rand = (int)(Math.random() * 5);
 			if (rand > 3)
 			{
-				moving = false;
+				setMoving(false);
 			}
 			else
 			{
-				moving = true;
-				direction = Direction.getDirection(rand);
+				setMoving(true);
+				setDirection(Direction.getDirection(rand));
 			}
 		}
 		

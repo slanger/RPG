@@ -1,8 +1,7 @@
 package com.me.rpg;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map.Entry;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -15,58 +14,15 @@ import com.badlogic.gdx.math.Rectangle;
 public abstract class Character
 {
 	
-	protected String name;
-	protected Sprite sprite;
-	protected TextureRegion rightIdle, leftIdle, upIdle, downIdle;
-	protected Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation, downWalkAnimation;
-	protected Direction direction = Direction.DOWN;
-	protected boolean moving = false;
-	protected float stateTime = 0f;
-	protected float speed = 100f;
-	
-	protected enum Direction
-	{
-		RIGHT	(0,  1,  0),
-		LEFT	(1, -1,  0),
-		UP		(2,  0,  1),
-		DOWN	(3,  0, -1);
-		
-		private int index, dx, dy;
-		
-		private Direction(int index, int dx, int dy)
-		{
-			this.index = index;
-			this.dx = dx;
-			this.dy = dy;
-		}
-		
-		public int getIndex()
-		{
-			return index;
-		}
-		
-		public int getDx()
-		{
-			return dx;
-		}
-		
-		public int getDy()
-		{
-			return dy;
-		}
-		
-		public static Direction getDirection(int index)
-		{
-			for (Direction d : Direction.values())
-			{
-				if (d.getIndex() == index)
-				{
-					return d;
-				}
-			}
-			throw new RuntimeException("Could not find the Direction with index of " + index);
-		}
-	}
+	private String name;
+	private Sprite sprite;
+	private Coordinate location;
+	private TextureRegion rightIdle, leftIdle, upIdle, downIdle;
+	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation, downWalkAnimation;
+	private Direction direction = Direction.DOWN;
+	private boolean moving = false;
+	private float stateTime = 0f;
+	private float speed = 100f;
 	
 	protected Character(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
 	{
@@ -95,6 +51,98 @@ public abstract class Character
 		sprite = new Sprite(downIdle, 0, 0, width, height);
 	}
 	
+	protected String getName() {
+		return name;
+	}
+	
+	protected void setName(String name) {
+		this.name = name;
+	}
+	
+	protected Coordinate getLocation() {
+		return location;
+	}
+
+	protected void setLocation(Coordinate location) {
+		this.location = location;
+	}
+
+	protected Direction getDirection() {
+		return direction;
+	}
+
+	protected void setDirection(Direction direction) {
+		this.direction = direction;
+	}
+
+	protected boolean isMoving() {
+		return moving;
+	}
+
+	protected void setMoving(boolean moving) {
+		this.moving = moving;
+	}
+
+	protected float getStateTime() {
+		return stateTime;
+	}
+
+	protected void addToStateTime(float deltaTime) {
+		this.stateTime += deltaTime;
+	}
+
+	protected Sprite getSprite() {
+		return sprite;
+	}
+
+	protected TextureRegion getRightIdle() {
+		return rightIdle;
+	}
+
+	protected TextureRegion getLeftIdle() {
+		return leftIdle;
+	}
+
+	protected TextureRegion getUpIdle() {
+		return upIdle;
+	}
+
+	protected TextureRegion getDownIdle() {
+		return downIdle;
+	}
+
+	protected Animation getRightWalkAnimation() {
+		return rightWalkAnimation;
+	}
+
+	protected Animation getLeftWalkAnimation() {
+		return leftWalkAnimation;
+	}
+
+	protected Animation getUpWalkAnimation() {
+		return upWalkAnimation;
+	}
+
+	protected Animation getDownWalkAnimation() {
+		return downWalkAnimation;
+	}
+
+	public float getSpeed() {
+		return speed;
+	}
+	
+	public void setSpeed(float newSpeed) {
+		this.speed = newSpeed;
+	}
+	
+	public float getSpriteWidth() {
+		return sprite.getWidth();
+	}
+	
+	public float getSpriteHeight() {
+		return sprite.getHeight();
+	}
+	
 	public void setPosition(float x, float y)
 	{
 		sprite.setPosition(x, y);
@@ -112,9 +160,9 @@ public abstract class Character
 	 * @param mapWidth The map width of the current map
 	 * @param mapHeight The map height of the current map
 	 */
-	public abstract void update(float deltaTime, Map currentMap, Coordinate currentLocation);
+	public abstract void update(float deltaTime, Map currentMap);
 	
-	public Coordinate checkCollision(float x, float y, float oldX, float oldY, float width, float height, RectangleMapObject[] objectsOnMap, HashMap<Character, Coordinate> charactersOnMap)
+	public Coordinate checkCollision(float x, float y, float oldX, float oldY, float width, float height, RectangleMapObject[] objectsOnMap, ArrayList<Character> charactersOnMap)
 	{
 		Rectangle boundingBox = new Rectangle(x, y, width, height);
 		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
@@ -139,17 +187,20 @@ public abstract class Character
 		}
 
 		// collision detection with characters
-		Iterator<Entry<Character, Coordinate>> iter = charactersOnMap.entrySet().iterator();
+		Iterator<Character> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
 		{
-			Entry<Character, Coordinate> entry = iter.next();
-			Character selected = entry.getKey();
+			Character selected = iter.next();
 			if (selected.equals(this))
 			{
 				continue;
 			}
-			Coordinate location = entry.getValue();
-			Rectangle r = new Rectangle(location.getX() - selected.getSpriteWidth()/2, location.getY() - selected.getSpriteHeight()/2, selected.getSpriteWidth(), selected.getSpriteHeight());
+			Coordinate location = selected.getLocation();
+			float tempWidth = selected.getSpriteWidth();
+			float tempHeight = selected.getSpriteHeight();
+			float tempX = location.getX() - tempWidth / 2;
+			float tempY = location.getY() - tempHeight / 2;
+			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
 			if (r.overlaps(boundingBox))
 			{
 				if (r.overlaps(boundingBoxWithNewY))
@@ -164,22 +215,6 @@ public abstract class Character
 		}
 		
 		return returnCoordinate;
-	}
-	
-	public float getSpeed() {
-		return speed;
-	}
-	
-	public void setSpeed(float newSpeed) {
-		this.speed = newSpeed;
-	}
-	
-	public float getSpriteWidth() {
-		return sprite.getWidth();
-	}
-	
-	public float getSpriteHeight() {
-		return sprite.getHeight();
 	}
 	
 	/**

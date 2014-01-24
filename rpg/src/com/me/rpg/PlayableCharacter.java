@@ -13,10 +13,11 @@ public class PlayableCharacter extends Character
 		super(name, spritesheet, width, height, tileWidth, tileHeight, animationDuration);
 	}
 	
-	public void update(float deltaTime, Map currentMap, Coordinate currentLocation)
+	public void update(float deltaTime, Map currentMap)
 	{
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
+		Coordinate currentLocation = getLocation();
 		float oldX = currentLocation.getX() - spriteWidth / 2;
 		float oldY = currentLocation.getY() - spriteHeight / 2;
 		float x = oldX;
@@ -24,21 +25,21 @@ public class PlayableCharacter extends Character
 		float speed = getSpeed();
 		int mapWidth = currentMap.getWidth();
 		int mapHeight = currentMap.getHeight();
-		moving = false;
-		stateTime += deltaTime;
+		setMoving(false);
+		addToStateTime(deltaTime);
 		
 		// update x
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
 			x -= speed * deltaTime;
-			direction = Direction.LEFT;
-			moving = true;
+			setDirection(Direction.LEFT);
+			setMoving(true);
 		}
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
 		{
 			x += speed * deltaTime;
-			direction = Direction.RIGHT;
-			moving = true;
+			setDirection(Direction.RIGHT);
+			setMoving(true);
 		}
 		
 		// clamp x
@@ -55,14 +56,14 @@ public class PlayableCharacter extends Character
 		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
 			y += speed * deltaTime;
-			direction = Direction.UP;
-			moving = true;
+			setDirection(Direction.UP);
+			setMoving(true);
 		}
 		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
 			y -= speed * deltaTime;
-			direction = Direction.DOWN;
-			moving = true;
+			setDirection(Direction.DOWN);
+			setMoving(true);
 		}
 		
 		// clamp y
@@ -79,31 +80,30 @@ public class PlayableCharacter extends Character
 		Coordinate newCoordinate = checkCollision(x, y, oldX, oldY, spriteWidth, spriteHeight, currentMap.getObjectsOnMap(), currentMap.getCharactersOnMap());
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
-		
 		TextureRegion currentFrame = null;
-		if (moving)
+		if (isMoving())
 		{
 			currentLocation.setX(x + spriteWidth / 2);
 			currentLocation.setY(y + spriteHeight / 2);
 		}
-		switch (direction)
+		switch (getDirection())
 		{
 		case RIGHT:
-			currentFrame = moving ? rightWalkAnimation.getKeyFrame(stateTime, true) : rightIdle;
+			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(getStateTime(), true) : getRightIdle();
 			break;
 		case LEFT:
-			currentFrame = moving ? leftWalkAnimation.getKeyFrame(stateTime, true) : leftIdle;
+			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(getStateTime(), true) : getLeftIdle();
 			break;
 		case UP:
-			currentFrame = moving ? upWalkAnimation.getKeyFrame(stateTime, true) : upIdle;
+			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(getStateTime(), true) : getUpIdle();
 			break;
 		case DOWN:
-			currentFrame = moving ? downWalkAnimation.getKeyFrame(stateTime, true) : downIdle;
+			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(getStateTime(), true) : getDownIdle();
 			break;
 		}
 		if (currentFrame != null)
 		{
-			sprite.setRegion(currentFrame);
+			getSprite().setRegion(currentFrame);
 		}
 	}
 	
