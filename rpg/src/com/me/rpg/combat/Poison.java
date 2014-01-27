@@ -19,8 +19,5 @@ public class Poison extends StatusEffect {
 		return false;
 	}
 	
-	@Override
-	protected Object clone() {
-		
-	}
+	// maybe want some Boilerplate - prototype pattern here.  Poison (or other stuff) needs only one set of animation, but many different configs
 }

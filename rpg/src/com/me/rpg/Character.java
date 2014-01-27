@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.combat.Weapon;
 
 public abstract class Character
 {
@@ -23,6 +24,9 @@ public abstract class Character
 	private boolean moving = false;
 	private float stateTime = 0f;
 	private float speed = 100f;
+	
+	// Combat stuff
+	protected Weapon weaponSlot;
 	
 	protected Character(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
 	{
@@ -151,6 +155,8 @@ public abstract class Character
 	public void render(SpriteBatch batch)
 	{
 		sprite.draw(batch);
+		if (weaponSlot != null)
+			weaponSlot.render(sprite.getBoundingRectangle(), getDirection(), batch);
 	}
 	
 	/**
@@ -223,6 +229,14 @@ public abstract class Character
 	@Override
 	public String toString() {
 		return String.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving=%s, stateTime=%lf}", name, sprite, direction, moving, stateTime);
+	}
+
+	/**
+	 * Likely insufficient implementation of equip
+	 * @param sword
+	 */
+	public void equip(Weapon weapon) {
+		this.weaponSlot = weapon;
 	}
 	
 }

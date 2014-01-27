@@ -15,6 +15,18 @@ public class PlayableCharacter extends Character
 	
 	public void update(float deltaTime, Map currentMap)
 	{
+		// attack thing
+		if (Gdx.input.isKeyPressed(Keys.A)) {
+			if (weaponSlot != null) {
+				weaponSlot.doAttack();
+			}
+		}
+		
+		if (weaponSlot != null) {
+			weaponSlot.update(deltaTime);
+		}
+		
+		
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
 		Coordinate currentLocation = getLocation();

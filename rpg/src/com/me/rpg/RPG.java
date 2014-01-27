@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.me.rpg.combat.MeleeWeapon;
+import com.me.rpg.combat.Weapon;
 
 public class RPG implements ApplicationListener
 {
@@ -53,6 +55,11 @@ public class RPG implements ApplicationListener
 		map = new Map(tiledMap, batch);
 		map.addFocusedCharacterToMap(player, map.getWidth() *3 / 4, map.getHeight() / 2);
 		map.addCharacterToMap(npc, map.getWidth() * 2 / 3, map.getHeight() / 2);
+		
+		// attack test stuff
+		Texture swordSprite = manager.get("lame_sword.png");
+		Weapon sword = new MeleeWeapon("LameSword", swordSprite, 32, 16, 32, 16, 0.5f);
+		player.equip(sword);
 	}
 	
 	@Override
@@ -123,6 +130,7 @@ public class RPG implements ApplicationListener
 		// load textures
 		manager.load(playerTexturePath, Texture.class);
 		manager.load(npcTexturePath, Texture.class);
+		manager.load("lame_sword.png", Texture.class);
 		
 		manager.update();
 		manager.finishLoading();
