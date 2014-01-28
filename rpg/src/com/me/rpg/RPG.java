@@ -63,7 +63,7 @@ public class RPG implements Screen
 		manager.dispose();
 		map.dispose();
 		// TODO not sure what else we need to dispose of. Maybe all textures, texture regions?
-		// --> Anything that implements Disposable needs to call dispose() here  -SML
+		// --> Anything that implements Disposable needs to call dispose() here  -Mark
 	}
 	
 	@Override

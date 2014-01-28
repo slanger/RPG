@@ -1,16 +1,36 @@
 package com.me.rpg;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Timer;
 
 public class NonplayableCharacter extends Character
 {
 	
+	private boolean isHappy = false;
+	
 	public NonplayableCharacter(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight, animationDuration);
 		Timer.schedule(new moveTask(), 1, 1);
+	}
+	
+	@Override
+	public void render(SpriteBatch batch)
+	{
+		if (isHappy)
+		{
+			Color oldColor = new Color(getSprite().getColor());
+			getSprite().setColor(new Color(0, 1, 0, oldColor.a));
+			getSprite().draw(batch);
+			getSprite().setColor(oldColor);
+		}
+		else
+		{
+			getSprite().draw(batch);
+		}
 	}
 	
 	public void update(float deltaTime, Map currentMap)
@@ -103,6 +123,31 @@ public class NonplayableCharacter extends Character
 			}
 		}
 		
+	}
+	
+	private class changeColorTask extends Timer.Task
+	{
+		
+		public void run()
+		{
+			Color c = getSprite().getColor();
+			float a = c.a;
+			a -= 0.1f;
+			if (a <= 0f)
+			{
+				isHappy = false;
+				a = 1f;
+				this.cancel();
+			}
+			getSprite().setColor(new Color(c.r, c.g, c.b, a));
+		}
+		
+	}
+	
+	public void acceptGoodAction(Character characterDoingAction)
+	{
+		isHappy = true;
+		Timer.schedule(new changeColorTask(), 1, 0.5f);
 	}
 	
 }

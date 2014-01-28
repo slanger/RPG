@@ -26,6 +26,7 @@ public abstract class Character
 	
 	protected Character(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
 	{
+		setName(name);
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth, tileHeight);
 		int columns = sheet[0].length;
 		TextureRegion[] rightWalkFrames = new TextureRegion[columns];
@@ -67,6 +68,14 @@ public abstract class Character
 		this.location = location;
 	}
 
+	protected float getX() {
+		return location.getX();
+	}
+	
+	protected float getY() {
+		return location.getY();
+	}
+	
 	protected Direction getDirection() {
 		return direction;
 	}
@@ -216,6 +225,40 @@ public abstract class Character
 		
 		return returnCoordinate;
 	}
+	
+	/**
+	 * A collision check that only checks characters.
+	 * For example, you can check if a weapon's hitbox collided with any
+	 * characters without having to worry about other objects on the map.
+	 * Returns a reference to a Character object if the input hitbox collides
+	 * with the Character's hitbox.
+	 * Returns null otherwise
+	 */
+	public Character checkCharacterCollision(Rectangle hitbox, ArrayList<Character> charactersOnMap)
+	{
+		Iterator<Character> iter = charactersOnMap.iterator();
+		while (iter.hasNext())
+		{
+			Character selected = iter.next();
+			if (selected.equals(this))
+			{
+				continue;
+			}
+			Coordinate location = selected.getLocation();
+			float tempWidth = selected.getSpriteWidth();
+			float tempHeight = selected.getSpriteHeight();
+			float tempX = location.getX() - tempWidth / 2;
+			float tempY = location.getY() - tempHeight / 2;
+			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
+			if (hitbox.overlaps(r))
+			{
+				return selected;
+			}
+		}
+		return null;
+	}
+	
+	public abstract void acceptGoodAction(Character characterDoingAction);
 	
 	/**
 	 * May be useful with debugging. Likely will be out of date if Character class is updated.

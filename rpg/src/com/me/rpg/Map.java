@@ -20,7 +20,7 @@ public class Map implements Disposable
 	private int mapWidth;
 	private int mapHeight;
 	private final ArrayList<Character> charactersOnMap;
-	private RectangleMapObject[] objectsOnMap;
+	private final RectangleMapObject[] objectsOnMap;
 	
 	// split the map into grid spaces to help with collision and context-sensitive actions
 	//private int gridSpaceWidth;
