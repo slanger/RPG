@@ -11,8 +11,8 @@ public class Main
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "RPG";
 		cfg.useGL20 = true;
-		cfg.width = 400;
-		cfg.height = 400;
+		cfg.width = 600;
+		cfg.height = 600;
 		
 		new LwjglApplication(new RPG(), cfg);
 	}

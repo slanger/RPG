@@ -8,6 +8,7 @@ public class MeleeWeapon extends Weapon {
 	
 	public MeleeWeapon(String string, Texture swordSprite, int width, int height, int tileWidth,
 			int tileHeight, float animationDuration) {
+		
 		TextureRegion[][] sheet = TextureRegion.split(swordSprite, tileWidth, tileHeight);
 		Sprite sword = new Sprite(sheet[0][0], 0, 0, width, height);
 		setSprite(sword);
@@ -16,11 +17,11 @@ public class MeleeWeapon extends Weapon {
 	}
 	
 	protected void setStatsDefault() {
-		speed = .25f;
-		fireRate = 0.1f;
+		speed = 0.3f;
+		fireRate = 0.3f;
 		range = 15;
 		power = 50;
-		attacking = false;
+		setAttacking(false);
 		stateTime = 0f;
 	}
 	

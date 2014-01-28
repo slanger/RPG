@@ -55,6 +55,10 @@ public class RPG implements ApplicationListener
 		map = new Map(tiledMap, batch);
 		map.addFocusedCharacterToMap(player, map.getWidth() *3 / 4, map.getHeight() / 2);
 		map.addCharacterToMap(npc, map.getWidth() * 2 / 3, map.getHeight() / 2);
+		for (int i = 0; i < 5; ++i) {
+			npc = new NonplayableCharacter("NPC" + i, spritesheet, 32, 32, 16, 16, 0.15f);
+			map.addCharacterToMap(npc, map.getWidth() * i / 5, map.getHeight() * i / 5);
+		}
 		
 		// attack test stuff
 		Texture swordSprite = manager.get("lame_sword.png");

@@ -111,21 +111,27 @@ public class Map implements Disposable
 		float bottomLeftY = focusY - viewportHeight / 2;
 		//int width = Math.min(mapWidth, viewportWidth);
 		//int height = Math.min(mapHeight, viewportHeight);
-		
-		if (bottomLeftX > mapWidth - viewportWidth) {
-			bottomLeftX = mapWidth - viewportWidth;
-		}
-		if (bottomLeftX < 0) {
-			bottomLeftX = 0;
-		}
-		
-		if (bottomLeftY > mapHeight - viewportHeight) {
-			bottomLeftY = mapHeight - viewportHeight;
-		}
-		if (bottomLeftY < 0) {
-			bottomLeftY = 0;
+		if (mapWidth >= viewportWidth) {
+			if (bottomLeftX > mapWidth - viewportWidth) {
+				bottomLeftX = mapWidth - viewportWidth;
+			}
+			if (bottomLeftX < 0) {
+				bottomLeftX = 0;
+			}
+		} else { // handles screen larger than map
+			bottomLeftX = (mapWidth - viewportWidth) / 2;
 		}
 		
+		if (mapHeight >= viewportHeight) {
+			if (bottomLeftY > mapHeight - viewportHeight) {
+				bottomLeftY = mapHeight - viewportHeight;
+			}
+			if (bottomLeftY < 0) {
+				bottomLeftY = 0;
+			}
+		} else {
+			bottomLeftY = (mapHeight - viewportHeight) / 2;
+		}
 		//float offsetX = Math.min(something, mapWidth/2);
 		//float offsetY = Math.min(something, mapHeight/2);
 		
@@ -135,7 +141,7 @@ public class Map implements Disposable
 		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
 		//batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
 		
-		RPG.camera.position.set(focusX, focusY, 0);
+		RPG.camera.position.set(bottomLeftX + viewportWidth/2, bottomLeftY + viewportHeight/2, 0);
 		//RPG.camera.update();
 		tiledMapRenderer.setView(RPG.camera);
 		//tiledMapRenderer.setView(RPG.camera.combined, 50, 50, width, height);
@@ -146,7 +152,7 @@ public class Map implements Disposable
 		
 		//System.err.printf("bottomLeftX=%f, bottomLeftRight=%f.  charLoc=%s\n", bottomLeftX, bottomLeftY, focusedCoordinate);
 		Iterator<Character> iter = charactersOnMap.iterator();
-		Rectangle cameraBounds = new Rectangle(focusX - viewportWidth / 2, focusY - viewportHeight / 2, viewportWidth, viewportHeight);
+		Rectangle cameraBounds = new Rectangle(bottomLeftX, bottomLeftY, viewportWidth, viewportHeight);
 		while (iter.hasNext()) {
 			Character selected = iter.next();
 			Coordinate selectedLocation = selected.getLocation();
