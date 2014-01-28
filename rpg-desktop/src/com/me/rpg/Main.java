@@ -14,7 +14,7 @@ public class Main
 		cfg.width = 400;
 		cfg.height = 400;
 		
-		new LwjglApplication(new RPG(), cfg);
+		new LwjglApplication(new ScreenHandler(), cfg);
 	}
 	
 }

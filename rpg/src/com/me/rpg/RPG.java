@@ -2,6 +2,7 @@ package com.me.rpg;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
-public class RPG implements ApplicationListener
+public class RPG implements Screen
 {
 	
 	private final String mapTmxPath = "maps/example.tmx";
@@ -28,8 +29,7 @@ public class RPG implements ApplicationListener
 	private Map map;
 	private Character player, npc;
 	
-	@Override
-	public void create()
+	public RPG()
 	{
 		load();
 		
@@ -67,7 +67,7 @@ public class RPG implements ApplicationListener
 	}
 	
 	@Override
-	public void render()
+	public void render(float delta)
 	{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -126,6 +126,18 @@ public class RPG implements ApplicationListener
 		
 		manager.update();
 		manager.finishLoading();
+	}
+
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
