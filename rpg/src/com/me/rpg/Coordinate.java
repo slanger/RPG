@@ -35,4 +35,8 @@ public class Coordinate {
 	public String toString() {
 		return String.format("(%f, %f)", x, y);
 	}
+	
+	public static Coordinate copy(Coordinate c) {
+		return new Coordinate(c.getX(), c.getY());
+	}
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class PlayableCharacter extends Character
 {
+	boolean switchBool = false;
 	
 	public PlayableCharacter(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
 	{
@@ -14,19 +15,7 @@ public class PlayableCharacter extends Character
 	}
 	
 	public void update(float deltaTime, Map currentMap)
-	{
-		// attack thing
-		if (Gdx.input.isKeyPressed(Keys.A)) {
-			if (weaponSlot != null) {
-				weaponSlot.doAttack();
-			}
-		}
-		
-		if (weaponSlot != null) {
-			weaponSlot.update(deltaTime);
-		}
-		
-		
+	{	
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
 		Coordinate currentLocation = getLocation();
@@ -116,6 +105,24 @@ public class PlayableCharacter extends Character
 		if (currentFrame != null)
 		{
 			getSprite().setRegion(currentFrame);
+		}
+		
+		// attack thing
+		if (Gdx.input.isKeyPressed(Keys.A)) {
+			if (weaponSlot != null) {
+				weaponSlot.attack(currentMap, getDirection(), getSprite().getBoundingRectangle());
+			}
+		}
+		if (Gdx.input.isKeyPressed(Keys.S)) {
+			if (weaponSlot != null && switchBool) {
+				switchBool = false;
+				weaponSlot.switchStyle();
+			}
+		} else {
+			switchBool = true;
+		}
+		if (weaponSlot != null) {
+			weaponSlot.update(deltaTime);
 		}
 	}
 	

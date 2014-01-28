@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.combat.MeleeWeapon;
+import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Weapon;
 
 public class RPG implements ApplicationListener
@@ -20,6 +22,7 @@ public class RPG implements ApplicationListener
 	private final String mapTmxPath = "maps/example.tmx";
 	private final String playerTexturePath = "hero.png";
 	private final String npcTexturePath = "villain.png";
+	private final String swordPath = "sword.png";
 	
 	public static AssetManager manager = new AssetManager();
 	public static OrthographicCamera camera;
@@ -60,10 +63,17 @@ public class RPG implements ApplicationListener
 			map.addCharacterToMap(npc, map.getWidth() * i / 5, map.getHeight() * i / 5);
 		}
 		
-		// attack test stuff
-		Texture swordSprite = manager.get("lame_sword.png");
-		Weapon sword = new MeleeWeapon("LameSword", swordSprite, 32, 16, 32, 16, 0.5f);
-		player.equip(sword);
+		// melee attack test stuff
+		//Texture swordSprite = manager.get(swordPath);
+		//Weapon sword = new MeleeWeapon("LameSword", swordSprite, 32, 32, 32, 32);
+		//player.equip(sword);
+		
+		// ranged attack test stuff
+		Texture swordSprite = manager.get(swordPath);
+		RangedWeapon swordbow = new RangedWeapon("swordbow", swordSprite, 32, 32, 32, 32);
+		player.equip(swordbow);
+		Projectile p = new Projectile("swordarrow", swordSprite, 32, 32, 32, 32, swordbow);
+		swordbow.equipProjectile(p, 100000);
 	}
 	
 	@Override
@@ -134,7 +144,7 @@ public class RPG implements ApplicationListener
 		// load textures
 		manager.load(playerTexturePath, Texture.class);
 		manager.load(npcTexturePath, Texture.class);
-		manager.load("lame_sword.png", Texture.class);
+		manager.load(swordPath, Texture.class);
 		
 		manager.update();
 		manager.finishLoading();

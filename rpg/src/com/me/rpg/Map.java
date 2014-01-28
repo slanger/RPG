@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
+import com.me.rpg.combat.Projectile;
 
 public class Map implements Disposable
 {
@@ -21,6 +22,7 @@ public class Map implements Disposable
 	private int mapHeight;
 	private final ArrayList<Character> charactersOnMap;
 	private RectangleMapObject[] objectsOnMap;
+	private ArrayList<Projectile> flyingProjectiles;
 	
 	// split the map into grid spaces to help with collision and context-sensitive actions
 	//private int gridSpaceWidth;
@@ -79,6 +81,7 @@ public class Map implements Disposable
 		//gridHeight = mapHeight / gridSpaceHeight;
 		
 		charactersOnMap = new ArrayList<Character>();
+		flyingProjectiles = new ArrayList<Projectile>();
 		
 		// get collision objects
 		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
@@ -167,6 +170,19 @@ public class Map implements Disposable
 			}
 		}
 		
+		Iterator<Projectile> it = flyingProjectiles.iterator();
+		while (it.hasNext()) {
+			Projectile p = it.next();
+			if (p.isFinished() || !p.isFired()) {
+				it.remove();
+				continue;
+			}
+			Rectangle projectileLoc = p.getSpriteBounds();
+			if (projectileLoc.overlaps(cameraBounds)) {
+				p.render(batch);
+			}
+		}
+		
 		batch.end();
 		
 		tiledMapRenderer.render(foregroundLayers);
@@ -177,6 +193,10 @@ public class Map implements Disposable
 		while (iter.hasNext()) {
 			Character selected = iter.next();
 			selected.update(deltaTime, this);
+		}
+		Iterator<Projectile> it = flyingProjectiles.iterator();
+		while (it.hasNext()) {
+			it.next().update(deltaTime);
 		}
 	}
 	
@@ -227,6 +247,10 @@ public class Map implements Disposable
 	
 	public boolean characterOnMap(Character character) {
 		return charactersOnMap.contains(character);
+	}
+	
+	public void addProjectile(Projectile p) {
+		flyingProjectiles.add(p);
 	}
 
 	@Override
