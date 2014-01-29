@@ -17,22 +17,22 @@ public enum Direction
 		this.dy = dy;
 		this.degrees = degrees;
 	}
-	
+
 	public int getIndex()
 	{
 		return index;
 	}
-	
+
 	public int getDx()
 	{
 		return dx;
 	}
-	
+
 	public int getDy()
 	{
 		return dy;
 	}
-	
+
 	public static Direction getDirection(int index)
 	{
 		for (Direction d : Direction.values())
@@ -42,7 +42,8 @@ public enum Direction
 				return d;
 			}
 		}
-		throw new RuntimeException("Could not find the Direction with index of " + index);
+		throw new RuntimeException(
+				"Could not find the Direction with index of " + index);
 	}
 
 	public float getDegrees() {

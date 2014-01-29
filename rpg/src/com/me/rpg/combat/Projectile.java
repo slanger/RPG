@@ -17,6 +17,7 @@ public class Projectile implements Cloneable {
 	private boolean finished;
 	private Coordinate origin;
 	private float stateTime;
+	private float degreeRotation;
 	
 	private Sprite weaponRight, weaponUp, weaponLeft, weaponDown;
 	
@@ -64,7 +65,7 @@ public class Projectile implements Cloneable {
 		float movement = range * stateTime / speed;
 		Sprite sprite = getWeapon();
 		sprite.setPosition(origin.getX() + movement * firedDirection.getDx(), origin.getY() + movement * firedDirection.getDy());
-		sprite.setRotation(360*3 * stateTime / speed);
+		sprite.setRotation(degreeRotation * stateTime / speed);
 	}
 	
 	public void render(SpriteBatch batch) {

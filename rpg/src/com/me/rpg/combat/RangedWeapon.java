@@ -19,9 +19,11 @@ public class RangedWeapon extends Weapon {
 	}
 	
 	protected void setStatsDefault() {
-		speed = 5.0f;
-		fireRate = 0.0001f;
-		range = 500;
+		// note:  pixel/second is range/speed
+		// this should probably be faster than unit movement
+		speed = 0.5f;
+		fireRate = 0.3f;
+		range = 250;
 		power = 50;
 		setAttacking(false);
 		stateTime = 0f;
