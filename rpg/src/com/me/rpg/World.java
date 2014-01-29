@@ -74,11 +74,6 @@ public class World implements Disposable
 		debugFont = new BitmapFont();
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 		
-		for (int i = 0; i < 5; ++i) {
-			npc = new NonplayableCharacter("NPC" + i, spritesheet, 32, 32, 16, 16, 0.15f, walkingBounds);
-			map.addCharacterToMap(npc, map.getWidth() * i / 5, map.getHeight() * i / 5);
-		}
-		
 		// melee attack test stuff
 		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
 		Weapon sword = new MeleeWeapon("LameSword", swordSprite, 32, 32, 32, 32);

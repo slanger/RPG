@@ -62,7 +62,7 @@ public class RandomWalkAI implements WalkAI
 	}
 
 	@Override
-	public Coordinate update(float deltaTime)
+	public Coordinate update(float deltaTime, Map currentMap)
 	{
 		if (!character.isMoving())
 		{
@@ -107,7 +107,7 @@ public class RandomWalkAI implements WalkAI
 		}
 
 		// collision detection with objects on map
-		Coordinate newCoordinate = Map.checkCollision(x, y, oldX, oldY,
+		Coordinate newCoordinate = currentMap.checkCollision(x, y, oldX, oldY,
 				spriteWidth, spriteHeight, character);
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();

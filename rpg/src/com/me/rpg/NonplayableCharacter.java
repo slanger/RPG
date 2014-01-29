@@ -76,7 +76,7 @@ public class NonplayableCharacter extends Character
 		}
 		
 		// update movement
-		Coordinate newLocation = walkAI.update(deltaTime);
+		Coordinate newLocation = walkAI.update(deltaTime, currentMap);
 		if (newLocation != null)
 		{
 			setLocation(newLocation);
