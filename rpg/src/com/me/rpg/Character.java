@@ -1,15 +1,10 @@
 package com.me.rpg;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character
 {
@@ -65,12 +60,12 @@ public abstract class Character
 		this.name = name;
 	}
 
-	protected Coordinate getLocation()
+	public Coordinate getLocation()
 	{
 		return location;
 	}
 
-	protected void setLocation(Coordinate location)
+	public void setLocation(Coordinate location)
 	{
 		this.location = location;
 	}
@@ -85,22 +80,22 @@ public abstract class Character
 		return location.getY();
 	}
 
-	protected Direction getDirection()
+	public Direction getDirection()
 	{
 		return direction;
 	}
 
-	protected void setDirection(Direction direction)
+	public void setDirection(Direction direction)
 	{
 		this.direction = direction;
 	}
 
-	protected boolean isMoving()
+	public boolean isMoving()
 	{
 		return moving;
 	}
 
-	protected void setMoving(boolean moving)
+	public void setMoving(boolean moving)
 	{
 		this.moving = moving;
 	}
@@ -204,95 +199,6 @@ public abstract class Character
 	 */
 	public abstract void update(float deltaTime, Map currentMap);
 
-	public Coordinate checkCollision(float x, float y, float oldX, float oldY,
-			float width, float height, RectangleMapObject[] objectsOnMap,
-			ArrayList<Character> charactersOnMap)
-	{
-		Rectangle boundingBox = new Rectangle(x, y, width, height);
-		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
-		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, width, height);
-		Coordinate returnCoordinate = new Coordinate(x, y);
-
-		// collision detection with objects on map
-		for (RectangleMapObject object : objectsOnMap)
-		{
-			Rectangle r = object.getRectangle();
-			if (r.overlaps(boundingBox))
-			{
-				if (r.overlaps(boundingBoxWithNewY))
-				{
-					returnCoordinate.setY(oldY);
-				}
-				if (r.overlaps(boundingBoxWithNewX))
-				{
-					returnCoordinate.setX(oldX);
-				}
-			}
-		}
-
-		// collision detection with characters
-		Iterator<Character> iter = charactersOnMap.iterator();
-		while (iter.hasNext())
-		{
-			Character selected = iter.next();
-			if (selected.equals(this))
-			{
-				continue;
-			}
-			Coordinate location = selected.getLocation();
-			float tempWidth = selected.getSpriteWidth();
-			float tempHeight = selected.getSpriteHeight();
-			float tempX = location.getX() - tempWidth / 2;
-			float tempY = location.getY() - tempHeight / 2;
-			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
-			if (r.overlaps(boundingBox))
-			{
-				if (r.overlaps(boundingBoxWithNewY))
-				{
-					returnCoordinate.setY(oldY);
-				}
-				if (r.overlaps(boundingBoxWithNewX))
-				{
-					returnCoordinate.setX(oldX);
-				}
-			}
-		}
-
-		return returnCoordinate;
-	}
-
-	/**
-	 * A collision check that only checks characters. For example, you can check
-	 * if a weapon's hitbox collided with any characters without having to worry
-	 * about other objects on the map. Returns a reference to a Character object
-	 * if the input hitbox collides with the Character's hitbox. Returns null
-	 * otherwise
-	 */
-	public Character checkCharacterCollision(Rectangle hitbox,
-			ArrayList<Character> charactersOnMap)
-	{
-		Iterator<Character> iter = charactersOnMap.iterator();
-		while (iter.hasNext())
-		{
-			Character selected = iter.next();
-			if (selected.equals(this))
-			{
-				continue;
-			}
-			Coordinate location = selected.getLocation();
-			float tempWidth = selected.getSpriteWidth();
-			float tempHeight = selected.getSpriteHeight();
-			float tempX = location.getX() - tempWidth / 2;
-			float tempY = location.getY() - tempHeight / 2;
-			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
-			if (hitbox.overlaps(r))
-			{
-				return selected;
-			}
-		}
-		return null;
-	}
-
 	public abstract void acceptGoodAction(Character characterDoingAction);
 
 	/**
@@ -303,7 +209,7 @@ public abstract class Character
 	public String toString()
 	{
 		return String
-				.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving=%s, stateTime=%lf}",
+				.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving:%s, stateTime:%lf}",
 						name, sprite, direction, moving, stateTime);
 	}
 

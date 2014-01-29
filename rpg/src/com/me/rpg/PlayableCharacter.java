@@ -99,9 +99,8 @@ public class PlayableCharacter extends Character
 		}
 
 		// collision detection with objects on map
-		Coordinate newCoordinate = checkCollision(x, y, oldX, oldY,
-				spriteWidth, spriteHeight, currentMap.getObjectsOnMap(),
-				currentMap.getCharactersOnMap());
+		Coordinate newCoordinate = Map.checkCollision(x, y, oldX, oldY,
+				spriteWidth, spriteHeight, this);
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
 		TextureRegion currentFrame = null;
@@ -142,8 +141,7 @@ public class PlayableCharacter extends Character
 		float x = getX() + getSpriteWidth() * getDirection().getDx();
 		float y = getY() + getSpriteHeight() * getDirection().getDy();
 		Rectangle hitbox = new Rectangle(x, y, width, height);
-		Character c = checkCharacterCollision(hitbox,
-				currentMap.getCharactersOnMap());
+		Character c = Map.checkCharacterCollision(hitbox, this);
 		if (c != null)
 		{
 			c.acceptGoodAction(this);

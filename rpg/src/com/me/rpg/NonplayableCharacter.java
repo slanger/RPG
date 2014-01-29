@@ -4,19 +4,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.ai.RandomWalkAI;
+import com.me.rpg.ai.WalkAI;
 
 public class NonplayableCharacter extends Character
 {
 
+	private WalkAI walkAI;
 	private boolean isHappy = false;
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration)
+			int height, int tileWidth, int tileHeight, float animationDuration,
+			Rectangle walkingBounds)
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
 				animationDuration);
-		Timer.schedule(new moveTask(), 1, 1);
+
+		walkAI = new RandomWalkAI(this, 1, 1, walkingBounds);
+		walkAI.start();
 	}
 
 	@Override
@@ -35,6 +42,7 @@ public class NonplayableCharacter extends Character
 		}
 	}
 
+	@Override
 	public void update(float deltaTime, Map currentMap)
 	{
 		float spriteWidth = getSpriteWidth();
@@ -95,9 +103,8 @@ public class NonplayableCharacter extends Character
 		}
 
 		// collision detection with objects on map
-		Coordinate newCoordinate = checkCollision(x, y, oldX, oldY,
-				spriteWidth, spriteHeight, currentMap.getObjectsOnMap(),
-				currentMap.getCharactersOnMap());
+		Coordinate newCoordinate = Map.checkCollision(x, y, oldX, oldY,
+				spriteWidth, spriteHeight, this);
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
 
@@ -112,31 +119,10 @@ public class NonplayableCharacter extends Character
 		}
 	}
 
-	private class moveTask extends Timer.Task
-	{
-
-		public void run()
-		{
-			// generate a random int in the range [0, 4] and convert to a
-			// direction
-			// 4 means the NPC won't move this update
-			int rand = (int) (Math.random() * 5);
-			if (rand > 3)
-			{
-				setMoving(false);
-			}
-			else
-			{
-				setMoving(true);
-				setDirection(Direction.getDirection(rand));
-			}
-		}
-
-	}
-
 	private class changeColorTask extends Timer.Task
 	{
 
+		@Override
 		public void run()
 		{
 			Color c = getSprite().getColor();
@@ -153,6 +139,7 @@ public class NonplayableCharacter extends Character
 
 	}
 
+	@Override
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		isHappy = true;

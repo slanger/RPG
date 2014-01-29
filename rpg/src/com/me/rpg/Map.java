@@ -3,6 +3,7 @@ package com.me.rpg;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
@@ -16,11 +17,14 @@ import com.badlogic.gdx.utils.Disposable;
 public class Map implements Disposable
 {
 
+	private SpriteBatch batch;
+	private OrthographicCamera camera;
+
 	private Character focusedCharacter;
 	private int mapWidth;
 	private int mapHeight;
-	private final ArrayList<Character> charactersOnMap;
-	private final RectangleMapObject[] objectsOnMap;
+	private static ArrayList<Character> charactersOnMap;
+	private static RectangleMapObject[] objectsOnMap;
 
 	// Tiled map variables
 	private TiledMap tiledMap;
@@ -46,19 +50,22 @@ public class Map implements Disposable
 		return tiledMap;
 	}
 
-	public ArrayList<Character> getCharactersOnMap()
+	public static ArrayList<Character> getCharactersOnMap()
 	{
 		return charactersOnMap;
 	}
 
-	public RectangleMapObject[] getObjectsOnMap()
+	public static RectangleMapObject[] getObjectsOnMap()
 	{
 		return objectsOnMap;
 	}
 
-	public Map(TiledMap tiledMap, SpriteBatch batch)
+	public Map(SpriteBatch batch, OrthographicCamera camera, TiledMap tiledMap)
 	{
+		this.batch = batch;
+		this.camera = camera;
 		this.tiledMap = tiledMap;
+
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
 
 		// get map width and height from .tmx file
@@ -95,7 +102,7 @@ public class Map implements Disposable
 	 * @param viewportHeight
 	 *            The height of the camera
 	 */
-	public void render(SpriteBatch batch, int viewportWidth, int viewportHeight)
+	public void render()
 	{
 		Coordinate focusedCoordinate = Coordinate.ZERO;
 		if (focusedCharacter != null)
@@ -103,6 +110,8 @@ public class Map implements Disposable
 			focusedCoordinate = focusedCharacter.getLocation();
 		}
 
+		float viewportWidth = camera.viewportWidth;
+		float viewportHeight = camera.viewportHeight;
 		float focusX = focusedCoordinate.getX();
 		float focusY = focusedCoordinate.getY();
 		float bottomLeftX = focusX - viewportWidth / 2;
@@ -141,13 +150,13 @@ public class Map implements Disposable
 		// accomplishes that, but is not fully tested
 		// batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
 
-		RPG.camera.position.set(focusX, focusY, 0);
-		// RPG.camera.update();
-		tiledMapRenderer.setView(RPG.camera);
-		// tiledMapRenderer.setView(RPG.camera.combined, 50, 50, width, height);
+		camera.position.set(focusX, focusY, 0);
+		// camera.update();
+		tiledMapRenderer.setView(camera);
+		// tiledMapRenderer.setView(camera.combined, 50, 50, width, height);
 		tiledMapRenderer.render(backgroundLayers);
 
-		batch.setProjectionMatrix(RPG.camera.combined);
+		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
 		Iterator<Character> iter = charactersOnMap.iterator();
@@ -185,6 +194,97 @@ public class Map implements Disposable
 			Character selected = iter.next();
 			selected.update(deltaTime, this);
 		}
+	}
+
+	public static Coordinate checkCollision(float x, float y, float oldX, float oldY,
+			float width, float height, Character thisCharacter)
+	{
+		RectangleMapObject[] objectsOnMap = getObjectsOnMap();
+		ArrayList<Character> charactersOnMap = getCharactersOnMap();
+
+		Rectangle boundingBox = new Rectangle(x, y, width, height);
+		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
+		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, width, height);
+		Coordinate returnCoordinate = new Coordinate(x, y);
+
+		// collision detection with objects on map
+		for (RectangleMapObject object : objectsOnMap)
+		{
+			Rectangle r = object.getRectangle();
+			if (r.overlaps(boundingBox))
+			{
+				if (r.overlaps(boundingBoxWithNewY))
+				{
+					returnCoordinate.setY(oldY);
+				}
+				if (r.overlaps(boundingBoxWithNewX))
+				{
+					returnCoordinate.setX(oldX);
+				}
+			}
+		}
+
+		// collision detection with characters
+		Iterator<Character> iter = charactersOnMap.iterator();
+		while (iter.hasNext())
+		{
+			Character selected = iter.next();
+			if (selected.equals(thisCharacter))
+			{
+				continue;
+			}
+			Coordinate location = selected.getLocation();
+			float tempWidth = selected.getSpriteWidth();
+			float tempHeight = selected.getSpriteHeight();
+			float tempX = location.getX() - tempWidth / 2;
+			float tempY = location.getY() - tempHeight / 2;
+			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
+			if (r.overlaps(boundingBox))
+			{
+				if (r.overlaps(boundingBoxWithNewY))
+				{
+					returnCoordinate.setY(oldY);
+				}
+				if (r.overlaps(boundingBoxWithNewX))
+				{
+					returnCoordinate.setX(oldX);
+				}
+			}
+		}
+
+		return returnCoordinate;
+	}
+
+	/**
+	 * A collision check that only checks characters. For example, you can check
+	 * if a weapon's hitbox collided with any characters without having to worry
+	 * about other objects on the map. Returns a reference to a Character object
+	 * if the input hitbox collides with the Character's hitbox. Returns null
+	 * otherwise
+	 */
+	public static Character checkCharacterCollision(Rectangle hitbox, Character thisCharacter)
+	{
+		ArrayList<Character> charactersOnMap = getCharactersOnMap();
+		Iterator<Character> iter = charactersOnMap.iterator();
+		while (iter.hasNext())
+		{
+			Character selected = iter.next();
+			if (selected.equals(thisCharacter))
+			{
+				continue;
+			}
+			Coordinate location = selected.getLocation();
+			float tempWidth = selected.getSpriteWidth();
+			float tempHeight = selected.getSpriteHeight();
+			float tempX = location.getX() - tempWidth / 2;
+			float tempY = location.getY() - tempHeight / 2;
+			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
+			if (hitbox.overlaps(r))
+			{
+				return selected;
+			}
+		}
+		return null;
 	}
 
 	public void removeCharacterFromMap(Character removeCharacter)
