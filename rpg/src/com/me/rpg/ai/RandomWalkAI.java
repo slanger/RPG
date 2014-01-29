@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.Character;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
+import com.me.rpg.Map;
 
 public class RandomWalkAI implements WalkAI
 {
@@ -76,39 +77,40 @@ public class RandomWalkAI implements WalkAI
 		float x = oldX;
 		float y = oldY;
 		float speed = character.getSpeed();
-		float boundsWidth = walkingBounds.getWidth();
-		float boundsHeight = walkingBounds.getHeight();
 
 		Direction direction = character.getDirection();
 		x += speed * deltaTime * direction.getDx();
 		y += speed * deltaTime * direction.getDy();
 
 		// clamp x
-		if (x < 0)
+		float minX = walkingBounds.getX();
+		float maxX = minX + walkingBounds.getWidth() - spriteWidth;
+		if (x < minX)
 		{
-			x = 0;
+			x = minX;
 		}
-		if (x > boundsWidth - spriteWidth)
+		if (x > maxX)
 		{
-			x = boundsWidth - spriteWidth;
+			x = maxX;
 		}
 
 		// clamp y
-		if (y < 0)
+		float minY = walkingBounds.getY();
+		float maxY = minY + walkingBounds.getHeight() - spriteHeight;
+		if (y < minY)
 		{
-			y = 0;
+			y = minY;
 		}
-		if (y > boundsHeight - spriteHeight)
+		if (y > maxY)
 		{
-			y = boundsHeight - spriteHeight;
+			y = maxY;
 		}
 
 		// collision detection with objects on map
-//		Coordinate newCoordinate = checkCollision(x, y, oldX, oldY,
-//				spriteWidth, spriteHeight, currentMap.getObjectsOnMap(),
-//				currentMap.getCharactersOnMap());
-//		x = newCoordinate.getX();
-//		y = newCoordinate.getY();
+		Coordinate newCoordinate = Map.checkCollision(x, y, oldX, oldY,
+				spriteWidth, spriteHeight, character);
+		x = newCoordinate.getX();
+		y = newCoordinate.getY();
 
 		return new Coordinate(x + spriteWidth / 2, y + spriteHeight / 2);
 	}

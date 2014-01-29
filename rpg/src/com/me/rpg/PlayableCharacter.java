@@ -50,7 +50,7 @@ public class PlayableCharacter extends Character
 			enable_good_action = true;
 		}
 
-		// update x
+		// check for input
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
 			x -= speed * deltaTime;
@@ -63,18 +63,6 @@ public class PlayableCharacter extends Character
 			setDirection(Direction.RIGHT);
 			setMoving(true);
 		}
-
-		// clamp x
-		if (x < 0)
-		{
-			x = 0;
-		}
-		if (x > mapWidth - spriteWidth)
-		{
-			x = mapWidth - spriteWidth;
-		}
-
-		// update y
 		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
 			y += speed * deltaTime;
@@ -88,27 +76,40 @@ public class PlayableCharacter extends Character
 			setMoving(true);
 		}
 
-		// clamp y
-		if (y < 0)
-		{
-			y = 0;
-		}
-		if (y > mapHeight - spriteHeight)
-		{
-			y = mapHeight - spriteHeight;
-		}
-
-		// collision detection with objects on map
-		Coordinate newCoordinate = Map.checkCollision(x, y, oldX, oldY,
-				spriteWidth, spriteHeight, this);
-		x = newCoordinate.getX();
-		y = newCoordinate.getY();
-		TextureRegion currentFrame = null;
+		// update x and y
 		if (isMoving())
 		{
+			// clamp x
+			if (x < 0)
+			{
+				x = 0;
+			}
+			if (x > mapWidth - spriteWidth)
+			{
+				x = mapWidth - spriteWidth;
+			}
+
+			// clamp y
+			if (y < 0)
+			{
+				y = 0;
+			}
+			if (y > mapHeight - spriteHeight)
+			{
+				y = mapHeight - spriteHeight;
+			}
+
+			// collision detection with objects on map
+			Coordinate newCoordinate = Map.checkCollision(x, y, oldX, oldY,
+					spriteWidth, spriteHeight, this);
+			x = newCoordinate.getX();
+			y = newCoordinate.getY();
+
 			currentLocation.setX(x + spriteWidth / 2);
 			currentLocation.setY(y + spriteHeight / 2);
 		}
+
+		TextureRegion currentFrame = null;
 		switch (getDirection())
 		{
 		case RIGHT:
@@ -128,6 +129,7 @@ public class PlayableCharacter extends Character
 					getStateTime(), true) : getDownIdle();
 			break;
 		}
+
 		if (currentFrame != null)
 		{
 			getSprite().setRegion(currentFrame);

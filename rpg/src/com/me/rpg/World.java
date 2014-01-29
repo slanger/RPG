@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 
 public class World implements Disposable
@@ -18,33 +20,53 @@ public class World implements Disposable
 
 	private Map map;
 	private PlayableCharacter player;
-	private NonplayableCharacter npc;
+	private NonplayableCharacter npc1;
+	private NonplayableCharacter npc2;
 
 	public World(SpriteBatch batch, OrthographicCamera camera)
 	{
+		final String PLAYER_NAME = "Player";
+		final String NPC1_NAME = "NPC1";
+		final String NPC2_NAME = "NPC2";
+
 		this.batch = batch;
 		this.camera = camera;
 
+		// create map
+		TiledMap tiledMap = RPG.manager.get(RPG.MAP_TMX_PATH, TiledMap.class);
+		map = new Map(batch, camera, tiledMap);
+
+		// get spawn points and walking boundaries from .tmx
+		MapLayer spawnLayer = tiledMap.getLayers().get("Spawn");
+		MapObjects spawnPoints = spawnLayer.getObjects();
+		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get("WalkingBoundaries");
+		MapObjects walkingBoundaries = walkingBoundariesLayer.getObjects();
+
 		// create characters
-		Texture spritesheet = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
-		player = new PlayableCharacter("Player", spritesheet, 32, 32, 16, 16,
+		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
+		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, 32, 32, 16, 16,
 				0.15f);
 		player.setSpeed(200f);
-		spritesheet = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
-		Rectangle walkingBounds = new Rectangle(0, 0, camera.viewportWidth,
-				camera.viewportHeight);
-		npc = new NonplayableCharacter("NPC", spritesheet, 32, 32, 16, 16,
-				0.15f, walkingBounds);
 
-		// map setup
-		TiledMap tiledMap = RPG.manager.get(RPG.MAP_TMX_PATH, TiledMap.class);
+		Texture spritesheet2 = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
+		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries.get(NPC1_NAME);
+		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, 32, 32, 16, 16,
+				0.15f, boundary1.getRectangle());
 
-		// create map and place characters on it
-		map = new Map(batch, camera, tiledMap);
-		map.addFocusedCharacterToMap(player, map.getWidth() * 3 / 4,
-				map.getHeight() / 2);
-		map.addCharacterToMap(npc, map.getWidth() * 2 / 3, map.getHeight() / 2);
+		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries.get(NPC2_NAME);
+		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, 32, 32, 16, 16,
+				0.15f, boundary2.getRectangle());
 
+		// add characters to map
+		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints.get(PLAYER_NAME);
+		map.addFocusedCharacterToMap(player, playerSpawn.getRectangle().x,
+				playerSpawn.getRectangle().y);
+		RectangleMapObject npc1Spawn = (RectangleMapObject) spawnPoints.get(NPC1_NAME);
+		map.addCharacterToMap(npc1, npc1Spawn.getRectangle().x, npc1Spawn.getRectangle().y);
+		RectangleMapObject npc2Spawn = (RectangleMapObject) spawnPoints.get(NPC2_NAME);
+		map.addCharacterToMap(npc2, npc2Spawn.getRectangle().x, npc2Spawn.getRectangle().y);
+
+		// create debug font
 		debugFont = new BitmapFont();
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 	}
