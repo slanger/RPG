@@ -13,21 +13,24 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character
 {
-	
+
 	private String name;
 	private Sprite sprite;
 	private Coordinate location;
 	private TextureRegion rightIdle, leftIdle, upIdle, downIdle;
-	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation, downWalkAnimation;
+	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation,
+			downWalkAnimation;
 	private Direction direction = Direction.DOWN;
 	private boolean moving = false;
 	private float stateTime = 0f;
 	private float speed = 100f;
-	
-	protected Character(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
+
+	protected Character(String name, Texture spritesheet, int width,
+			int height, int tileWidth, int tileHeight, float animationDuration)
 	{
 		setName(name);
-		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth, tileHeight);
+		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
+				tileHeight);
 		int columns = sheet[0].length;
 		TextureRegion[] rightWalkFrames = new TextureRegion[columns];
 		TextureRegion[] leftWalkFrames = new TextureRegion[columns];
@@ -51,133 +54,165 @@ public abstract class Character
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
 	}
-	
-	protected String getName() {
+
+	protected String getName()
+	{
 		return name;
 	}
-	
-	protected void setName(String name) {
+
+	protected void setName(String name)
+	{
 		this.name = name;
 	}
-	
-	protected Coordinate getLocation() {
+
+	protected Coordinate getLocation()
+	{
 		return location;
 	}
 
-	protected void setLocation(Coordinate location) {
+	protected void setLocation(Coordinate location)
+	{
 		this.location = location;
 	}
 
-	protected float getX() {
+	protected float getX()
+	{
 		return location.getX();
 	}
-	
-	protected float getY() {
+
+	protected float getY()
+	{
 		return location.getY();
 	}
-	
-	protected Direction getDirection() {
+
+	protected Direction getDirection()
+	{
 		return direction;
 	}
 
-	protected void setDirection(Direction direction) {
+	protected void setDirection(Direction direction)
+	{
 		this.direction = direction;
 	}
 
-	protected boolean isMoving() {
+	protected boolean isMoving()
+	{
 		return moving;
 	}
 
-	protected void setMoving(boolean moving) {
+	protected void setMoving(boolean moving)
+	{
 		this.moving = moving;
 	}
 
-	protected float getStateTime() {
+	protected float getStateTime()
+	{
 		return stateTime;
 	}
 
-	protected void addToStateTime(float deltaTime) {
+	protected void addToStateTime(float deltaTime)
+	{
 		this.stateTime += deltaTime;
 	}
 
-	protected Sprite getSprite() {
+	protected Sprite getSprite()
+	{
 		return sprite;
 	}
 
-	protected TextureRegion getRightIdle() {
+	protected TextureRegion getRightIdle()
+	{
 		return rightIdle;
 	}
 
-	protected TextureRegion getLeftIdle() {
+	protected TextureRegion getLeftIdle()
+	{
 		return leftIdle;
 	}
 
-	protected TextureRegion getUpIdle() {
+	protected TextureRegion getUpIdle()
+	{
 		return upIdle;
 	}
 
-	protected TextureRegion getDownIdle() {
+	protected TextureRegion getDownIdle()
+	{
 		return downIdle;
 	}
 
-	protected Animation getRightWalkAnimation() {
+	protected Animation getRightWalkAnimation()
+	{
 		return rightWalkAnimation;
 	}
 
-	protected Animation getLeftWalkAnimation() {
+	protected Animation getLeftWalkAnimation()
+	{
 		return leftWalkAnimation;
 	}
 
-	protected Animation getUpWalkAnimation() {
+	protected Animation getUpWalkAnimation()
+	{
 		return upWalkAnimation;
 	}
 
-	protected Animation getDownWalkAnimation() {
+	protected Animation getDownWalkAnimation()
+	{
 		return downWalkAnimation;
 	}
 
-	public float getSpeed() {
+	public float getSpeed()
+	{
 		return speed;
 	}
-	
-	public void setSpeed(float newSpeed) {
+
+	public void setSpeed(float newSpeed)
+	{
 		this.speed = newSpeed;
 	}
-	
-	public float getSpriteWidth() {
+
+	public float getSpriteWidth()
+	{
 		return sprite.getWidth();
 	}
-	
-	public float getSpriteHeight() {
+
+	public float getSpriteHeight()
+	{
 		return sprite.getHeight();
 	}
-	
+
 	public void setPosition(float x, float y)
 	{
 		sprite.setPosition(x, y);
 	}
-	
+
 	public void render(SpriteBatch batch)
 	{
 		sprite.draw(batch);
 	}
-	
+
 	/**
 	 * Will modify the currentLocation object to have the new location
-	 * @param deltaTime As reported by Graphics.getDeltaTime()
-	 * @param currentLocation The location of this Character on the current map
-	 * @param mapWidth The map width of the current map
-	 * @param mapHeight The map height of the current map
+	 * 
+	 * @param deltaTime
+	 *            As reported by Graphics.getDeltaTime()
+	 * @param currentLocation
+	 *            The location of this Character on the current map
+	 * @param mapWidth
+	 *            The map width of the current map
+	 * @param mapHeight
+	 *            The map height of the current map
 	 */
 	public abstract void update(float deltaTime, Map currentMap);
-	
-	public Coordinate checkCollision(float x, float y, float oldX, float oldY, float width, float height, RectangleMapObject[] objectsOnMap, ArrayList<Character> charactersOnMap)
+
+	public Coordinate checkCollision(float x, float y, float oldX, float oldY,
+			float width, float height, RectangleMapObject[] objectsOnMap,
+			ArrayList<Character> charactersOnMap)
 	{
 		Rectangle boundingBox = new Rectangle(x, y, width, height);
 		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
 		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, width, height);
 		Coordinate returnCoordinate = new Coordinate(x, y);
-		
+
 		// collision detection with objects on map
 		for (RectangleMapObject object : objectsOnMap)
 		{
@@ -222,19 +257,19 @@ public abstract class Character
 				}
 			}
 		}
-		
+
 		return returnCoordinate;
 	}
-	
+
 	/**
-	 * A collision check that only checks characters.
-	 * For example, you can check if a weapon's hitbox collided with any
-	 * characters without having to worry about other objects on the map.
-	 * Returns a reference to a Character object if the input hitbox collides
-	 * with the Character's hitbox.
-	 * Returns null otherwise
+	 * A collision check that only checks characters. For example, you can check
+	 * if a weapon's hitbox collided with any characters without having to worry
+	 * about other objects on the map. Returns a reference to a Character object
+	 * if the input hitbox collides with the Character's hitbox. Returns null
+	 * otherwise
 	 */
-	public Character checkCharacterCollision(Rectangle hitbox, ArrayList<Character> charactersOnMap)
+	public Character checkCharacterCollision(Rectangle hitbox,
+			ArrayList<Character> charactersOnMap)
 	{
 		Iterator<Character> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
@@ -257,15 +292,19 @@ public abstract class Character
 		}
 		return null;
 	}
-	
+
 	public abstract void acceptGoodAction(Character characterDoingAction);
-	
+
 	/**
-	 * May be useful with debugging. Likely will be out of date if Character class is updated.
+	 * May be useful with debugging. Likely will be out of date if Character
+	 * class is updated.
 	 */
 	@Override
-	public String toString() {
-		return String.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving=%s, stateTime=%lf}", name, sprite, direction, moving, stateTime);
+	public String toString()
+	{
+		return String
+				.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving=%s, stateTime=%lf}",
+						name, sprite, direction, moving, stateTime);
 	}
-	
+
 }

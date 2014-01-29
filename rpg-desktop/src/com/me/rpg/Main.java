@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 public class Main
 {
-	
+
 	public static void main(String[] args)
 	{
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
@@ -13,8 +13,8 @@ public class Main
 		cfg.useGL20 = true;
 		cfg.width = 400;
 		cfg.height = 400;
-		
+
 		new LwjglApplication(new ScreenHandler(), cfg);
 	}
-	
+
 }

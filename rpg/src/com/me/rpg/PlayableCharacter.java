@@ -8,14 +8,16 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class PlayableCharacter extends Character
 {
-	
+
 	private boolean enable_good_action = true;
-		
-	public PlayableCharacter(String name, Texture spritesheet, int width, int height, int tileWidth, int tileHeight, float animationDuration)
+
+	public PlayableCharacter(String name, Texture spritesheet, int width,
+			int height, int tileWidth, int tileHeight, float animationDuration)
 	{
-		super(name, spritesheet, width, height, tileWidth, tileHeight, animationDuration);
+		super(name, spritesheet, width, height, tileWidth, tileHeight,
+				animationDuration);
 	}
-	
+
 	public void update(float deltaTime, Map currentMap)
 	{
 		float spriteWidth = getSpriteWidth();
@@ -30,11 +32,11 @@ public class PlayableCharacter extends Character
 		int mapHeight = currentMap.getHeight();
 		setMoving(false);
 		addToStateTime(deltaTime);
-		
+
 		// handle input
 		// I use this idiom to get around having the action be executed like
 		// 1000 times before the player takes his finger off the button
-		// Let me know if you think of something better  -Mark
+		// Let me know if you think of something better -Mark
 		if (Gdx.input.isKeyPressed(Keys.A))
 		{
 			if (enable_good_action)
@@ -47,7 +49,7 @@ public class PlayableCharacter extends Character
 		{
 			enable_good_action = true;
 		}
-		
+
 		// update x
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
@@ -61,7 +63,7 @@ public class PlayableCharacter extends Character
 			setDirection(Direction.RIGHT);
 			setMoving(true);
 		}
-		
+
 		// clamp x
 		if (x < 0)
 		{
@@ -71,7 +73,7 @@ public class PlayableCharacter extends Character
 		{
 			x = mapWidth - spriteWidth;
 		}
-		
+
 		// update y
 		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
@@ -85,7 +87,7 @@ public class PlayableCharacter extends Character
 			setDirection(Direction.DOWN);
 			setMoving(true);
 		}
-		
+
 		// clamp y
 		if (y < 0)
 		{
@@ -95,9 +97,11 @@ public class PlayableCharacter extends Character
 		{
 			y = mapHeight - spriteHeight;
 		}
-		
+
 		// collision detection with objects on map
-		Coordinate newCoordinate = checkCollision(x, y, oldX, oldY, spriteWidth, spriteHeight, currentMap.getObjectsOnMap(), currentMap.getCharactersOnMap());
+		Coordinate newCoordinate = checkCollision(x, y, oldX, oldY,
+				spriteWidth, spriteHeight, currentMap.getObjectsOnMap(),
+				currentMap.getCharactersOnMap());
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
 		TextureRegion currentFrame = null;
@@ -109,16 +113,20 @@ public class PlayableCharacter extends Character
 		switch (getDirection())
 		{
 		case RIGHT:
-			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(getStateTime(), true) : getRightIdle();
+			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getRightIdle();
 			break;
 		case LEFT:
-			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(getStateTime(), true) : getLeftIdle();
+			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getLeftIdle();
 			break;
 		case UP:
-			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(getStateTime(), true) : getUpIdle();
+			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getUpIdle();
 			break;
 		case DOWN:
-			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(getStateTime(), true) : getDownIdle();
+			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getDownIdle();
 			break;
 		}
 		if (currentFrame != null)
@@ -126,7 +134,7 @@ public class PlayableCharacter extends Character
 			getSprite().setRegion(currentFrame);
 		}
 	}
-	
+
 	private void doGoodAction(float deltaTime, Map currentMap)
 	{
 		float width = getSpriteWidth();
@@ -134,16 +142,17 @@ public class PlayableCharacter extends Character
 		float x = getX() + getSpriteWidth() * getDirection().getDx();
 		float y = getY() + getSpriteHeight() * getDirection().getDy();
 		Rectangle hitbox = new Rectangle(x, y, width, height);
-		Character c = checkCharacterCollision(hitbox, currentMap.getCharactersOnMap());
+		Character c = checkCharacterCollision(hitbox,
+				currentMap.getCharactersOnMap());
 		if (c != null)
 		{
 			c.acceptGoodAction(this);
 		}
 	}
-	
+
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		return; // do nothing
 	}
-	
+
 }
