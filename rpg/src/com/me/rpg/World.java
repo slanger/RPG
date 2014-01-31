@@ -84,9 +84,7 @@ public class World implements Disposable
 		RangedWeapon swordbow = new RangedWeapon("swordbow", bowSprite, 32, 32, 32, 32);
 		player.equip(swordbow);
 		Projectile p = new Projectile("swordarrow", swordSprite, 32, 32, 32, 32, swordbow);
-		swordbow.equipProjectile(p, 50);
-		
-		// player.equip(sword)
+		swordbow.equipProjectile(p, 1000);
 	}
 
 	public void render()

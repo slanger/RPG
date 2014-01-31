@@ -23,8 +23,8 @@ public class MeleeWeapon extends Weapon {
 	}
 	
 	protected void setStatsDefault() {
-		speed = 0.5f;
-		fireRate = 0.8f;
+		speed = 0.4f;
+		fireRate = 0.2f;
 		range = 12; // 12 is good for a melee weapon of length 32
 		power = 50;
 		setAttacking(false);
@@ -100,6 +100,11 @@ public class MeleeWeapon extends Weapon {
 	
 	protected void doAttack(Map map, Direction direction, Rectangle attackOrigin) {
 		
+	}
+
+	@Override
+	protected float doGetWait() {
+		return speed;
 	}
 	
 }

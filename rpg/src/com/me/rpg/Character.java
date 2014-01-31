@@ -23,6 +23,7 @@ public abstract class Character
 	
 	// Combat stuff
 	protected Weapon weaponSlot;
+	protected Weapon weaponSlotExtra;
 
 	protected Character(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration)
@@ -224,6 +225,7 @@ public abstract class Character
 	 * @param sword
 	 */
 	public void equip(Weapon weapon) {
+		this.weaponSlotExtra = weaponSlot; // blah
 		this.weaponSlot = weapon;
 	}
 }

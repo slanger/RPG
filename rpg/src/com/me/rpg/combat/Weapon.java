@@ -98,7 +98,7 @@ public abstract class Weapon implements Cloneable {
 			SpriteBatch batch);
 	
 	public void attack(Map map, Direction direction, Rectangle attackOrigin) {
-		if(attacking) {
+		if (attacking) {
 			return;
 		}
 		if (stateTime < fireRate) {
@@ -111,12 +111,14 @@ public abstract class Weapon implements Cloneable {
 	
 	protected abstract void doAttack(Map map, Direction direction, Rectangle attackOrigin);
 	
+	protected abstract float doGetWait();
+	
 	public void update(float deltaTime) {
 		stateTime += deltaTime;
 		if (!attacking) {
 			return;
 		}
-		if (stateTime > fireRate) {
+		if (stateTime > doGetWait()) {
 			stateTime = 0f;
 			attacking = false;
 			return;

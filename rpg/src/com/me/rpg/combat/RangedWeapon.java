@@ -22,7 +22,7 @@ public class RangedWeapon extends Weapon {
 		// note:  pixel/second is range/speed
 		// this should probably be faster than unit movement
 		speed = 0.5f;
-		fireRate = 0.3f;
+		fireRate = 0.01f;
 		range = 250;
 		power = 50;
 		setAttacking(false);
@@ -64,5 +64,10 @@ public class RangedWeapon extends Weapon {
 		Coordinate origin = new Coordinate(originX, originY);
 		Projectile firedCopy = equippedAmmo.makeAttackingCopy(direction, origin, this);
 		map.addProjectile(firedCopy);
+	}
+
+	@Override
+	protected float doGetWait() {
+		return 0f;
 	}
 }

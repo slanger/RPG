@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.combat.Weapon;
 
 public class PlayableCharacter extends Character
 {
@@ -152,6 +153,16 @@ public class PlayableCharacter extends Character
 		}
 		if (weaponSlot != null) {
 			weaponSlot.update(deltaTime);
+		}
+		if (Gdx.input.isKeyPressed(Keys.M)){
+			if (switchBool) {
+				Weapon temp = weaponSlot;
+				weaponSlot = weaponSlotExtra;
+				weaponSlotExtra = temp;
+				switchBool = false;
+			} else {
+				switchBool = true;
+			}
 		}
 	}
 
