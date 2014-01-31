@@ -15,6 +15,7 @@ public class RandomWalkAI implements WalkAI
 	private float intervalSeconds;
 	private Rectangle walkingBounds;
 	private MoveTask moveTask;
+	private boolean toggleWalking = false;
 
 	private class MoveTask extends Timer.Task
 	{
@@ -22,6 +23,12 @@ public class RandomWalkAI implements WalkAI
 		@Override
 		public void run()
 		{
+			if (toggleWalking)
+			{
+				character.setMoving(false);
+				toggleWalking = !toggleWalking;
+				return;
+			}
 			// generate a random int in the range [0, 4] and convert to a
 			// direction
 			// 4 means the NPC won't move this update
@@ -35,6 +42,7 @@ public class RandomWalkAI implements WalkAI
 				character.setMoving(true);
 				character.setDirection(Direction.getDirection(rand));
 			}
+			toggleWalking = !toggleWalking;
 		}
 
 	}
@@ -107,12 +115,14 @@ public class RandomWalkAI implements WalkAI
 		}
 
 		// collision detection with objects on map
-		Coordinate newCoordinate = currentMap.checkCollision(x, y, oldX, oldY,
-				spriteWidth, spriteHeight, character);
-		x = newCoordinate.getX();
-		y = newCoordinate.getY();
+		Coordinate newCoordinate = new Coordinate(x, y);
+		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
+				spriteWidth, spriteHeight, character, newCoordinate);
 
-		return new Coordinate(x + spriteWidth / 2, y + spriteHeight / 2);
+		character.setMoving(didMove);
+
+		return new Coordinate(newCoordinate.getX() + spriteWidth / 2,
+				newCoordinate.getY() + spriteHeight / 2);
 	}
 
 }

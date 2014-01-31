@@ -102,13 +102,17 @@ public class PlayableCharacter extends Character
 			}
 
 			// collision detection with objects on map
-			Coordinate newCoordinate = currentMap.checkCollision(x, y, oldX, oldY,
-					spriteWidth, spriteHeight, this);
-			x = newCoordinate.getX();
-			y = newCoordinate.getY();
+			Coordinate newCoordinate = new Coordinate(x, y);
+			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
+					spriteWidth, spriteHeight, this, newCoordinate);
 
-			currentLocation.setX(x + spriteWidth / 2);
-			currentLocation.setY(y + spriteHeight / 2);
+			setMoving(didMove);
+
+			if (didMove)
+			{
+				currentLocation.setX(x + spriteWidth / 2);
+				currentLocation.setY(y + spriteHeight / 2);
+			}
 		}
 
 		TextureRegion currentFrame = null;

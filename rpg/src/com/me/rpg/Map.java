@@ -215,8 +215,8 @@ public class Map implements Disposable
 		}
 	}
 
-	public Coordinate checkCollision(float x, float y, float oldX, float oldY,
-			float width, float height, Character thisCharacter)
+	public boolean checkCollision(float x, float y, float oldX, float oldY,
+			float width, float height, Character thisCharacter, Coordinate newCoordinate)
 	{
 		RectangleMapObject[] objectsOnMap = getObjectsOnMap();
 		ArrayList<Character> charactersOnMap = getCharactersOnMap();
@@ -224,7 +224,8 @@ public class Map implements Disposable
 		Rectangle boundingBox = new Rectangle(x, y, width, height);
 		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
 		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, width, height);
-		Coordinate returnCoordinate = new Coordinate(x, y);
+		newCoordinate.setX(x);
+		newCoordinate.setY(y);
 
 		// collision detection with objects on map
 		for (RectangleMapObject object : objectsOnMap)
@@ -234,11 +235,11 @@ public class Map implements Disposable
 			{
 				if (r.overlaps(boundingBoxWithNewY))
 				{
-					returnCoordinate.setY(oldY);
+					newCoordinate.setY(oldY);
 				}
 				if (r.overlaps(boundingBoxWithNewX))
 				{
-					returnCoordinate.setX(oldX);
+					newCoordinate.setX(oldX);
 				}
 			}
 		}
@@ -262,16 +263,16 @@ public class Map implements Disposable
 			{
 				if (r.overlaps(boundingBoxWithNewY))
 				{
-					returnCoordinate.setY(oldY);
+					newCoordinate.setY(oldY);
 				}
 				if (r.overlaps(boundingBoxWithNewX))
 				{
-					returnCoordinate.setX(oldX);
+					newCoordinate.setX(oldX);
 				}
 			}
 		}
 
-		return returnCoordinate;
+		return !(newCoordinate.getX() == oldX && newCoordinate.getY() == oldY);
 	}
 
 	/**
