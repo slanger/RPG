@@ -54,28 +54,45 @@ public class PlayableCharacter extends Character
 		}
 
 		// check for input
+		int dx = 0;
+		int dy = 0;
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
-			x -= speed * deltaTime;
-			setDirection(Direction.LEFT);
-			setMoving(true);
+			dx += Direction.LEFT.getDx();
+			dy += Direction.LEFT.getDy();
 		}
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
 		{
-			x += speed * deltaTime;
-			setDirection(Direction.RIGHT);
-			setMoving(true);
+			dx += Direction.RIGHT.getDx();
+			dy += Direction.RIGHT.getDy();
 		}
 		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
-			y += speed * deltaTime;
-			setDirection(Direction.UP);
-			setMoving(true);
+			dx += Direction.UP.getDx();
+			dy += Direction.UP.getDy();
 		}
 		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			y -= speed * deltaTime;
-			setDirection(Direction.DOWN);
+			dx += Direction.DOWN.getDx();
+			dy += Direction.DOWN.getDy();
+		}
+
+		// decode Direction from input
+		int diff = Math.abs(dx) + Math.abs(dy);
+		if (diff >= 2)
+		{
+			// moving diagonally, slow down movement in x and y
+			x += (dx * speed * deltaTime) / Math.sqrt(2);
+			y += (dy * speed * deltaTime) / Math.sqrt(2);
+			setDirection(Direction.getDirectionByDiff(0, dy));
+			setMoving(true);
+		}
+		else if (diff >= 1)
+		{
+			// moving in 1 direction
+			x += dx * speed * deltaTime;
+			y += dy * speed * deltaTime;
+			setDirection(Direction.getDirectionByDiff(dx, dy));
 			setMoving(true);
 		}
 

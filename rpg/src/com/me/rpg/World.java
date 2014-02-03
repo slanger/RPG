@@ -32,6 +32,8 @@ public class World implements Disposable
 		final String PLAYER_NAME = "Player";
 		final String NPC1_NAME = "NPC1";
 		final String NPC2_NAME = "NPC2";
+		final int width = 16;
+		final int height = 16;
 
 		this.batch = batch;
 		this.camera = camera;
@@ -48,17 +50,17 @@ public class World implements Disposable
 
 		// create characters
 		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
-		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, 32, 32, 16, 16,
+		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width, height, 16, 16,
 				0.15f);
 		player.setSpeed(200f);
 
 		Texture spritesheet2 = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
-		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries.get(NPC1_NAME);
-		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, 32, 32, 16, 16,
+		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries.get("castle");
+		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height, 16, 16,
 				0.15f, boundary1.getRectangle());
 
-		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries.get(NPC2_NAME);
-		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, 32, 32, 16, 16,
+		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries.get("desert");
+		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height, 16, 16,
 				0.15f, boundary2.getRectangle());
 
 		// add characters to map

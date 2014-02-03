@@ -1,0 +1,19 @@
+
+prototype_map.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+prototype_map
+  rotate: false
+  xy: 0, 0
+  size: 2560, 2560
+  orig: 2560, 2560
+  offset: 0, 0
+  index: 1
+prototype_map
+  rotate: false
+  xy: 2562, 0
+  size: 64, 80
+  orig: 64, 80
+  offset: 0, 0
+  index: 39

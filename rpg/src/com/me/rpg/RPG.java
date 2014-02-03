@@ -14,7 +14,8 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 public class RPG implements Screen
 {
 
-	public static final String MAP_TMX_PATH = "maps/example.tmx";
+	//public static final String MAP_TMX_PATH = "maps/example/example.tmx";
+	public static final String MAP_TMX_PATH = "maps/prototype_map/prototype_map.tmx";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
 	public static final String SWORD_PATH = "sword.png";

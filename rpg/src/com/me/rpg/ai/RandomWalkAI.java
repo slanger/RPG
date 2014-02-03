@@ -40,7 +40,7 @@ public class RandomWalkAI implements WalkAI
 			else
 			{
 				character.setMoving(true);
-				character.setDirection(Direction.getDirection(rand));
+				character.setDirection(Direction.getDirectionByIndex(rand));
 			}
 			toggleWalking = !toggleWalking;
 		}
