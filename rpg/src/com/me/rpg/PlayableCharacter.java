@@ -103,7 +103,7 @@ public class PlayableCharacter extends Character
 			}
 
 			// collision detection with objects on map
-			Coordinate newCoordinate = new Coordinate(x, y);
+			Coordinate newCoordinate = new Coordinate();
 			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
 					spriteWidth, spriteHeight, this, newCoordinate);
 
@@ -111,8 +111,8 @@ public class PlayableCharacter extends Character
 
 			if (didMove)
 			{
-				currentLocation.setX(x + spriteWidth / 2);
-				currentLocation.setY(y + spriteHeight / 2);
+				currentLocation.setX(newCoordinate.getX() + spriteWidth / 2);
+				currentLocation.setY(newCoordinate.getY() + spriteHeight / 2);
 			}
 		}
 

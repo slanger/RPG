@@ -115,7 +115,7 @@ public class RandomWalkAI implements WalkAI
 		}
 
 		// collision detection with objects on map
-		Coordinate newCoordinate = new Coordinate(x, y);
+		Coordinate newCoordinate = new Coordinate();
 		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
 				spriteWidth, spriteHeight, character, newCoordinate);
 

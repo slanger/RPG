@@ -8,6 +8,15 @@ public class Coordinate
 	private float x;
 	private float y;
 
+	/**
+	 * Empty constructor.
+	 * Use this if you want to set x and y after construction.
+	 */
+	public Coordinate()
+	{
+
+	}
+
 	public Coordinate(float x, float y)
 	{
 		this.x = x;
