@@ -122,25 +122,35 @@ public class Map implements Disposable
 		float bottomLeftY = focusY - viewportHeight / 2;
 		//int width = Math.min(mapWidth, viewportWidth);
 		//int height = Math.min(mapHeight, viewportHeight);
-		if (mapWidth >= viewportWidth) {
-			if (bottomLeftX > mapWidth - viewportWidth) {
+		if (mapWidth >= viewportWidth)
+		{
+			if (bottomLeftX > mapWidth - viewportWidth)
+			{
 				bottomLeftX = mapWidth - viewportWidth;
 			}
-			if (bottomLeftX < 0) {
+			if (bottomLeftX < 0)
+			{
 				bottomLeftX = 0;
 			}
-		} else { // handles screen larger than map
+		}
+		else
+		{ // handles screen larger than map
 			bottomLeftX = (mapWidth - viewportWidth) / 2;
 		}
-		
-		if (mapHeight >= viewportHeight) {
-			if (bottomLeftY > mapHeight - viewportHeight) {
+
+		if (mapHeight >= viewportHeight)
+		{
+			if (bottomLeftY > mapHeight - viewportHeight)
+			{
 				bottomLeftY = mapHeight - viewportHeight;
 			}
-			if (bottomLeftY < 0) {
+			if (bottomLeftY < 0)
+			{
 				bottomLeftY = 0;
 			}
-		} else {
+		}
+		else
+		{
 			bottomLeftY = (mapHeight - viewportHeight) / 2;
 		}
 		//float offsetX = Math.min(something, mapWidth/2);
@@ -152,7 +162,7 @@ public class Map implements Disposable
 		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
 		//batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
 		
-		camera.position.set(bottomLeftX + viewportWidth/2, bottomLeftY + viewportHeight/2, 0);
+		camera.position.set(bottomLeftX + viewportWidth / 2, bottomLeftY + viewportHeight / 2, 0);
 		//RPG.camera.update();
 		tiledMapRenderer.setView(camera);
 		//tiledMapRenderer.setView(RPG.camera.combined, 50, 50, width, height);
@@ -184,18 +194,21 @@ public class Map implements Disposable
 		}
 		
 		Iterator<Projectile> it = flyingProjectiles.iterator();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			Projectile p = it.next();
-			if (p.isFinished() || !p.isFired()) {
+			if (p.isFinished() || !p.isFired())
+			{
 				it.remove();
 				continue;
 			}
 			Rectangle projectileLoc = p.getSpriteBounds();
-			if (projectileLoc.overlaps(cameraBounds)) {
+			if (projectileLoc.overlaps(cameraBounds))
+			{
 				p.render(batch);
 			}
 		}
-		
+
 		batch.end();
 
 		tiledMapRenderer.render(foregroundLayers);
@@ -210,7 +223,8 @@ public class Map implements Disposable
 			selected.update(deltaTime, this);
 		}
 		Iterator<Projectile> it = flyingProjectiles.iterator();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			it.next().update(deltaTime);
 		}
 	}

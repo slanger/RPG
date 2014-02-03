@@ -9,9 +9,9 @@ import com.me.rpg.combat.Weapon;
 
 public class PlayableCharacter extends Character
 {
+
 	private boolean switchBool = false;
 	private boolean enable_good_action = true;
-
 
 	public PlayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration)
@@ -20,6 +20,7 @@ public class PlayableCharacter extends Character
 				animationDuration);
 	}
 
+	@Override
 	public void update(float deltaTime, Map currentMap)
 	{	
 		float spriteWidth = getSpriteWidth();
@@ -142,29 +143,41 @@ public class PlayableCharacter extends Character
 		}
 		
 		// attack thing
-		if (Gdx.input.isKeyPressed(Keys.J)) {
-			if (weaponSlot != null) {
-				weaponSlot.attack(currentMap, getDirection(), getSprite().getBoundingRectangle());
+		if (Gdx.input.isKeyPressed(Keys.J))
+		{
+			if (weaponSlot != null)
+			{
+				weaponSlot.attack(currentMap, getDirection(), getSprite()
+						.getBoundingRectangle());
 			}
 		}
-		if (Gdx.input.isKeyPressed(Keys.K)) {
-			if (weaponSlot != null && switchBool) {
+		if (Gdx.input.isKeyPressed(Keys.K))
+		{
+			if (weaponSlot != null && switchBool)
+			{
 				switchBool = false;
 				weaponSlot.switchStyle();
 			}
-		} else {
+		}
+		else
+		{
 			switchBool = true;
 		}
-		if (weaponSlot != null) {
+		if (weaponSlot != null)
+		{
 			weaponSlot.update(deltaTime);
 		}
-		if (Gdx.input.isKeyPressed(Keys.M)){
-			if (switchBool) {
+		if (Gdx.input.isKeyPressed(Keys.M))
+		{
+			if (switchBool)
+			{
 				Weapon temp = weaponSlot;
 				weaponSlot = weaponSlotExtra;
 				weaponSlotExtra = temp;
 				switchBool = false;
-			} else {
+			}
+			else
+			{
 				switchBool = true;
 			}
 		}
@@ -184,6 +197,7 @@ public class PlayableCharacter extends Character
 		}
 	}
 
+	@Override
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		return; // do nothing

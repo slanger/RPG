@@ -224,8 +224,10 @@ public abstract class Character
 	 * Likely insufficient implementation of equip
 	 * @param sword
 	 */
-	public void equip(Weapon weapon) {
+	public void equip(Weapon weapon)
+	{
 		this.weaponSlotExtra = weaponSlot; // blah
 		this.weaponSlot = weapon;
 	}
+
 }
