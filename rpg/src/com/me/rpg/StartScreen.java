@@ -1,6 +1,7 @@
 package com.me.rpg;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
@@ -110,6 +111,24 @@ public class StartScreen implements Screen, InputProcessor
 					int pointer, int button)
 			{
 				screenHandler.setScreen(screenHandler.rpgScreen);
+			}
+		});
+
+		// if Enter is pressed, go to game screen
+		// TODO this is triggered during the game state, so we need to limit
+		// this listener to just the start menu
+		// TODO add keyboard functionality to start menu -Mark
+		stage.addListener(new InputListener()
+		{
+			@Override
+			public boolean keyUp(InputEvent event, int keycode)
+			{
+				if (keycode == Keys.ENTER)
+				{
+					System.out.println("Enter was pressed");
+					screenHandler.setScreen(screenHandler.rpgScreen);
+				}
+				return true;
 			}
 		});
 
