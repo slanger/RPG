@@ -1,9 +1,10 @@
-package com.me.rpg;
+package com.me.rpg.maps;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
@@ -12,31 +13,44 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.me.rpg.Character;
+import com.me.rpg.Coordinate;
+import com.me.rpg.RPG;
+import com.me.rpg.World;
+import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.RangedWeapon;
+import com.me.rpg.combat.Weapon;
 
-public class Map implements Disposable
+public abstract class Map implements Disposable
 {
 
-	private SpriteBatch batch;
-	private OrthographicCamera camera;
+	protected World world;
+	protected SpriteBatch batch;
+	protected OrthographicCamera camera;
 
-	private Character focusedCharacter;
-	private int mapWidth;
-	private int mapHeight;
+	protected Character focusedCharacter;
+	protected int mapWidth;
+	protected int mapHeight;
 	
-	private ArrayList<Character> charactersOnMap;
-	private RectangleMapObject[] objectsOnMap;
-	private ArrayList<Projectile> flyingProjectiles;
+	protected ArrayList<Character> charactersOnMap;
+	protected ArrayList<Projectile> flyingProjectiles;
+
+	protected RectangleMapObject[] collidables;
+	protected RectangleMapObject[] warpPoints;
 
 	// Tiled map variables
-	private TiledMap tiledMap;
-	private OrthogonalTiledMapRenderer tiledMapRenderer;
+	protected TiledMap tiledMap;
+	protected OrthogonalTiledMapRenderer tiledMapRenderer;
 
 	// Tiled layers drawn behind characters, labeled by index
-	private final int[] backgroundLayers = new int[] { 0, 1 };
+	protected int[] backgroundLayers;
 	// Tiled layers drawn in front of characters, labeled by index
-	private final int[] foregroundLayers = new int[] { 2 };
+	protected int[] foregroundLayers;
+
+	private boolean updateEnable = true;
 
 	public int getWidth()
 	{
@@ -60,17 +74,36 @@ public class Map implements Disposable
 
 	public RectangleMapObject[] getObjectsOnMap()
 	{
-		return objectsOnMap;
+		return collidables;
 	}
 
-	public Map(SpriteBatch batch, OrthographicCamera camera, TiledMap tiledMap)
+	public World getWorld()
 	{
+		return world;
+	}
+
+	public boolean isUpdating()
+	{
+		return updateEnable;
+	}
+
+	public void setUpdateEnable(boolean updateEnable)
+	{
+		this.updateEnable = updateEnable;
+	}
+
+	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
+	{
+		this.world = world;
 		this.batch = batch;
 		this.camera = camera;
-		this.tiledMap = tiledMap;
 
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
+		charactersOnMap = new ArrayList<Character>();
+		flyingProjectiles = new ArrayList<Projectile>();
+	}
 
+	protected void setup()
+	{
 		// get map width and height from .tmx file
 		MapProperties mapProperties = tiledMap.getProperties();
 		int tileWidth = (Integer) mapProperties.get("tilewidth");
@@ -78,33 +111,68 @@ public class Map implements Disposable
 		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
 		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
 
-		charactersOnMap = new ArrayList<Character>();
-		flyingProjectiles = new ArrayList<Projectile>();
-		
-		// get collision objects
-		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
-		MapObjects mapObjects = collisionLayer.getObjects();
-		objectsOnMap = new RectangleMapObject[mapObjects.getCount()];
-		for (int i = 0; i < objectsOnMap.length; i++)
+		// get collidables
+		MapObjects collidableObjects = getCollidables();
+		collidables = new RectangleMapObject[collidableObjects.getCount()];
+		for (int i = 0; i < collidables.length; i++)
 		{
-			objectsOnMap[i] = (RectangleMapObject) mapObjects.get(i);
+			collidables[i] = (RectangleMapObject) collidableObjects.get(i);
 		}
+
+		// get warp points
+		MapObjects warpObjects = getWarpPoints();
+		warpPoints = new RectangleMapObject[warpObjects.getCount()];
+		for (int i = 0; i < warpPoints.length; i++)
+		{
+			warpPoints[i] = (RectangleMapObject) warpObjects.get(i);
+		}
+	}
+
+	protected MapObjects getCollidables()
+	{
+		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
+		return collisionLayer.getObjects();
+	}
+
+	protected MapObjects getSpawnPoints()
+	{
+		MapLayer spawnLayer = tiledMap.getLayers().get("Spawn");
+		return spawnLayer.getObjects();
+	}
+
+	protected MapObjects getWalkingBoundaries()
+	{
+		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get("WalkingBoundaries");
+		return walkingBoundariesLayer.getObjects();
+	}
+
+	protected MapObjects getWarpPoints()
+	{
+		MapLayer warpLayer = tiledMap.getLayers().get("Warp");
+		return warpLayer.getObjects();
+	}
+
+	protected void genericWeaponSetup(Character character)
+	{
+		int width = 32;
+		int height = 32;
+
+		// melee attack test stuff
+		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
+		Weapon sword = new MeleeWeapon("LameSword", swordSprite, width, height, 32, 32);
+		character.equip(sword);
+
+		// ranged attack test stuff
+		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
+		RangedWeapon bow = new RangedWeapon("LameBow", bowSprite, width, height, 32, 32);
+		character.equip(bow);
+		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32, bow);
+		bow.equipProjectile(arrow, 1000);
 	}
 
 	/**
 	 * Draws the background image of the map, followed by all the Characters
 	 * that are in view nearby the focusedCharacter
-	 * 
-	 * Note: This may be a little too tightly coupled to some of the rendering
-	 * objects/info.
-	 * 
-	 * @param batch
-	 *            The spriteBatch being used in the main loop to render to the
-	 *            screen
-	 * @param viewportWidth
-	 *            The width of the camera
-	 * @param viewportHeight
-	 *            The height of the camera
 	 */
 	public void render()
 	{
@@ -216,6 +284,10 @@ public class Map implements Disposable
 
 	public void update(float deltaTime)
 	{
+		if (!updateEnable)
+		{
+			return;
+		}
 		Iterator<Character> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
 		{
@@ -292,9 +364,10 @@ public class Map implements Disposable
 	/**
 	 * A collision check that only checks characters. For example, you can check
 	 * if a weapon's hitbox collided with any characters without having to worry
-	 * about other objects on the map. Returns a reference to a Character object
-	 * if the input hitbox collides with the Character's hitbox. Returns null
-	 * otherwise
+	 * about other objects on the map.
+	 * Returns a reference to a Character object if the input hitbox collides
+	 * with the Character's hitbox.
+	 * Returns null otherwise.
 	 */
 	public Character checkCharacterCollision(Rectangle hitbox, Character thisCharacter)
 	{
@@ -319,6 +392,38 @@ public class Map implements Disposable
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * A collision check that only checks warp points.
+	 * Returns a reference to a Map object if the input hitbox collides with a
+	 * warp point.
+	 * Returns null otherwise.
+	 */
+	public Map checkWarpPointCollision(Rectangle hitbox)
+	{
+		Vector2 centerPoint = hitbox.getCenter(new Vector2());
+		for (RectangleMapObject warpPoint : warpPoints)
+		{
+			if (warpPoint.getRectangle().contains(centerPoint))
+			{
+				String newMapString = warpPoint.getName();
+				return getMap(MapType.getMapType(newMapString));
+			}
+		}
+		return null;
+	}
+
+	public Map getMap(MapType mapType)
+	{
+		switch (mapType)
+		{
+		case EXAMPLE:
+			return new ExampleMap(world, batch, camera);
+		case PROTOTYPE:
+			return new PrototypeMap(world, batch, camera);
+		}
+		throw new RuntimeException("Cannot get Map from the given MapType");
 	}
 
 	public void removeCharacterFromMap(Character removeCharacter)

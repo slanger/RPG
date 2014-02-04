@@ -2,18 +2,12 @@ package com.me.rpg;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Disposable;
-import com.me.rpg.combat.MeleeWeapon;
-import com.me.rpg.combat.Projectile;
-import com.me.rpg.combat.RangedWeapon;
-import com.me.rpg.combat.Weapon;
+import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.maps.ExampleMap;
+import com.me.rpg.maps.Map;
 
 public class World implements Disposable
 {
@@ -23,70 +17,53 @@ public class World implements Disposable
 	private OrthographicCamera camera;
 
 	private Map map;
-	private PlayableCharacter player;
-	private NonplayableCharacter npc1;
-	private NonplayableCharacter npc2;
+
+	public Map getMap()
+	{
+		return map;
+	}
+
+	public void setMap(Map map)
+	{
+		this.map.dispose();
+		this.map.setUpdateEnable(false);
+		Timer.schedule(new ChangeMapTask(map), 1.0f);
+	}
+
+	private class ChangeMapTask extends Timer.Task
+	{
+
+		private Map newMap;
+
+		ChangeMapTask(Map newMap)
+		{
+			this.newMap = newMap;
+		}
+
+		@Override
+		public void run()
+		{
+			changeMap(newMap);
+		}
+
+	}
+
+	private void changeMap(Map newMap)
+	{
+		map = newMap;
+	}
 
 	public World(SpriteBatch batch, OrthographicCamera camera)
 	{
-		final String PLAYER_NAME = "Player";
-		final String NPC1_NAME = "NPC1";
-		final String NPC2_NAME = "NPC2";
-		final int width = 16;
-		final int height = 16;
-
 		this.batch = batch;
 		this.camera = camera;
 
 		// create map
-		TiledMap tiledMap = RPG.manager.get(RPG.MAP_TMX_PATH, TiledMap.class);
-		map = new Map(batch, camera, tiledMap);
-
-		// get spawn points and walking boundaries from .tmx
-		MapLayer spawnLayer = tiledMap.getLayers().get("Spawn");
-		MapObjects spawnPoints = spawnLayer.getObjects();
-		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get("WalkingBoundaries");
-		MapObjects walkingBoundaries = walkingBoundariesLayer.getObjects();
-
-		// create characters
-		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
-		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width, height, 16, 16,
-				0.15f);
-		player.setSpeed(200f);
-
-		Texture spritesheet2 = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
-		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries.get("castle");
-		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, boundary1.getRectangle());
-
-		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries.get("desert");
-		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, boundary2.getRectangle());
-
-		// add characters to map
-		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints.get(PLAYER_NAME);
-		map.addFocusedCharacterToMap(player, playerSpawn.getRectangle().x,
-				playerSpawn.getRectangle().y);
-		RectangleMapObject npc1Spawn = (RectangleMapObject) spawnPoints.get(NPC1_NAME);
-		map.addCharacterToMap(npc1, npc1Spawn.getRectangle().x, npc1Spawn.getRectangle().y);
-		RectangleMapObject npc2Spawn = (RectangleMapObject) spawnPoints.get(NPC2_NAME);
-		map.addCharacterToMap(npc2, npc2Spawn.getRectangle().x, npc2Spawn.getRectangle().y);
+		map = new ExampleMap(this, batch, camera);
 
 		// create debug font
 		debugFont = new BitmapFont();
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
-		
-		// melee attack test stuff
-		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
-		Weapon sword = new MeleeWeapon("LameSword", swordSprite, 32, 32, 32, 32);
-		player.equip(sword);
-		
-		// ranged attack test stuff
-		Texture bowSprite = RPG.manager.get(RPG.SWORD_PATH);
-		RangedWeapon swordbow = new RangedWeapon("swordbow", bowSprite, 32, 32, 32, 32);
-		player.equip(swordbow);
-		Projectile p = new Projectile("swordarrow", swordSprite, 32, 32, 32, 32, swordbow);
-		swordbow.equipProjectile(p, 1000);
 	}
 
 	public void render()

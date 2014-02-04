@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
-import com.me.rpg.Map;
+import com.me.rpg.maps.Map;
 
 public class RangedWeapon extends Weapon {
 	
@@ -22,7 +22,7 @@ public class RangedWeapon extends Weapon {
 		// note:  pixel/second is range/speed
 		// this should probably be faster than unit movement
 		speed = 0.5f;
-		fireRate = 0.01f;
+		fireRate = 0.2f;
 		range = 250;
 		power = 50;
 		setAttacking(false);
@@ -35,9 +35,9 @@ public class RangedWeapon extends Weapon {
 	
 	public void equipProjectile(Projectile projectile, int ammoCount) {
 		if (ammoCount < 0)
-			throw new RuntimeException("You can't equip negative ammo, you punk.");
+			throw new RuntimeException("You can't equip negative ammo, you punk."); // LOL
 		if (projectile == null)
-			throw new RuntimeException("You can't equip a NULL reference, you punkish punky punk");
+			throw new RuntimeException("You can't equip a NULL reference, you punkish punky punk"); // Double LOL
 		
 		this.equippedAmmo = projectile;
 		this.ammoCount = ammoCount;
@@ -49,11 +49,13 @@ public class RangedWeapon extends Weapon {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
 	protected void doUpdate() {
 		
 	}
-	
+
+	@Override
 	protected void doAttack(Map map, Direction direction, Rectangle attackOrigin) {
 		if (ammoCount == 0) {
 			return; // can't fire with no ammo
@@ -70,4 +72,5 @@ public class RangedWeapon extends Weapon {
 	protected float doGetWait() {
 		return 0f;
 	}
+
 }

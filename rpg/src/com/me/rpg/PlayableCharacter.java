@@ -6,12 +6,27 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.combat.Weapon;
+import com.me.rpg.maps.Map;
 
 public class PlayableCharacter extends Character
 {
 
-	private boolean switchBool = false;
-	private boolean enable_good_action = true;
+	private boolean enableAttack = true;
+	private boolean enableWeaponSwitch = true;
+	private boolean enableStyleSwitch = true;
+	private boolean enableGoodAction = true;
+
+	private boolean enableControls = true;
+
+	public boolean getEnableControls()
+	{
+		return enableControls;
+	}
+
+	public void setEnableControls(boolean enable_controls)
+	{
+		this.enableControls = enable_controls;
+	}
 
 	public PlayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration)
@@ -31,8 +46,6 @@ public class PlayableCharacter extends Character
 		float x = oldX;
 		float y = oldY;
 		float speed = getSpeed();
-		int mapWidth = currentMap.getWidth();
-		int mapHeight = currentMap.getHeight();
 		setMoving(false);
 		addToStateTime(deltaTime);
 
@@ -42,83 +55,66 @@ public class PlayableCharacter extends Character
 		// Let me know if you think of something better -Mark
 		if (Gdx.input.isKeyPressed(Keys.A))
 		{
-			if (enable_good_action)
+			if (enableGoodAction)
 			{
-				enable_good_action = false;
+				enableGoodAction = false;
 				doGoodAction(deltaTime, currentMap);
 			}
 		}
 		else
 		{
-			enable_good_action = true;
+			enableGoodAction = true;
 		}
 
 		// check for input
-		int dx = 0;
-		int dy = 0;
-		if (Gdx.input.isKeyPressed(Keys.LEFT))
+		if (enableControls)
 		{
-			dx += Direction.LEFT.getDx();
-			dy += Direction.LEFT.getDy();
-		}
-		if (Gdx.input.isKeyPressed(Keys.RIGHT))
-		{
-			dx += Direction.RIGHT.getDx();
-			dy += Direction.RIGHT.getDy();
-		}
-		if (Gdx.input.isKeyPressed(Keys.UP))
-		{
-			dx += Direction.UP.getDx();
-			dy += Direction.UP.getDy();
-		}
-		if (Gdx.input.isKeyPressed(Keys.DOWN))
-		{
-			dx += Direction.DOWN.getDx();
-			dy += Direction.DOWN.getDy();
-		}
+			int dx = 0;
+			int dy = 0;
+			if (Gdx.input.isKeyPressed(Keys.LEFT))
+			{
+				dx += Direction.LEFT.getDx();
+				dy += Direction.LEFT.getDy();
+			}
+			if (Gdx.input.isKeyPressed(Keys.RIGHT))
+			{
+				dx += Direction.RIGHT.getDx();
+				dy += Direction.RIGHT.getDy();
+			}
+			if (Gdx.input.isKeyPressed(Keys.UP))
+			{
+				dx += Direction.UP.getDx();
+				dy += Direction.UP.getDy();
+			}
+			if (Gdx.input.isKeyPressed(Keys.DOWN))
+			{
+				dx += Direction.DOWN.getDx();
+				dy += Direction.DOWN.getDy();
+			}
 
-		// decode Direction from input
-		int diff = Math.abs(dx) + Math.abs(dy);
-		if (diff >= 2)
-		{
-			// moving diagonally, slow down movement in x and y
-			x += (dx * speed * deltaTime) / Math.sqrt(2);
-			y += (dy * speed * deltaTime) / Math.sqrt(2);
-			setDirection(Direction.getDirectionByDiff(0, dy));
-			setMoving(true);
-		}
-		else if (diff >= 1)
-		{
-			// moving in 1 direction
-			x += dx * speed * deltaTime;
-			y += dy * speed * deltaTime;
-			setDirection(Direction.getDirectionByDiff(dx, dy));
-			setMoving(true);
+			// decode Direction from input
+			int diff = Math.abs(dx) + Math.abs(dy);
+			if (diff >= 2)
+			{
+				// moving diagonally, slow down movement in x and y
+				x += (dx * speed * deltaTime) / Math.sqrt(2);
+				y += (dy * speed * deltaTime) / Math.sqrt(2);
+				setDirection(Direction.getDirectionByDiff(0, dy));
+				setMoving(true);
+			}
+			else if (diff >= 1)
+			{
+				// moving in 1 direction
+				x += dx * speed * deltaTime;
+				y += dy * speed * deltaTime;
+				setDirection(Direction.getDirectionByDiff(dx, dy));
+				setMoving(true);
+			}
 		}
 
 		// update x and y
 		if (isMoving())
 		{
-			// clamp x
-			if (x < 0)
-			{
-				x = 0;
-			}
-			if (x > mapWidth - spriteWidth)
-			{
-				x = mapWidth - spriteWidth;
-			}
-
-			// clamp y
-			if (y < 0)
-			{
-				y = 0;
-			}
-			if (y > mapHeight - spriteHeight)
-			{
-				y = mapHeight - spriteHeight;
-			}
-
 			// collision detection with objects on map
 			Coordinate newCoordinate = new Coordinate();
 			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
@@ -128,8 +124,17 @@ public class PlayableCharacter extends Character
 
 			if (didMove)
 			{
-				currentLocation.setX(newCoordinate.getX() + spriteWidth / 2);
-				currentLocation.setY(newCoordinate.getY() + spriteHeight / 2);
+				x = newCoordinate.getX();
+				y = newCoordinate.getY();
+				currentLocation.setX(x + spriteWidth / 2);
+				currentLocation.setY(y + spriteHeight / 2);
+
+				// check warp point collision
+				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(x, y, spriteWidth, spriteHeight));
+				if (newMap != null)
+				{
+					currentMap.getWorld().setMap(newMap);
+				}
 			}
 		}
 
@@ -159,44 +164,54 @@ public class PlayableCharacter extends Character
 			getSprite().setRegion(currentFrame);
 		}
 		
-		// attack thing
+		// attack
 		if (Gdx.input.isKeyPressed(Keys.J))
 		{
-			if (weaponSlot != null)
+			if (weaponSlot != null && enableAttack)
 			{
 				weaponSlot.attack(currentMap, getDirection(), getSprite()
 						.getBoundingRectangle());
-			}
-		}
-		if (Gdx.input.isKeyPressed(Keys.K))
-		{
-			if (weaponSlot != null && switchBool)
-			{
-				switchBool = false;
-				weaponSlot.switchStyle();
+				enableAttack = false;
 			}
 		}
 		else
 		{
-			switchBool = true;
+			enableAttack = true;
 		}
+
+		// switch attack style
+		if (Gdx.input.isKeyPressed(Keys.K))
+		{
+			if (weaponSlot != null && enableStyleSwitch)
+			{
+				weaponSlot.switchStyle();
+				enableStyleSwitch = false;
+			}
+		}
+		else
+		{
+			enableStyleSwitch = true;
+		}
+
 		if (weaponSlot != null)
 		{
 			weaponSlot.update(deltaTime);
 		}
+
+		// switch weapon
 		if (Gdx.input.isKeyPressed(Keys.M))
 		{
-			if (switchBool)
+			if (enableWeaponSwitch)
 			{
 				Weapon temp = weaponSlot;
 				weaponSlot = weaponSlotExtra;
 				weaponSlotExtra = temp;
-				switchBool = false;
+				enableWeaponSwitch = false;
 			}
-			else
-			{
-				switchBool = true;
-			}
+		}
+		else
+		{
+			enableWeaponSwitch = true;
 		}
 	}
 

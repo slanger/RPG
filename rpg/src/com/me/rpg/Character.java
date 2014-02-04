@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.me.rpg.combat.Weapon;
+import com.me.rpg.maps.Map;
 
 public abstract class Character
 {
@@ -55,12 +56,12 @@ public abstract class Character
 		sprite = new Sprite(downIdle, 0, 0, width, height);
 	}
 
-	protected String getName()
+	public String getName()
 	{
 		return name;
 	}
 
-	protected void setName(String name)
+	public void setName(String name)
 	{
 		this.name = name;
 	}
@@ -75,12 +76,12 @@ public abstract class Character
 		this.location = location;
 	}
 
-	protected float getX()
+	public float getX()
 	{
 		return location.getX();
 	}
 
-	protected float getY()
+	public float getY()
 	{
 		return location.getY();
 	}
@@ -115,7 +116,7 @@ public abstract class Character
 		this.stateTime += deltaTime;
 	}
 
-	protected Sprite getSprite()
+	public Sprite getSprite()
 	{
 		return sprite;
 	}
@@ -189,7 +190,9 @@ public abstract class Character
 	{
 		sprite.draw(batch);
 		if (weaponSlot != null)
+		{
 			weaponSlot.render(sprite.getBoundingRectangle(), getDirection(), batch);
+		}
 	}
 
 	/**

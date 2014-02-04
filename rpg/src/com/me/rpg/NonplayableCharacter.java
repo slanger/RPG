@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.ai.WalkAI;
+import com.me.rpg.maps.Map;
 
 public class NonplayableCharacter extends Character
 {

@@ -28,7 +28,6 @@
   <object x="1248" y="1408" width="64" height="48"/>
   <object x="1344" y="1344" width="64" height="48"/>
   <object x="1136" y="1344" width="64" height="48"/>
-  <object x="1248" y="1248" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="WalkingBoundaries" width="160" height="160">
   <object name="town" x="128" y="304" width="816" height="640"/>
@@ -60,5 +59,9 @@
   <object name="NPC1" x="2032" y="368" width="32" height="32"/>
   <object name="NPC2" x="512" y="2128" width="32" height="32"/>
   <object name="Player" x="1248" y="1280" width="32" height="32"/>
+  <object name="NPC3" x="512" y="512" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup name="Warp" width="160" height="160">
+  <object name="example" x="1248" y="1248" width="32" height="32"/>
  </objectgroup>
 </map>

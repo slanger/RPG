@@ -10,15 +10,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.me.rpg.maps.ExampleMap;
+import com.me.rpg.maps.PrototypeMap;
 
 public class RPG implements Screen
 {
 
-	//public static final String MAP_TMX_PATH = "maps/example/example.tmx";
-	public static final String MAP_TMX_PATH = "maps/prototype_map/prototype_map.tmx";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
 	public static final String SWORD_PATH = "sword.png";
+	public static final String ARROW_PATH = "arrow.png";
 
 	public static AssetManager manager = new AssetManager();
 
@@ -34,6 +35,7 @@ public class RPG implements Screen
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
+		//camera.zoom -= 0.1f;
 
 		batch = new SpriteBatch();
 		world = new World(batch, camera);
@@ -90,12 +92,14 @@ public class RPG implements Screen
 		// load Tiled map
 		manager.setLoader(TiledMap.class, new TmxMapLoader(
 				new InternalFileHandleResolver()));
-		manager.load(MAP_TMX_PATH, TiledMap.class);
+		manager.load(ExampleMap.MAP_TMX_PATH, TiledMap.class);
+		manager.load(PrototypeMap.MAP_TMX_PATH, TiledMap.class);
 		
 		// load textures
 		manager.load(PLAYER_TEXTURE_PATH, Texture.class);
 		manager.load(NPC_TEXTURE_PATH, Texture.class);
 		manager.load(SWORD_PATH, Texture.class);
+		manager.load(ARROW_PATH, Texture.class);
 		
 		manager.update();
 		manager.finishLoading();
