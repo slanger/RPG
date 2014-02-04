@@ -53,13 +53,15 @@
   <object name="16" x="1152" y="2368" width="32" height="32"/>
   <object name="17" x="1088" y="2432" width="32" height="32"/>
   <object name="18" x="880" y="2432" width="32" height="32"/>
-  <object name="19" x="512" y="2128" width="32" height="32"/>
+  <object name="desert" x="512" y="2112" width="32" height="32"/>
+  <object name="castle" x="2032" y="400" width="32" height="32"/>
+  <object name="town" x="528" y="528" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="Spawn" width="160" height="160">
-  <object name="NPC1" x="2032" y="368" width="32" height="32"/>
-  <object name="NPC2" x="512" y="2128" width="32" height="32"/>
+  <object name="NPC1" x="2032" y="288" width="32" height="32"/>
+  <object name="NPC2" x="288" y="1920" width="32" height="32"/>
   <object name="Player" x="1248" y="1280" width="32" height="32"/>
-  <object name="NPC3" x="512" y="512" width="32" height="32"/>
+  <object name="NPC3" x="832" y="448" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="Warp" width="160" height="160">
   <object name="example" x="1248" y="1248" width="32" height="32"/>

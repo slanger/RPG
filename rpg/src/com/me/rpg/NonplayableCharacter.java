@@ -8,13 +8,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.ai.RandomWalkAI;
 //import com.me.rpg.ai.StandStillAI;
-import com.me.rpg.ai.WalkAI;
 import com.me.rpg.maps.Map;
 
 public class NonplayableCharacter extends Character
 {
 
-	private WalkAI walkAI;
 	private boolean isHappy = false;
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
@@ -25,7 +23,7 @@ public class NonplayableCharacter extends Character
 				animationDuration);
 
 		walkAI = new RandomWalkAI(this, 1, 1, walkingBounds);
-		//walkAI = new StandStillAI(this, 0, 0, walkingBounds);
+		//walkAI = new StandStillAI();
 		walkAI.start();
 	}
 
@@ -102,6 +100,21 @@ public class NonplayableCharacter extends Character
 				this.cancel();
 			}
 			getSprite().setColor(new Color(c.r, c.g, c.b, a));
+		}
+
+	}
+
+	private class MoveToOtherTownTask extends Timer.Task
+	{
+
+		@Override
+		public void run()
+		{
+			int randomInt = (int) (Math.random() * 20);
+			if (randomInt == 0)
+			{
+				// TODO switch to FollowPathAI
+			}
 		}
 
 	}

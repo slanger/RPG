@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 
@@ -21,6 +22,8 @@ public abstract class Character
 	private boolean moving = false;
 	private float stateTime = 0f;
 	private float speed = 100f;
+
+	protected WalkAI walkAI;
 	
 	// Combat stuff
 	protected Weapon weaponSlot;
@@ -184,6 +187,16 @@ public abstract class Character
 	public void setPosition(float x, float y)
 	{
 		sprite.setPosition(x, y);
+	}
+
+	public WalkAI getWalkAI()
+	{
+		return walkAI;
+	}
+
+	public void setWalkAI(WalkAI walkAI)
+	{
+		this.walkAI = walkAI;
 	}
 
 	public void render(SpriteBatch batch)
