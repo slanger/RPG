@@ -32,15 +32,15 @@ public class RandomWalkAI implements WalkAI
 			// generate a random int in the range [0, 4] and convert to a
 			// direction
 			// 4 means the NPC won't move this update
-			int rand = (int) (Math.random() * 5);
-			if (rand > 3)
+			int randomInt = (int) (Math.random() * 5);
+			if (randomInt > 3)
 			{
 				character.setMoving(false);
 			}
 			else
 			{
 				character.setMoving(true);
-				character.setDirection(Direction.getDirectionByIndex(rand));
+				character.setDirection(Direction.getDirectionByIndex(randomInt));
 			}
 			toggleWalking = !toggleWalking;
 		}

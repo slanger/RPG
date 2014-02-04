@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.ai.RandomWalkAI;
+//import com.me.rpg.ai.StandStillAI;
 import com.me.rpg.ai.WalkAI;
 import com.me.rpg.maps.Map;
 
@@ -24,6 +25,7 @@ public class NonplayableCharacter extends Character
 				animationDuration);
 
 		walkAI = new RandomWalkAI(this, 1, 1, walkingBounds);
+		//walkAI = new StandStillAI(this, 0, 0, walkingBounds);
 		walkAI.start();
 	}
 
@@ -84,7 +86,7 @@ public class NonplayableCharacter extends Character
 		}
 	}
 
-	private class changeColorTask extends Timer.Task
+	private class ChangeColorTask extends Timer.Task
 	{
 
 		@Override
@@ -108,7 +110,7 @@ public class NonplayableCharacter extends Character
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		isHappy = true;
-		Timer.schedule(new changeColorTask(), 1, 0.5f);
+		Timer.schedule(new ChangeColorTask(), 1, 0.5f);
 	}
 
 }
