@@ -15,11 +15,15 @@ public class PlayableCharacter extends Character
 	private boolean enableWeaponSwitch = true;
 	private boolean enableStyleSwitch = true;
 	private boolean enableGoodAction = true;
-	private boolean enableDialogue = true;
 	private boolean enableControls = true;
     
+	private boolean enableInputE = true;
+	private boolean enableInput1 = true;
+	private boolean enableInput2 = true;
+	private boolean enableInput3 = true;
+
+	
 	private float lastCheckedTime;
-	private boolean tempAcceptInput=true;
 	
 	public boolean getEnableControls()
 	{
@@ -70,12 +74,11 @@ public class PlayableCharacter extends Character
 		}
 		
 		//DIALOGUE STUFF
-		if(tempAcceptInput==true){
 		if (Gdx.input.isKeyPressed(Keys.E) )
 		{
-			if (enableDialogue)
+			if (enableInputE)
 			{
-				
+				enableInputE = false;
 				if(currentMap.getWorld().getDialogue().getInDialogue()==false)
 				{
 					initiateDialogue(deltaTime, currentMap);
@@ -88,42 +91,47 @@ public class PlayableCharacter extends Character
 				else
 				{
 					//
-				}
-				tempAcceptInput=false;
+				}			
 			}
+		}
+		else{
+			enableInputE = true;
 		}
 		if (Gdx.input.isKeyPressed(Keys.NUM_1))
 		{
-			if (enableDialogue && currentMap.getWorld().getDialogue().getRequireResponse()==true)
+			if (enableInput1)
 			{
-				tempAcceptInput=false;
+				enableInput1=false;
 				advanceDialogue(deltaTime,currentMap,"NUM_1");
 			}
 		}
+		else{
+			enableInput1=true;
+		}
 		if (Gdx.input.isKeyPressed(Keys.NUM_2))
 		{
-			if (enableDialogue && currentMap.getWorld().getDialogue().getRequireResponse()==true)
+			if (enableInput2)
 			{
-				tempAcceptInput=false;
+				enableInput2 = false;
 				advanceDialogue(deltaTime,currentMap,"NUM_2");
 			}
+		}
+		else{
+			enableInput2=true;
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.NUM_3))
 		{
-			if (enableDialogue && currentMap.getWorld().getDialogue().getRequireResponse()==true)
+			if (enableInput3)
 			{
-				tempAcceptInput=false;
+				enableInput3=false;
 				advanceDialogue(deltaTime,currentMap,"NUM_3");
 			}
 		}
+		else{
+			enableInput3=true;
 		}
 		
-		if (Gdx.input.isKeyPressed(Keys.R))
-		//END DIALOGUE STUFF
-		{
-			tempAcceptInput=true;
-		}
 		// check for input
 		if (enableControls)
 		{

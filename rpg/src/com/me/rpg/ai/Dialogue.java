@@ -29,7 +29,7 @@ public class Dialogue {
 	private int lastIndex;
 	private String currentText;//the dialogue at the position in the arrays
 	private int numOptions;//the number of options for response.
-	private boolean requireResponse;//does the player have to select an option
+	private boolean requireResponse=false;//does the player have to select an option
 	private boolean inDialogue;
 
 	
@@ -116,21 +116,33 @@ public class Dialogue {
 	
 	public void advanceDialogue(String key)
 	{
+		int temp2;
 		if(currentIndex <0) currentIndex=0;
-		if(currentIndex <= lastIndex)
+		if(currentIndex < lastIndex)
 		{
-			requireResponse = false;
 			currentText = dialogueArray[currentIndex];
 			int temp=playerResponsePosition[currentIndex];
-			if(temp!=0){ //request player response
-				System.out.println("waiting for response");
-				requireResponse = true;
-				if(key=="NUM_1" && temp>0) currentIndex+=1;
-				else if(key=="NUM_2" && temp>1) currentIndex+=2;
-				else if(key=="NUM_3" && temp>2) currentIndex+=3;
+			if(temp != 0) requireResponse=true;
+			if(requireResponse==true)
+			{
+				if(key=="NUM_1" && temp>0) 
+				{
+					requireResponse=false;
+					currentIndex+=1;
+				}
+				else if(key=="NUM_2" && temp>1)
+				{
+					requireResponse=false;
+					currentIndex+=2;
+				}
+				else if(key=="NUM_3" && temp>2)
+				{ 
+					requireResponse=false;
+					currentIndex+=3;
+				}
 				else{
 					//index stays same until response
-				}	
+				}		
 			}
 			else{
 				if(key=="E") currentIndex++;
@@ -139,7 +151,19 @@ public class Dialogue {
 					//index stays same until E hit.
 				}
 			}
-			System.out.println(currentIndex);
+			if(currentIndex+1 > lastIndex)
+			{
+				temp2 = 0;
+			}
+			else
+			{
+				temp2 = playerResponsePosition[currentIndex+1];
+			}
+			if(temp2!=0)
+			{ //request player response
+				requireResponse=true;
+			}
+			
 		}
 		else{
 			System.out.println(lastIndex);
