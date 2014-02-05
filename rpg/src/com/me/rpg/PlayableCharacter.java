@@ -15,9 +15,12 @@ public class PlayableCharacter extends Character
 	private boolean enableWeaponSwitch = true;
 	private boolean enableStyleSwitch = true;
 	private boolean enableGoodAction = true;
-
+	private boolean enableDialogue = true;
 	private boolean enableControls = true;
-
+    
+	private float lastCheckedTime;
+	private boolean tempAcceptInput=true;
+	
 	public boolean getEnableControls()
 	{
 		return enableControls;
@@ -65,7 +68,62 @@ public class PlayableCharacter extends Character
 		{
 			enableGoodAction = true;
 		}
-
+		
+		//DIALOGUE STUFF
+		if(tempAcceptInput==true){
+		if (Gdx.input.isKeyPressed(Keys.E) )
+		{
+			if (enableDialogue)
+			{
+				
+				if(currentMap.getWorld().getDialogue().getInDialogue()==false)
+				{
+					initiateDialogue(deltaTime, currentMap);
+					advanceDialogue(deltaTime,currentMap,"E");
+				}
+				else if(currentMap.getWorld().getDialogue().getInDialogue()==true) //currently in dialogue
+				{
+					advanceDialogue(deltaTime,currentMap,"E");
+				}
+				else
+				{
+					//
+				}
+				tempAcceptInput=false;
+			}
+		}
+		if (Gdx.input.isKeyPressed(Keys.NUM_1))
+		{
+			if (enableDialogue && currentMap.getWorld().getDialogue().getRequireResponse()==true)
+			{
+				tempAcceptInput=false;
+				advanceDialogue(deltaTime,currentMap,"NUM_1");
+			}
+		}
+		if (Gdx.input.isKeyPressed(Keys.NUM_2))
+		{
+			if (enableDialogue && currentMap.getWorld().getDialogue().getRequireResponse()==true)
+			{
+				tempAcceptInput=false;
+				advanceDialogue(deltaTime,currentMap,"NUM_2");
+			}
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.NUM_3))
+		{
+			if (enableDialogue && currentMap.getWorld().getDialogue().getRequireResponse()==true)
+			{
+				tempAcceptInput=false;
+				advanceDialogue(deltaTime,currentMap,"NUM_3");
+			}
+		}
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.R))
+		//END DIALOGUE STUFF
+		{
+			tempAcceptInput=true;
+		}
 		// check for input
 		if (enableControls)
 		{
@@ -228,7 +286,27 @@ public class PlayableCharacter extends Character
 			c.acceptGoodAction(this);
 		}
 	}
-
+	private void initiateDialogue(float deltaTime, Map currentMap)
+	{
+		float width = getSpriteWidth();
+		float height = getSpriteHeight();
+		float x = getX() + getSpriteWidth() * getDirection().getDx();
+		float y = getY() + getSpriteHeight() * getDirection().getDy();
+		Rectangle hitbox = new Rectangle(x, y, width, height);
+		Character c = currentMap.checkCharacterCollision(hitbox, this);
+		if (c != null)
+		{
+			c.setMoving(false);
+			currentMap.getWorld().getDialogue().setInDialogue(true);
+			currentMap.getWorld().getDialogue().update(c);
+		}
+	}
+	
+	private void advanceDialogue(float deltaTime, Map currentMap, String key)
+	{
+			currentMap.getWorld().getDialogue().advanceDialogue(key);
+	}
+	
 	@Override
 	public void acceptGoodAction(Character characterDoingAction)
 	{
