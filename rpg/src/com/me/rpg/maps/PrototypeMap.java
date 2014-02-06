@@ -21,6 +21,8 @@ public class PrototypeMap extends Map
 	{
 		super(world, batch, camera);
 
+		mapType = MapType.PROTOTYPE;
+
 		// get Tiled map
 		tiledMap = RPG.manager.get(MAP_TMX_PATH, TiledMap.class);
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);

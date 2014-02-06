@@ -6,14 +6,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 //import com.me.rpg.ai.StandStillAI;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.MapType;
 
 public class NonplayableCharacter extends Character
 {
 
 	private boolean isHappy = false;
+	private MoveToOtherTownTask moveToOtherTownTask;
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
@@ -22,9 +25,10 @@ public class NonplayableCharacter extends Character
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
 				animationDuration);
 
-		walkAI = new RandomWalkAI(this, 1, 1, walkingBounds);
-		//walkAI = new StandStillAI();
-		walkAI.start();
+		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
+
+		moveToOtherTownTask = new MoveToOtherTownTask(this);
+		Timer.schedule(moveToOtherTownTask, 0, 5);
 	}
 
 	@Override
@@ -48,6 +52,18 @@ public class NonplayableCharacter extends Character
 	public void update(float deltaTime, Map currentMap)
 	{
 		addToStateTime(deltaTime);
+
+		// update movement
+		Coordinate newLocation = new Coordinate();
+		Direction newDirection = walkAI.update(deltaTime, currentMap, newLocation);
+		if (isMoving())
+		{
+			setLocation(newLocation);
+		}
+		if (newDirection != null)
+		{
+			setDirection(newDirection);
+		}
 
 		// update texture
 		TextureRegion currentFrame = null;
@@ -75,13 +91,13 @@ public class NonplayableCharacter extends Character
 		{
 			getSprite().setRegion(currentFrame);
 		}
-		
-		// update movement
-		Coordinate newLocation = walkAI.update(deltaTime, currentMap);
-		if (newLocation != null)
-		{
-			setLocation(newLocation);
-		}
+	}
+
+	@Override
+	public void doneFollowingPath()
+	{
+		setWalkAI(new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle())));
+		Timer.schedule(moveToOtherTownTask, 0, 5);
 	}
 
 	private class ChangeColorTask extends Timer.Task
@@ -107,13 +123,25 @@ public class NonplayableCharacter extends Character
 	private class MoveToOtherTownTask extends Timer.Task
 	{
 
+		private Character character;
+
+		MoveToOtherTownTask(Character character)
+		{
+			this.character = character;
+		}
+
 		@Override
 		public void run()
 		{
 			int randomInt = (int) (Math.random() * 20);
 			if (randomInt == 0)
 			{
-				// TODO switch to FollowPathAI
+				if (currentMap.getMapType() == MapType.PROTOTYPE)
+				{
+					System.out.println(getName() + " going to different town");
+					setWalkAI(new FollowPathAI(character, currentMap));
+					this.cancel();
+				}
 			}
 		}
 
@@ -123,7 +151,7 @@ public class NonplayableCharacter extends Character
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		isHappy = true;
-		Timer.schedule(new ChangeColorTask(), 1, 0.5f);
+		Timer.schedule(new ChangeColorTask(), 0, 0.5f);
 	}
 
 }

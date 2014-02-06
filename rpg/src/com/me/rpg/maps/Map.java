@@ -52,6 +52,13 @@ public abstract class Map implements Disposable
 
 	private boolean updateEnable = true;
 
+	protected MapType mapType;
+
+	public MapType getMapType()
+	{
+		return mapType;
+	}
+
 	public int getWidth()
 	{
 		return mapWidth;
@@ -152,6 +159,12 @@ public abstract class Map implements Disposable
 		return warpLayer.getObjects();
 	}
 
+	protected MapObjects getWaypoints()
+	{
+		MapLayer waypointsLayer = tiledMap.getLayers().get("Waypoints");
+		return waypointsLayer.getObjects();
+	}
+
 	protected void genericWeaponSetup(Character character)
 	{
 		int width = 32;
@@ -168,6 +181,36 @@ public abstract class Map implements Disposable
 		character.equip(bow);
 		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32, bow);
 		bow.equipProjectile(arrow, 1000);
+	}
+
+	/**
+	 * This method has a lot of hardcoding and should be used just for testing.
+	 */
+	public Rectangle[] getTestPath()
+	{
+		MapObjects waypointObjects = getWaypoints();
+		RectangleMapObject castleWaypoint = (RectangleMapObject) waypointObjects.get("castle");
+		RectangleMapObject desertWaypoint = (RectangleMapObject) waypointObjects.get("desert");
+		Rectangle[] returnPath = { castleWaypoint.getRectangle(), desertWaypoint.getRectangle() };
+		return returnPath;
+	}
+
+	public Rectangle getEnclosingWalkingBounds(Rectangle characterBoundingRectangle)
+	{
+		MapObjects walkingBoundaries = getWalkingBoundaries();
+		int count = walkingBoundaries.getCount();
+		Rectangle r;
+		for (int i = 0; i < count; i++)
+		{
+			r = ((RectangleMapObject) walkingBoundaries.get(i)).getRectangle();
+			if (r.contains(characterBoundingRectangle))
+			{
+				return r;
+			}
+		}
+		throw new RuntimeException(
+				"Cannot find a walking boundary for Rectangle: "
+						+ characterBoundingRectangle.toString());
 	}
 
 	/**
@@ -435,6 +478,7 @@ public abstract class Map implements Disposable
 							+ removeCharacter);
 		}
 		charactersOnMap.remove(removeCharacter);
+		removeCharacter.setCurrentMap(null);
 		if (focusedCharacter.equals(removeCharacter))
 		{
 			focusedCharacter = null;
@@ -466,6 +510,7 @@ public abstract class Map implements Disposable
 		}
 		newCharacter.setLocation(newLocation);
 		charactersOnMap.add(newCharacter);
+		newCharacter.setCurrentMap(this);
 	}
 
 	public void setFocusedCharacter(Character newFocus)
@@ -496,8 +541,9 @@ public abstract class Map implements Disposable
 	{
 		return charactersOnMap.contains(character);
 	}
-	
-	public void addProjectile(Projectile p) {
+
+	public void addProjectile(Projectile p)
+	{
 		flyingProjectiles.add(p);
 	}
 

@@ -66,11 +66,12 @@ public class RandomWalkAI implements WalkAI
 	@Override
 	public void stop()
 	{
+		character.setMoving(false);
 		moveTask.cancel();
 	}
 
 	@Override
-	public Coordinate update(float deltaTime, Map currentMap)
+	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
 	{
 		if (!character.isMoving())
 		{
@@ -121,8 +122,10 @@ public class RandomWalkAI implements WalkAI
 
 		character.setMoving(didMove);
 
-		return new Coordinate(newCoordinate.getX() + spriteWidth / 2,
-				newCoordinate.getY() + spriteHeight / 2);
+		newLocation.setX(newCoordinate.getX() + spriteWidth / 2);
+		newLocation.setY(newCoordinate.getY() + spriteHeight / 2);
+
+		return null; // we do not need to return a Direction
 	}
 
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -94,13 +95,16 @@ public class RPG implements Screen
 				new InternalFileHandleResolver()));
 		manager.load(ExampleMap.MAP_TMX_PATH, TiledMap.class);
 		manager.load(PrototypeMap.MAP_TMX_PATH, TiledMap.class);
-		
+
 		// load textures
 		manager.load(PLAYER_TEXTURE_PATH, Texture.class);
 		manager.load(NPC_TEXTURE_PATH, Texture.class);
 		manager.load(SWORD_PATH, Texture.class);
 		manager.load(ARROW_PATH, Texture.class);
-		
+
+		// load sounds
+		manager.load(World.WARP_SOUND_PATH, Sound.class);
+
 		manager.update();
 		manager.finishLoading();
 	}

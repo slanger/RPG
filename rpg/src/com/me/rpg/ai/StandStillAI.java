@@ -1,6 +1,7 @@
 package com.me.rpg.ai;
 
 import com.me.rpg.Coordinate;
+import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
 
 public class StandStillAI implements WalkAI
@@ -24,7 +25,7 @@ public class StandStillAI implements WalkAI
 	}
 
 	@Override
-	public Coordinate update(float deltaTime, Map currentMap)
+	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
 	{
 		return null;
 	}

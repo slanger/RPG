@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
@@ -24,6 +25,7 @@ public abstract class Character
 	private float speed = 100f;
 
 	protected WalkAI walkAI;
+	protected Map currentMap = null;
 	
 	// Combat stuff
 	protected Weapon weaponSlot;
@@ -124,6 +126,11 @@ public abstract class Character
 		return sprite;
 	}
 
+	public Rectangle getBoundingRectangle()
+	{
+		return sprite.getBoundingRectangle();
+	}
+
 	protected TextureRegion getRightIdle()
 	{
 		return rightIdle;
@@ -196,7 +203,22 @@ public abstract class Character
 
 	public void setWalkAI(WalkAI walkAI)
 	{
+		if (this.walkAI != null)
+		{
+			this.walkAI.stop();
+		}
 		this.walkAI = walkAI;
+		this.walkAI.start();
+	}
+
+	public Map getCurrentMap()
+	{
+		return currentMap;
+	}
+
+	public void setCurrentMap(Map currentMap)
+	{
+		this.currentMap = currentMap;
 	}
 
 	public void render(SpriteBatch batch)
@@ -223,6 +245,8 @@ public abstract class Character
 	public abstract void update(float deltaTime, Map currentMap);
 
 	public abstract void acceptGoodAction(Character characterDoingAction);
+
+	public abstract void doneFollowingPath();
 
 	/**
 	 * May be useful with debugging. Likely will be out of date if Character

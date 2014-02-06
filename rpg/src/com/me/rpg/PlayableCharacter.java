@@ -321,4 +321,10 @@ public class PlayableCharacter extends Character
 		return; // do nothing
 	}
 
+	@Override
+	public void doneFollowingPath()
+	{
+		return; // do nothing
+	}
+
 }

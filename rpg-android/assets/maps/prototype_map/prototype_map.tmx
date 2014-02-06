@@ -54,7 +54,7 @@
   <object name="17" x="1088" y="2432" width="32" height="32"/>
   <object name="18" x="880" y="2432" width="32" height="32"/>
   <object name="desert" x="512" y="2112" width="32" height="32"/>
-  <object name="castle" x="2032" y="400" width="32" height="32"/>
+  <object name="castle" x="2040" y="408" width="16" height="16"/>
   <object name="town" x="528" y="528" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="Spawn" width="160" height="160">

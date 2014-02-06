@@ -1,23 +1,29 @@
 package com.me.rpg.ai;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.Character;
 import com.me.rpg.Coordinate;
+import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
 
 public class FollowPathAI implements WalkAI
 {
 
 	private Character character;
+	private Map currentMap;
 	private Rectangle[] path;
-	private WalkAI previousWalkAI;
 	private int currentIndex = 0;
 
-	public FollowPathAI(Character character, Rectangle[] path, WalkAI previousWalkAI)
+	public FollowPathAI(Character character, Map currentMap)
 	{
 		this.character = character;
-		this.path = path;
-		this.previousWalkAI = previousWalkAI;
+		this.currentMap = currentMap;
+
+		Rectangle[] tempPath = currentMap.getTestPath();
+		path = new Rectangle[tempPath.length + 1];
+		path[0] = character.getBoundingRectangle();
+		System.arraycopy(tempPath, 0, path, 1, tempPath.length);
 	}
 
 	@Override
@@ -30,37 +36,63 @@ public class FollowPathAI implements WalkAI
 	public void stop()
 	{
 		character.setMoving(false);
-		character.setWalkAI(previousWalkAI);
 	}
 
 	@Override
-	public Coordinate update(float deltaTime, Map currentMap)
+	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
 	{
-		float xE = (float) (path[currentIndex + 1].getX() - path[currentIndex].getX());
-		float yE = (float) (path[currentIndex + 1].getY() - path[currentIndex].getY());
+		Rectangle currentWaypoint = path[currentIndex];
+		Rectangle nextWaypoint = path[currentIndex + 1];
+		Vector2 currentCenter = new Vector2();
+		Vector2 nextCenter = new Vector2();
+		currentWaypoint.getCenter(currentCenter);
+		nextWaypoint.getCenter(nextCenter);
+		float xE = (float) (nextCenter.x - currentCenter.x);
+		float yE = (float) (nextCenter.y - currentCenter.y);
 		float hE = (float) Math.sqrt(xE * xE + yE * yE);
-		
-		Coordinate returnCoordinate = new Coordinate();
+
 		float speed = character.getSpeed();
-		float x = character.getX() + (xE / hE) * speed;
-		float y = character.getY() + (yE / hE) * speed;
-		returnCoordinate.setX(x);
-		returnCoordinate.setY(y);
+		float x = character.getX() + (xE / hE) * speed * deltaTime;
+		float y = character.getY() + (yE / hE) * speed * deltaTime;
+		newLocation.setX(x);
+		newLocation.setY(y);
 
-		final float PRECISION = 1.0f;
+		Direction newDirection;
+		if (Math.abs(yE) >= Math.abs(xE))
+		{
+			if (yE > 0)
+			{
+				newDirection = Direction.UP;
+			}
+			else
+			{
+				newDirection = Direction.DOWN;
+			}
+		}
+		else
+		{
+			if (xE >= 0)
+			{
+				newDirection = Direction.RIGHT;
+			}
+			else
+			{
+				newDirection = Direction.LEFT;
+			}
+		}
 
-		if (Math.abs(x - (float) (path[currentIndex + 1].getX())) < PRECISION
-				&& Math.abs(y - (float) (path[currentIndex + 1].getY())) < PRECISION)
+		if (nextWaypoint.contains(x, y))
 		{
 			currentIndex++;
 		}
 
 		if (currentIndex >= path.length - 1)
 		{
-			stop();
+			System.out.println(character.getName() + " has arrived!");
+			character.doneFollowingPath();
 		}
 
-		return returnCoordinate;
+		return newDirection;
 	}
 
 }

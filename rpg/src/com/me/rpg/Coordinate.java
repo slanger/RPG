@@ -1,5 +1,7 @@
 package com.me.rpg;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Coordinate
 {
 
@@ -21,6 +23,12 @@ public class Coordinate
 	{
 		this.x = x;
 		this.y = y;
+	}
+
+	public Coordinate(Vector2 v)
+	{
+		this.x = v.x;
+		this.y = v.y;
 	}
 
 	public float getX()
