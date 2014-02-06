@@ -15,9 +15,16 @@ public class PlayableCharacter extends Character
 	private boolean enableWeaponSwitch = true;
 	private boolean enableStyleSwitch = true;
 	private boolean enableGoodAction = true;
-
 	private boolean enableControls = true;
+    
+	private boolean enableInputE = true;
+	private boolean enableInput1 = true;
+	private boolean enableInput2 = true;
+	private boolean enableInput3 = true;
 
+	
+	private float lastCheckedTime;
+	
 	public boolean getEnableControls()
 	{
 		return enableControls;
@@ -65,7 +72,66 @@ public class PlayableCharacter extends Character
 		{
 			enableGoodAction = true;
 		}
-
+		
+		//DIALOGUE STUFF
+		if (Gdx.input.isKeyPressed(Keys.E) )
+		{
+			if (enableInputE)
+			{
+				enableInputE = false;
+				if(currentMap.getWorld().getDialogue().getInDialogue()==false)
+				{
+					initiateDialogue(deltaTime, currentMap);
+					advanceDialogue(deltaTime,currentMap,"E");
+				}
+				else if(currentMap.getWorld().getDialogue().getInDialogue()==true) //currently in dialogue
+				{
+					advanceDialogue(deltaTime,currentMap,"E");
+				}
+				else
+				{
+					//
+				}			
+			}
+		}
+		else{
+			enableInputE = true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.NUM_1))
+		{
+			if (enableInput1)
+			{
+				enableInput1=false;
+				advanceDialogue(deltaTime,currentMap,"NUM_1");
+			}
+		}
+		else{
+			enableInput1=true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.NUM_2))
+		{
+			if (enableInput2)
+			{
+				enableInput2 = false;
+				advanceDialogue(deltaTime,currentMap,"NUM_2");
+			}
+		}
+		else{
+			enableInput2=true;
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.NUM_3))
+		{
+			if (enableInput3)
+			{
+				enableInput3=false;
+				advanceDialogue(deltaTime,currentMap,"NUM_3");
+			}
+		}
+		else{
+			enableInput3=true;
+		}
+		
 		// check for input
 		if (enableControls)
 		{
@@ -226,7 +292,27 @@ public class PlayableCharacter extends Character
 			c.acceptGoodAction(this);
 		}
 	}
-
+	private void initiateDialogue(float deltaTime, Map currentMap)
+	{
+		float width = getSpriteWidth();
+		float height = getSpriteHeight();
+		float x = getX() + getSpriteWidth() * getDirection().getDx();
+		float y = getY() + getSpriteHeight() * getDirection().getDy();
+		Rectangle hitbox = new Rectangle(x, y, width, height);
+		Character c = currentMap.checkCharacterCollision(hitbox, this);
+		if (c != null)
+		{
+			c.setMoving(false);
+			currentMap.getWorld().getDialogue().setInDialogue(true);
+			currentMap.getWorld().getDialogue().update(c);
+		}
+	}
+	
+	private void advanceDialogue(float deltaTime, Map currentMap, String key)
+	{
+			currentMap.getWorld().getDialogue().advanceDialogue(key);
+	}
+	
 	@Override
 	public void acceptGoodAction(Character characterDoingAction)
 	{
