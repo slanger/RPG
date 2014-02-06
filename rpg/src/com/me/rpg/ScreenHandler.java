@@ -41,7 +41,7 @@ public class ScreenHandler extends Game
 	@Override
 	public void resize(int width, int height)
 	{
-
+		super.getScreen().resize(width, height);
 	}
 
 	@Override

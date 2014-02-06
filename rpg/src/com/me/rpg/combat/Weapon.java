@@ -7,8 +7,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
+import com.me.rpg.Character;
 
 public abstract class Weapon implements Cloneable {
+	
+	protected Character owner;
 	
 	protected float speed;			// how long it takes for the weapon to reach the end of its stroke, in seconds
 	protected float fireRate; 		// how long the user must wait after attacking to attack or switch weapons, in seconds 
@@ -17,6 +20,7 @@ public abstract class Weapon implements Cloneable {
 	
 	private boolean attacking;	// indicates whether the weapon is currently being used to attack
 	protected float stateTime;		// helps determine animation parts
+	private Direction lastDirection; // last direction weapon was facing when used
 
 	private Sprite weaponRight, weaponUp, weaponLeft, weaponDown;
 	
@@ -30,6 +34,21 @@ public abstract class Weapon implements Cloneable {
 		weaponUp = new Sprite(sheet[0][1], 0, 0, height, width);
 		weaponLeft = new Sprite(sheet[0][2], 0, 0, width, height);
 		weaponDown = new Sprite(sheet[0][3], 0, 0, height, width);
+		lastDirection = Direction.DOWN;
+	}
+	
+	public void equippedBy(Character c) {
+		if (owner != null)
+			throw new RuntimeException("Cannot equip weapon.  It is already equippd by " + owner.toString());
+		owner = c;
+	}
+	
+	public void unequip() {
+		owner = null;
+	}
+	
+	public Character getOwner() {
+		return owner;
 	}
 	
 	protected Sprite getWeaponRight() {
@@ -78,7 +97,11 @@ public abstract class Weapon implements Cloneable {
 		throw new RuntimeException("Invalid direction attempted to retrieve for weapon: " + direction);
 	}
 	
-	protected boolean isAttacking() {
+	public Rectangle getSpriteBounds() {
+		return getWeapon(lastDirection).getBoundingRectangle();
+	}
+	
+	public boolean isAttacking() {
 		return attacking;
 	}
 	
@@ -90,7 +113,7 @@ public abstract class Weapon implements Cloneable {
 			SpriteBatch batch) {
 		if (!attacking)
 			return;
-		
+		lastDirection = direction;
 		doRender(charRectangle, direction, batch);
 	}
 	

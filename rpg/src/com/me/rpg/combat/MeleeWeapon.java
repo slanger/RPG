@@ -106,5 +106,4 @@ public class MeleeWeapon extends Weapon {
 	protected float doGetWait() {
 		return speed;
 	}
-	
 }

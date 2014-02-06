@@ -13,7 +13,6 @@ public class Main
 		cfg.useGL20 = true;
 		cfg.width = 400;
 		cfg.height = 400;
-
 		new LwjglApplication(new ScreenHandler(), cfg);
 	}
 

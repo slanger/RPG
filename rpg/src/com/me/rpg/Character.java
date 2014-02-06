@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 
@@ -210,6 +213,14 @@ public abstract class Character
 	public abstract void update(float deltaTime, Map currentMap);
 
 	public abstract void acceptGoodAction(Character characterDoingAction);
+	
+	public void acceptAttack(Weapon w) {
+		System.out.printf("Ouch, %s was attacked by %s\n", getName(), w.getOwner().getName());
+	}
+	
+	public void acceptAttack(Projectile p) {
+		System.out.printf("Whoa! %s was hit by a projectile, shot by %s\n", getName(), p.getFiredWeapon().getOwner().getName());
+	}
 
 	/**
 	 * May be useful with debugging. Likely will be out of date if Character
@@ -227,10 +238,38 @@ public abstract class Character
 	 * Likely insufficient implementation of equip
 	 * @param sword
 	 */
-	public void equip(Weapon weapon)
+	public void equip(Map m, Weapon weapon)
 	{
+		if (weaponSlot != null)
+		{
+			m.removeEquippedWeapon(weaponSlot);
+			weaponSlot.unequip();
+		}
+		weapon.equippedBy(this);
+		m.addEquippedWeapon(weapon);
 		this.weaponSlotExtra = weaponSlot; // blah
 		this.weaponSlot = weapon;
+	}
+	
+	public void swapWeapon(Map m) {
+		m.removeEquippedWeapon(weaponSlot);
+		weaponSlot.unequip();
+		
+		Weapon temp = weaponSlot;
+		weaponSlot = weaponSlotExtra;
+		weaponSlotExtra = temp;
+		weaponSlot.equippedBy(this);
+		m.addEquippedWeapon(weaponSlot);
+	}
+	
+	public Rectangle getHitBox() {
+		Rectangle r = sprite.getBoundingRectangle();
+		Vector2 center = new Vector2();
+		r.getCenter(center);
+		r.setWidth(r.getWidth()-8);
+		r.setHeight(r.getHeight()-8);
+		r.setCenter(center);
+		return r;
 	}
 
 }

@@ -3,6 +3,8 @@ package com.me.rpg.maps;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,6 +39,7 @@ public abstract class Map implements Disposable
 	
 	protected ArrayList<Character> charactersOnMap;
 	protected ArrayList<Projectile> flyingProjectiles;
+	protected ArrayList<Weapon> equippedWeapons;
 
 	protected RectangleMapObject[] collidables;
 	protected RectangleMapObject[] warpPoints;
@@ -51,6 +54,9 @@ public abstract class Map implements Disposable
 	protected int[] foregroundLayers;
 
 	private boolean updateEnable = true;
+	private boolean enableCameraSwitch = false;
+	private boolean cameraPan = false;
+	private float oldCameraZoom = 0f;
 
 	public int getWidth()
 	{
@@ -100,6 +106,7 @@ public abstract class Map implements Disposable
 
 		charactersOnMap = new ArrayList<Character>();
 		flyingProjectiles = new ArrayList<Projectile>();
+		equippedWeapons = new ArrayList<Weapon>();
 	}
 
 	protected void setup()
@@ -160,16 +167,41 @@ public abstract class Map implements Disposable
 		// melee attack test stuff
 		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
 		Weapon sword = new MeleeWeapon("LameSword", swordSprite, width, height, 32, 32);
-		character.equip(sword);
+		character.equip(this, sword);
 
 		// ranged attack test stuff
 		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
 		RangedWeapon bow = new RangedWeapon("LameBow", bowSprite, width, height, 32, 32);
-		character.equip(bow);
+		character.equip(this, bow);
 		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32, bow);
 		bow.equipProjectile(arrow, 1000);
 	}
 
+	private void cameraPanMovement() {
+        if(Gdx.input.isKeyPressed(Keys.A)) {
+            camera.zoom += 0.02;
+        }
+        if(Gdx.input.isKeyPressed(Keys.Q)) {
+        	camera.zoom -= 0.02;
+        }
+        if(Gdx.input.isKeyPressed(Keys.LEFT)) {
+            if (camera.position.x > 0)
+            	camera.translate(-3, 0, 0);
+        }
+        if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
+            if (camera.position.x < mapWidth)
+            	camera.translate(3, 0, 0);
+        }
+        if(Gdx.input.isKeyPressed(Keys.DOWN)) {
+            if (camera.position.y > 0)
+            	camera.translate(0, -3, 0);
+        }
+        if(Gdx.input.isKeyPressed(Keys.UP)) {
+            if (camera.position.y < mapHeight)
+            	camera.translate(0, 3, 0);
+        }
+	}
+	
 	/**
 	 * Draws the background image of the map, followed by all the Characters
 	 * that are in view nearby the focusedCharacter
@@ -221,27 +253,21 @@ public abstract class Map implements Disposable
 		{
 			bottomLeftY = (mapHeight - viewportHeight) / 2;
 		}
-		//float offsetX = Math.min(something, mapWidth/2);
-		//float offsetY = Math.min(something, mapHeight/2);
 		
-		//int drawnX = (int)bottomLeftX;
-		//int drawnY = (mapHeight > viewportHeight ? (mapHeight - viewportHeight) - (int)bottomLeftY : (int)bottomLeftY);
-		// NOTE:  There is a little bit of a flip going on here with the Y axis because the Image has (0,0) in the topleft corner, axis down and right
-		//		  We want (0,0) in the bottom left corner.  This transformation accomplishes that, but is not fully tested
-		//batch.draw(backgroundImage, offsetX, offsetY, drawnX, drawnY, width, height);
+		if (!cameraPan)
+		{
+			camera.position.set(bottomLeftX + viewportWidth / 2, bottomLeftY + viewportHeight / 2, 0);
+		}
 		
-		camera.position.set(bottomLeftX + viewportWidth / 2, bottomLeftY + viewportHeight / 2, 0);
-		//RPG.camera.update();
 		tiledMapRenderer.setView(camera);
-		//tiledMapRenderer.setView(RPG.camera.combined, 50, 50, width, height);
 		tiledMapRenderer.render(backgroundLayers);
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
 		Iterator<Character> iter = charactersOnMap.iterator();
-		Rectangle cameraBounds = new Rectangle(bottomLeftX, bottomLeftY,
-				viewportWidth, viewportHeight);
+		Rectangle cameraBounds = new Rectangle(camera.position.x - camera.zoom*viewportWidth/2, camera.position.y - camera.zoom*viewportHeight/2,
+				camera.zoom*viewportWidth, camera.zoom*viewportHeight);
 		while (iter.hasNext())
 		{
 			Character selected = iter.next();
@@ -254,8 +280,7 @@ public abstract class Map implements Disposable
 					- charHeight / 2);
 			// TODO this calculation is not quite right for characters on the
 			// edge of what is being drawn on the map
-			if (selected.getSprite().getBoundingRectangle()
-					.overlaps(cameraBounds))
+			if (selected.getHitBox().overlaps(cameraBounds))
 			{
 				selected.render(batch);
 			}
@@ -284,10 +309,79 @@ public abstract class Map implements Disposable
 
 	public void update(float deltaTime)
 	{
+		if (Gdx.input.isKeyPressed(Keys.C))
+		{
+			if (enableCameraSwitch) {
+				 enableCameraSwitch = false;
+				 cameraPan = !cameraPan;
+				 if (cameraPan)
+				 {
+					 oldCameraZoom = camera.zoom;
+				 }
+				 else
+				 {
+					 camera.zoom = oldCameraZoom;
+				 }
+			}
+		}
+		else
+		{
+			enableCameraSwitch = true;
+		}
+		
+		if (cameraPan)
+		{
+			cameraPanMovement();
+			return;
+		}
+		
 		if (!updateEnable)
 		{
 			return;
 		}
+		
+		// check intersections with weapons
+		Iterator<Weapon> weaponIter = equippedWeapons.iterator();
+		Iterator<Character> charIter;
+		Iterator<Projectile> projIter;
+		while (weaponIter.hasNext())
+		{
+			Weapon w = weaponIter.next();
+			if (!w.isAttacking())
+			{
+				continue;
+			}
+			charIter = charactersOnMap.iterator();
+			Rectangle weaponBox = w.getSpriteBounds();
+			while (charIter.hasNext()) {
+				Character c = charIter.next();
+				if (c.equals(w.getOwner()))
+					continue;
+				if (weaponBox.overlaps(c.getHitBox())) {
+					c.acceptAttack(w);
+				}
+			}
+		}
+		
+		// check if projectiles hit
+		projIter = flyingProjectiles.iterator();
+		while (projIter.hasNext())
+		{
+			Projectile p = projIter.next();
+			charIter = charactersOnMap.iterator();
+			Rectangle projectileBox = p.getSpriteBounds();
+			while (charIter.hasNext()) {
+				Character c = charIter.next();
+				if (c.equals(p.getFiredWeapon().getOwner()))
+					continue;
+				if (projectileBox.overlaps(c.getHitBox())) {
+					c.acceptAttack(p);
+					p.setHasHit();
+				}
+			}
+		}
+		
+		// move characters, projectiles
 		Iterator<Character> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
 		{
@@ -499,6 +593,14 @@ public abstract class Map implements Disposable
 	
 	public void addProjectile(Projectile p) {
 		flyingProjectiles.add(p);
+	}
+	
+	public void addEquippedWeapon(Weapon w) {
+		equippedWeapons.add(w);
+	}
+	
+	public void removeEquippedWeapon(Weapon w) {
+		equippedWeapons.remove(w);
 	}
 
 	@Override

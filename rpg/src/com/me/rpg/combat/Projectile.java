@@ -14,6 +14,7 @@ public class Projectile implements Cloneable {
 	private Direction firedDirection;
 	private boolean fired;
 	private boolean finished;
+	private int piercing;
 	private Coordinate origin;
 	private float stateTime;
 	private float degreeRotation;
@@ -33,6 +34,7 @@ public class Projectile implements Cloneable {
 		
 		fired = false;
 		finished = false;
+		piercing = 2;
 		origin = null;
 		firedDirection = Direction.RIGHT;
 		firedFrom = weapon;
@@ -40,6 +42,16 @@ public class Projectile implements Cloneable {
 		
 		speed = -1f;
 		range = -1;
+	}
+	
+	public RangedWeapon getFiredWeapon() {
+		return firedFrom;
+	}
+	
+	public void setHasHit() {
+		--piercing;
+		if (piercing <= 0)
+			finished = true;
 	}
 	
 	public boolean isFinished() {

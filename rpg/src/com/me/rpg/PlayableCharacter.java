@@ -203,9 +203,7 @@ public class PlayableCharacter extends Character
 		{
 			if (enableWeaponSwitch)
 			{
-				Weapon temp = weaponSlot;
-				weaponSlot = weaponSlotExtra;
-				weaponSlotExtra = temp;
+				swapWeapon(currentMap);
 				enableWeaponSwitch = false;
 			}
 		}
