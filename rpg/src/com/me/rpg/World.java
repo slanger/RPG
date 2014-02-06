@@ -1,14 +1,11 @@
 package com.me.rpg;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.maps.ExampleMap;
@@ -23,7 +20,7 @@ public class World implements Disposable
 	private BitmapFont debugFont;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
-	
+
 	private Map map;
 
 	private Dialogue dialogue;
@@ -35,6 +32,7 @@ public class World implements Disposable
 	{
 		return map;
 	}
+
 	public void setMap(Map map)
 	{
 		this.map.dispose();
@@ -43,6 +41,7 @@ public class World implements Disposable
 		warpSound.play();
 		Timer.schedule(new ChangeMapTask(map), 3.0f);
 	}
+
 	private class ChangeMapTask extends Timer.Task
 	{
 
@@ -71,14 +70,14 @@ public class World implements Disposable
 	{
 		return dialogue;
 	}
-	
+
 	public World(SpriteBatch batch, OrthographicCamera camera)
 	{
 		this.batch = batch;
 		this.camera = camera;
 
 		// create map
-		dialogue = new Dialogue(this,batch,camera);
+		dialogue = new Dialogue(this, batch, camera);
 		map = new ExampleMap(this, batch, camera);
 		// create debug font
 		debugFont = new BitmapFont();
@@ -106,13 +105,12 @@ public class World implements Disposable
 		debugFont.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(),
 				fpsX, fpsY);
 
-		//temporary dialogue stuff
-		if(dialogue.getInDialogue()==true)
+		// temporary dialogue stuff
+		if (dialogue.getInDialogue())
 		{
 			dialogue.render();
 		}
-		//
-		
+
 		batch.end();
 	}
 

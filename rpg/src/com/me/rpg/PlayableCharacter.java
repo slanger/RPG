@@ -16,15 +16,12 @@ public class PlayableCharacter extends Character
 	private boolean enableStyleSwitch = true;
 	private boolean enableGoodAction = true;
 	private boolean enableControls = true;
-    
+
 	private boolean enableInputE = true;
 	private boolean enableInput1 = true;
 	private boolean enableInput2 = true;
 	private boolean enableInput3 = true;
 
-	
-	private float lastCheckedTime;
-	
 	public boolean getEnableControls()
 	{
 		return enableControls;
@@ -44,7 +41,7 @@ public class PlayableCharacter extends Character
 
 	@Override
 	public void update(float deltaTime, Map currentMap)
-	{	
+	{
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
 		Coordinate currentLocation = getLocation();
@@ -72,66 +69,68 @@ public class PlayableCharacter extends Character
 		{
 			enableGoodAction = true;
 		}
-		
-		//DIALOGUE STUFF
-		if (Gdx.input.isKeyPressed(Keys.E) )
+
+		// DIALOGUE STUFF
+		if (Gdx.input.isKeyPressed(Keys.E))
 		{
 			if (enableInputE)
 			{
 				enableInputE = false;
-				if(currentMap.getWorld().getDialogue().getInDialogue()==false)
+				if (!currentMap.getWorld().getDialogue().getInDialogue())
 				{
 					initiateDialogue(deltaTime, currentMap);
-					advanceDialogue(deltaTime,currentMap,"E");
-				}
-				else if(currentMap.getWorld().getDialogue().getInDialogue()==true) //currently in dialogue
-				{
-					advanceDialogue(deltaTime,currentMap,"E");
+					advanceDialogue(deltaTime, currentMap, "E");
 				}
 				else
-				{
-					//
-				}			
+				{ // currently in dialogue
+					advanceDialogue(deltaTime, currentMap, "E");
+				}
 			}
 		}
-		else{
+		else
+		{
 			enableInputE = true;
 		}
+
 		if (Gdx.input.isKeyPressed(Keys.NUM_1))
 		{
 			if (enableInput1)
 			{
-				enableInput1=false;
-				advanceDialogue(deltaTime,currentMap,"NUM_1");
+				enableInput1 = false;
+				advanceDialogue(deltaTime, currentMap, "NUM_1");
 			}
 		}
-		else{
-			enableInput1=true;
+		else
+		{
+			enableInput1 = true;
 		}
+
 		if (Gdx.input.isKeyPressed(Keys.NUM_2))
 		{
 			if (enableInput2)
 			{
 				enableInput2 = false;
-				advanceDialogue(deltaTime,currentMap,"NUM_2");
+				advanceDialogue(deltaTime, currentMap, "NUM_2");
 			}
 		}
-		else{
-			enableInput2=true;
+		else
+		{
+			enableInput2 = true;
 		}
-		
+
 		if (Gdx.input.isKeyPressed(Keys.NUM_3))
 		{
 			if (enableInput3)
 			{
-				enableInput3=false;
-				advanceDialogue(deltaTime,currentMap,"NUM_3");
+				enableInput3 = false;
+				advanceDialogue(deltaTime, currentMap, "NUM_3");
 			}
 		}
-		else{
-			enableInput3=true;
+		else
+		{
+			enableInput3 = true;
 		}
-		
+
 		// check for input
 		if (enableControls)
 		{
@@ -196,7 +195,8 @@ public class PlayableCharacter extends Character
 				currentLocation.setY(y + spriteHeight / 2);
 
 				// check warp point collision
-				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(x, y, spriteWidth, spriteHeight));
+				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(
+						x, y, spriteWidth, spriteHeight));
 				if (newMap != null)
 				{
 					currentMap.getWorld().setMap(newMap);
@@ -229,7 +229,7 @@ public class PlayableCharacter extends Character
 		{
 			getSprite().setRegion(currentFrame);
 		}
-		
+
 		// attack
 		if (Gdx.input.isKeyPressed(Keys.J))
 		{
@@ -294,6 +294,7 @@ public class PlayableCharacter extends Character
 			c.acceptGoodAction(this);
 		}
 	}
+
 	private void initiateDialogue(float deltaTime, Map currentMap)
 	{
 		float width = getSpriteWidth();
@@ -309,12 +310,12 @@ public class PlayableCharacter extends Character
 			currentMap.getWorld().getDialogue().update(c);
 		}
 	}
-	
+
 	private void advanceDialogue(float deltaTime, Map currentMap, String key)
 	{
-			currentMap.getWorld().getDialogue().advanceDialogue(key);
+		currentMap.getWorld().getDialogue().advanceDialogue(key);
 	}
-	
+
 	@Override
 	public void acceptGoodAction(Character characterDoingAction)
 	{
