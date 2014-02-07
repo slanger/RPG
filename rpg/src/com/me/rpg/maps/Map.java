@@ -15,6 +15,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.Character;
 import com.me.rpg.Coordinate;
 import com.me.rpg.RPG;
@@ -50,7 +51,7 @@ public abstract class Map implements Disposable
 	// Tiled layers drawn in front of characters, labeled by index
 	protected int[] foregroundLayers;
 
-	private boolean updateEnable = true;
+	protected Timer timer;
 
 	protected MapType mapType;
 
@@ -89,14 +90,9 @@ public abstract class Map implements Disposable
 		return world;
 	}
 
-	public boolean isUpdating()
+	public Timer getTimer()
 	{
-		return updateEnable;
-	}
-
-	public void setUpdateEnable(boolean updateEnable)
-	{
-		this.updateEnable = updateEnable;
+		return timer;
 	}
 
 	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
@@ -104,6 +100,8 @@ public abstract class Map implements Disposable
 		this.world = world;
 		this.batch = batch;
 		this.camera = camera;
+
+		timer = new Timer();
 
 		charactersOnMap = new ArrayList<Character>();
 		flyingProjectiles = new ArrayList<Projectile>();
@@ -181,6 +179,25 @@ public abstract class Map implements Disposable
 		character.equip(bow);
 		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32, bow);
 		bow.equipProjectile(arrow, 1000);
+	}
+
+	/**
+	 * This method should be called after construction of Map when control is
+	 * first given to the player. Subclasses will override it with specific
+	 * implementation.
+	 */
+	public void open()
+	{
+		// default implementation
+	}
+
+	/**
+	 * This method should be called right before going to a new Map. Subclasses
+	 * will override it with specific implementation.
+	 */
+	public void close()
+	{
+		// default implementation
 	}
 
 	/**
@@ -327,10 +344,6 @@ public abstract class Map implements Disposable
 
 	public void update(float deltaTime)
 	{
-		if (!updateEnable)
-		{
-			return;
-		}
 		Iterator<Character> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
 		{
@@ -469,26 +482,24 @@ public abstract class Map implements Disposable
 		throw new RuntimeException("Cannot get Map from the given MapType");
 	}
 
+	/*
+	 * ADDING/REMOVING CHARACTERS
+	 */
+
 	public void removeCharacterFromMap(Character removeCharacter)
 	{
-		if (!characterOnMap(removeCharacter))
+		if (!isCharacterOnMap(removeCharacter))
 		{
 			throw new RuntimeException(
 					"Character cannot be removed from map - it is not on the map. Data: "
 							+ removeCharacter);
 		}
 		charactersOnMap.remove(removeCharacter);
-		removeCharacter.setCurrentMap(null);
+		removeCharacter.removedFromMap(this);
 		if (focusedCharacter.equals(removeCharacter))
 		{
 			focusedCharacter = null;
 		}
-	}
-
-	public void addCharacterToMap(Character newCharacter, float x, float y)
-	{
-		Coordinate newLocation = new Coordinate(x, y);
-		addCharacterToMap(newCharacter, newLocation);
 	}
 
 	public void addCharacterToMap(Character newCharacter, Coordinate newLocation)
@@ -499,7 +510,7 @@ public abstract class Map implements Disposable
 					"Cannot add the Character to the map - null location passed in. Data: "
 							+ newCharacter);
 		}
-		if (characterOnMap(newCharacter))
+		if (isCharacterOnMap(newCharacter))
 		{
 			throw new RuntimeException(
 					"Cannot add the Character to the map - it is already on the map. Data: OldLoc: "
@@ -510,18 +521,26 @@ public abstract class Map implements Disposable
 		}
 		newCharacter.setLocation(newLocation);
 		charactersOnMap.add(newCharacter);
-		newCharacter.setCurrentMap(this);
+		newCharacter.addedToMap(this);
 	}
 
 	public void setFocusedCharacter(Character newFocus)
 	{
-		if (!characterOnMap(newFocus))
+		if (!isCharacterOnMap(newFocus))
 		{
 			throw new RuntimeException(
 					"Cannot set character to be focus if it is not already on the map. Data: "
 							+ newFocus);
 		}
 		focusedCharacter = newFocus;
+	}
+
+	// HELPER METHODS
+
+	public void addCharacterToMap(Character newCharacter, float x, float y)
+	{
+		Coordinate newLocation = new Coordinate(x, y);
+		addCharacterToMap(newCharacter, newLocation);
 	}
 
 	public void addFocusedCharacterToMap(Character newFocusedCharacter,
@@ -537,7 +556,11 @@ public abstract class Map implements Disposable
 		setFocusedCharacter(newFocusedCharacter);
 	}
 
-	public boolean characterOnMap(Character character)
+	/*
+	 * END ADDING/REMOVING CHARACTERS
+	 */
+
+	public boolean isCharacterOnMap(Character character)
 	{
 		return charactersOnMap.contains(character);
 	}

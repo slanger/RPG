@@ -60,7 +60,7 @@ public class RandomWalkAI implements WalkAI
 	@Override
 	public void start()
 	{
-		Timer.schedule(moveTask, delaySeconds, intervalSeconds);
+		character.getCurrentMap().getTimer().scheduleTask(moveTask, delaySeconds, intervalSeconds);
 	}
 
 	@Override

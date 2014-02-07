@@ -3,12 +3,10 @@ package com.me.rpg;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
-//import com.me.rpg.ai.StandStillAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
 
@@ -28,7 +26,6 @@ public class NonplayableCharacter extends Character
 		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
 
 		moveToOtherTownTask = new MoveToOtherTownTask(this);
-		Timer.schedule(moveToOtherTownTask, 0, 5);
 	}
 
 	@Override
@@ -65,39 +62,14 @@ public class NonplayableCharacter extends Character
 			setDirection(newDirection);
 		}
 
-		// update texture
-		TextureRegion currentFrame = null;
-		switch (getDirection())
-		{
-		case RIGHT:
-			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getRightIdle();
-			break;
-		case LEFT:
-			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getLeftIdle();
-			break;
-		case UP:
-			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getUpIdle();
-			break;
-		case DOWN:
-			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getDownIdle();
-			break;
-		}
-
-		if (currentFrame != null)
-		{
-			getSprite().setRegion(currentFrame);
-		}
+		updateTexture();
 	}
 
 	@Override
 	public void doneFollowingPath()
 	{
 		setWalkAI(new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle())));
-		Timer.schedule(moveToOtherTownTask, 0, 5);
+		currentMap.getTimer().scheduleTask(moveToOtherTownTask, 0, 5);
 	}
 
 	private class ChangeColorTask extends Timer.Task
@@ -151,7 +123,7 @@ public class NonplayableCharacter extends Character
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		isHappy = true;
-		Timer.schedule(new ChangeColorTask(), 0, 0.5f);
+		currentMap.getTimer().scheduleTask(new ChangeColorTask(), 0, 0.5f);
 	}
 
 }

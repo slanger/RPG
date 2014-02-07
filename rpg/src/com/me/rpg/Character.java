@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.ai.StandStillAI;
 import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
@@ -59,6 +60,9 @@ public abstract class Character
 		downIdle = sheet[Direction.DOWN.getIndex()][0];
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
+		sprite.setRegion(downIdle);
+		// default walk AI
+		walkAI = new StandStillAI();
 	}
 
 	public String getName()
@@ -203,12 +207,7 @@ public abstract class Character
 
 	public void setWalkAI(WalkAI walkAI)
 	{
-		if (this.walkAI != null)
-		{
-			this.walkAI.stop();
-		}
 		this.walkAI = walkAI;
-		this.walkAI.start();
 	}
 
 	public Map getCurrentMap()
@@ -243,6 +242,47 @@ public abstract class Character
 	 *            The map height of the current map
 	 */
 	public abstract void update(float deltaTime, Map currentMap);
+
+	protected void updateTexture()
+	{
+		TextureRegion currentFrame = null;
+		switch (getDirection())
+		{
+		case RIGHT:
+			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getRightIdle();
+					break;
+		case LEFT:
+			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getLeftIdle();
+					break;
+		case UP:
+			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getUpIdle();
+					break;
+		case DOWN:
+			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getDownIdle();
+					break;
+		}
+
+		if (currentFrame != null)
+		{
+			sprite.setRegion(currentFrame);
+		}
+	}
+
+	public void addedToMap(Map map)
+	{
+		currentMap = map;
+		walkAI.start();
+	}
+
+	public void removedFromMap(Map map)
+	{
+		walkAI.stop();
+		currentMap = null;
+	}
 
 	public abstract void acceptGoodAction(Character characterDoingAction);
 

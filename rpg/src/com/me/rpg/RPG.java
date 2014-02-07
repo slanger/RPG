@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -90,7 +91,7 @@ public class RPG implements Screen
 
 	private void loadAssets()
 	{
-		// load Tiled map
+		// load Tiled maps
 		manager.setLoader(TiledMap.class, new TmxMapLoader(
 				new InternalFileHandleResolver()));
 		manager.load(ExampleMap.MAP_TMX_PATH, TiledMap.class);
@@ -101,9 +102,12 @@ public class RPG implements Screen
 		manager.load(NPC_TEXTURE_PATH, Texture.class);
 		manager.load(SWORD_PATH, Texture.class);
 		manager.load(ARROW_PATH, Texture.class);
+		manager.load(World.WHITE_DOT_PATH, Texture.class);
 
-		// load sounds
+		// load sounds and music
 		manager.load(World.WARP_SOUND_PATH, Sound.class);
+		manager.load(PrototypeMap.BACKGROUND_MUSIC_START, Music.class);
+		manager.load(PrototypeMap.BACKGROUND_MUSIC_LOOP, Music.class);
 
 		manager.update();
 		manager.finishLoading();

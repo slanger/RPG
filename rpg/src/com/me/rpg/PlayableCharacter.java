@@ -3,7 +3,6 @@ package com.me.rpg;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
@@ -27,9 +26,9 @@ public class PlayableCharacter extends Character
 		return enableControls;
 	}
 
-	public void setEnableControls(boolean enable_controls)
+	public void setEnableControls(boolean enableControls)
 	{
-		this.enableControls = enable_controls;
+		this.enableControls = enableControls;
 	}
 
 	public PlayableCharacter(String name, Texture spritesheet, int width,
@@ -42,6 +41,33 @@ public class PlayableCharacter extends Character
 	@Override
 	public void update(float deltaTime, Map currentMap)
 	{
+		setMoving(false);
+		addToStateTime(deltaTime);
+
+		// handle input
+		handleInput(deltaTime);
+
+		// update weapon
+		if (weaponSlot != null)
+		{
+			weaponSlot.update(deltaTime);
+		}
+
+		// update texture
+		updateTexture();
+	}
+
+	private void handleInput(float deltaTime)
+	{
+		if (!enableControls)
+		{
+			return;
+		}
+
+		/*
+		 * MOVEMENT
+		 */
+
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
 		Coordinate currentLocation = getLocation();
@@ -50,13 +76,80 @@ public class PlayableCharacter extends Character
 		float x = oldX;
 		float y = oldY;
 		float speed = getSpeed();
-		setMoving(false);
-		addToStateTime(deltaTime);
+		int dx = 0;
+		int dy = 0;
+		if (Gdx.input.isKeyPressed(Keys.LEFT))
+		{
+			dx += Direction.LEFT.getDx();
+			dy += Direction.LEFT.getDy();
+		}
+		if (Gdx.input.isKeyPressed(Keys.RIGHT))
+		{
+			dx += Direction.RIGHT.getDx();
+			dy += Direction.RIGHT.getDy();
+		}
+		if (Gdx.input.isKeyPressed(Keys.UP))
+		{
+			dx += Direction.UP.getDx();
+			dy += Direction.UP.getDy();
+		}
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			dx += Direction.DOWN.getDx();
+			dy += Direction.DOWN.getDy();
+		}
 
-		// handle input
-		// I use this idiom to get around having the action be executed like
-		// 1000 times before the player takes his finger off the button
-		// Let me know if you think of something better -Mark
+		// decode Direction from input
+		int diff = Math.abs(dx) + Math.abs(dy);
+		if (diff >= 2)
+		{
+			// moving diagonally, slow down movement in x and y
+			x += (dx * speed * deltaTime) / Math.sqrt(2);
+			y += (dy * speed * deltaTime) / Math.sqrt(2);
+			setDirection(Direction.getDirectionByDiff(0, dy));
+			setMoving(true);
+		}
+		else if (diff >= 1)
+		{
+			// moving in 1 direction
+			x += dx * speed * deltaTime;
+			y += dy * speed * deltaTime;
+			setDirection(Direction.getDirectionByDiff(dx, dy));
+			setMoving(true);
+		}
+
+		// update x and y
+		if (isMoving())
+		{
+			// collision detection with objects on map
+			Coordinate newCoordinate = new Coordinate();
+			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
+					spriteWidth, spriteHeight, this, newCoordinate);
+
+			setMoving(didMove);
+
+			if (didMove)
+			{
+				x = newCoordinate.getX();
+				y = newCoordinate.getY();
+				currentLocation.setX(x + spriteWidth / 2);
+				currentLocation.setY(y + spriteHeight / 2);
+
+				// check warp point collision
+				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(
+						x, y, spriteWidth, spriteHeight));
+				if (newMap != null)
+				{
+					currentMap.getWorld().warpToAnotherMap(newMap);
+				}
+			}
+		}
+
+		/*
+		 * END MOVEMENT
+		 */
+
+		// do good action
 		if (Gdx.input.isKeyPressed(Keys.A))
 		{
 			if (enableGoodAction)
@@ -70,7 +163,10 @@ public class PlayableCharacter extends Character
 			enableGoodAction = true;
 		}
 
-		// DIALOGUE STUFF
+		/*
+		 * DIALOGUE
+		 */
+
 		if (Gdx.input.isKeyPressed(Keys.E))
 		{
 			if (enableInputE)
@@ -131,104 +227,13 @@ public class PlayableCharacter extends Character
 			enableInput3 = true;
 		}
 
-		// check for input
-		if (enableControls)
-		{
-			int dx = 0;
-			int dy = 0;
-			if (Gdx.input.isKeyPressed(Keys.LEFT))
-			{
-				dx += Direction.LEFT.getDx();
-				dy += Direction.LEFT.getDy();
-			}
-			if (Gdx.input.isKeyPressed(Keys.RIGHT))
-			{
-				dx += Direction.RIGHT.getDx();
-				dy += Direction.RIGHT.getDy();
-			}
-			if (Gdx.input.isKeyPressed(Keys.UP))
-			{
-				dx += Direction.UP.getDx();
-				dy += Direction.UP.getDy();
-			}
-			if (Gdx.input.isKeyPressed(Keys.DOWN))
-			{
-				dx += Direction.DOWN.getDx();
-				dy += Direction.DOWN.getDy();
-			}
+		/*
+		 * END DIALOGUE
+		 */
 
-			// decode Direction from input
-			int diff = Math.abs(dx) + Math.abs(dy);
-			if (diff >= 2)
-			{
-				// moving diagonally, slow down movement in x and y
-				x += (dx * speed * deltaTime) / Math.sqrt(2);
-				y += (dy * speed * deltaTime) / Math.sqrt(2);
-				setDirection(Direction.getDirectionByDiff(0, dy));
-				setMoving(true);
-			}
-			else if (diff >= 1)
-			{
-				// moving in 1 direction
-				x += dx * speed * deltaTime;
-				y += dy * speed * deltaTime;
-				setDirection(Direction.getDirectionByDiff(dx, dy));
-				setMoving(true);
-			}
-		}
-
-		// update x and y
-		if (isMoving())
-		{
-			// collision detection with objects on map
-			Coordinate newCoordinate = new Coordinate();
-			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
-					spriteWidth, spriteHeight, this, newCoordinate);
-
-			setMoving(didMove);
-
-			if (didMove)
-			{
-				x = newCoordinate.getX();
-				y = newCoordinate.getY();
-				currentLocation.setX(x + spriteWidth / 2);
-				currentLocation.setY(y + spriteHeight / 2);
-
-				// check warp point collision
-				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(
-						x, y, spriteWidth, spriteHeight));
-				if (newMap != null)
-				{
-					currentMap.getWorld().setMap(newMap);
-				}
-			}
-		}
-
-		TextureRegion currentFrame = null;
-		switch (getDirection())
-		{
-		case RIGHT:
-			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getRightIdle();
-			break;
-		case LEFT:
-			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getLeftIdle();
-			break;
-		case UP:
-			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getUpIdle();
-			break;
-		case DOWN:
-			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getDownIdle();
-			break;
-		}
-
-		if (currentFrame != null)
-		{
-			getSprite().setRegion(currentFrame);
-		}
+		/*
+		 * COMBAT
+		 */
 
 		// attack
 		if (Gdx.input.isKeyPressed(Keys.J))
@@ -259,11 +264,6 @@ public class PlayableCharacter extends Character
 			enableStyleSwitch = true;
 		}
 
-		if (weaponSlot != null)
-		{
-			weaponSlot.update(deltaTime);
-		}
-
 		// switch weapon
 		if (Gdx.input.isKeyPressed(Keys.M))
 		{
@@ -279,6 +279,10 @@ public class PlayableCharacter extends Character
 		{
 			enableWeaponSwitch = true;
 		}
+
+		/*
+		 * END COMBAT
+		 */
 	}
 
 	private void doGoodAction(float deltaTime, Map currentMap)

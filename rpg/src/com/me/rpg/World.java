@@ -2,9 +2,10 @@ package com.me.rpg;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
@@ -16,17 +17,20 @@ public class World implements Disposable
 {
 
 	public static String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
+	public static String WHITE_DOT_PATH = "white_dot.png";
 
-	private BitmapFont debugFont;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
-
+	private BitmapFont debugFont;
 	private Map map;
+	private boolean updateEnable = true;
 
 	private Dialogue dialogue;
 
 	private boolean warping = false;
+	private float warpingAlpha;
 	private Sound warpSound;
+	private Sprite whiteScreen;
 
 	public Map getMap()
 	{
@@ -35,19 +39,44 @@ public class World implements Disposable
 
 	public void setMap(Map map)
 	{
-		this.map.dispose();
-		this.map.setUpdateEnable(false);
-		warping = true;
-		warpSound.play();
-		Timer.schedule(new ChangeMapTask(map), 3.0f);
+		if (this.map != null)
+		{
+			this.map.dispose();
+		}
+		this.map = map;
 	}
 
-	private class ChangeMapTask extends Timer.Task
+	public void warpToAnotherMap(Map map)
+	{
+		this.map.close();
+		updateEnable = false;
+		warping = true;
+		warpingAlpha = 0f;
+		warpSound.play();
+		map.getTimer().scheduleTask(new Timer.Task()
+		{
+
+			@Override
+			public void run()
+			{
+				warpingAlpha += 0.1f;
+				if (warpingAlpha > 1f)
+				{
+					warpingAlpha = 1f;
+					this.cancel();
+				}
+			}
+
+		}, 0f, 0.1f);
+		map.getTimer().scheduleTask(new WarpToAnotherMapTask(map), 3.0f);
+	}
+
+	private class WarpToAnotherMapTask extends Timer.Task
 	{
 
 		private Map newMap;
 
-		ChangeMapTask(Map newMap)
+		WarpToAnotherMapTask(Map newMap)
 		{
 			this.newMap = newMap;
 		}
@@ -55,20 +84,58 @@ public class World implements Disposable
 		@Override
 		public void run()
 		{
-			changeMap(newMap);
+			setMap(newMap);
+
+			newMap.getTimer().scheduleTask(new Timer.Task()
+			{
+
+				@Override
+				public void run()
+				{
+					warpingAlpha -= 0.1f;
+				}
+
+			}, 0f, 0.1f, 10);
+
+			newMap.getTimer().scheduleTask(new Timer.Task()
+			{
+
+				@Override
+				public void run()
+				{
+					updateEnable = true;
+					warping = false;
+					newMap.open();
+				}
+
+			}, 1.0f);
 		}
 
-	}
-
-	private void changeMap(Map newMap)
-	{
-		map = newMap;
-		warping = false;
 	}
 
 	public Dialogue getDialogue()
 	{
 		return dialogue;
+	}
+
+	public boolean isUpdating()
+	{
+		return updateEnable;
+	}
+
+	public void setUpdateEnable(boolean updateEnable)
+	{
+		this.updateEnable = updateEnable;
+
+		// turn on/off Map Timer
+		if (updateEnable)
+		{
+			map.getTimer().start();
+		}
+		else
+		{
+			map.getTimer().stop();
+		}
 	}
 
 	public World(SpriteBatch batch, OrthographicCamera camera)
@@ -79,11 +146,14 @@ public class World implements Disposable
 		// create map
 		dialogue = new Dialogue(this, batch, camera);
 		map = new ExampleMap(this, batch, camera);
+
 		// create debug font
 		debugFont = new BitmapFont();
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 
-		warpSound = RPG.manager.get(WARP_SOUND_PATH);
+		// warp resources
+		warpSound = RPG.manager.get(WARP_SOUND_PATH, Sound.class);
+		whiteScreen = new Sprite(RPG.manager.get(WHITE_DOT_PATH, Texture.class));
 	}
 
 	public void render()
@@ -93,10 +163,17 @@ public class World implements Disposable
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
+		// temporary dialogue stuff
+		if (dialogue.getInDialogue())
+		{
+			dialogue.render();
+		}
+
 		if (warping)
 		{
-			Gdx.gl.glClearColor(1, 1, 1, 1);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
+			whiteScreen.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
+			whiteScreen.draw(batch, warpingAlpha);
 		}
 
 		// render HUD and overlays
@@ -105,18 +182,15 @@ public class World implements Disposable
 		debugFont.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(),
 				fpsX, fpsY);
 
-		// temporary dialogue stuff
-		if (dialogue.getInDialogue())
-		{
-			dialogue.render();
-		}
-
 		batch.end();
 	}
 
 	public void update(float deltaTime)
 	{
-		map.update(deltaTime);
+		if (updateEnable)
+		{
+			map.update(deltaTime);
+		}
 	}
 
 	@Override

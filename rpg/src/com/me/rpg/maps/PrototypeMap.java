@@ -1,5 +1,6 @@
 package com.me.rpg.maps;
 
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.NonplayableCharacter;
 import com.me.rpg.PlayableCharacter;
 import com.me.rpg.RPG;
@@ -16,6 +18,11 @@ public class PrototypeMap extends Map
 {
 	
 	public static final String MAP_TMX_PATH = "maps/prototype_map/prototype_map.tmx";
+	public static final String BACKGROUND_MUSIC_START = "music/ALTTP_overworld_start.wav";
+	public static final String BACKGROUND_MUSIC_LOOP = "music/ALTTP_overworld_loop.wav";
+
+	private Music startMusic, loopMusic;
+	private StartLoopMusicTask startLoopMusicTask = new StartLoopMusicTask();
 
 	public PrototypeMap(World world, SpriteBatch batch, OrthographicCamera camera)
 	{
@@ -81,6 +88,39 @@ public class PrototypeMap extends Map
 
 		// setup weapons
 		genericWeaponSetup(player);
+
+		// get music
+		startMusic = RPG.manager.get(BACKGROUND_MUSIC_START);
+		loopMusic = RPG.manager.get(BACKGROUND_MUSIC_LOOP);
 	}
-	
+
+	@Override
+	public void open()
+	{
+		world.setUpdateEnable(true);
+		startMusic.play();
+		timer.scheduleTask(startLoopMusicTask, 7.192f); // length of intro music
+	}
+
+	@Override
+	public void close()
+	{
+		timer.stop();
+		startLoopMusicTask.cancel();
+		startMusic.stop();
+		loopMusic.stop();
+	}
+
+	private class StartLoopMusicTask extends Timer.Task
+	{
+
+		@Override
+		public void run()
+		{
+			loopMusic.setLooping(true);
+			loopMusic.play();
+		}
+
+	}
+
 }
