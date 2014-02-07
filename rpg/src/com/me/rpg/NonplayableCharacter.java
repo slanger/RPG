@@ -9,7 +9,7 @@ import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
 
-public class NonplayableCharacter extends Character
+public class NonplayableCharacter extends GameCharacter
 {
 
 	private boolean isHappy = false;
@@ -94,9 +94,9 @@ public class NonplayableCharacter extends Character
 	private class MoveToOtherTownTask extends Timer.Task
 	{
 
-		private Character character;
+		private GameCharacter character;
 
-		MoveToOtherTownTask(Character character)
+		MoveToOtherTownTask(GameCharacter character)
 		{
 			this.character = character;
 		}
@@ -119,7 +119,7 @@ public class NonplayableCharacter extends Character
 	}
 
 	@Override
-	public void acceptGoodAction(Character characterDoingAction)
+	public void acceptGoodAction(GameCharacter characterDoingAction)
 	{
 		isHappy = true;
 		currentMap.getTimer().scheduleTask(new ChangeColorTask(), 0, 0.5f);

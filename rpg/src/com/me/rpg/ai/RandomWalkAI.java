@@ -2,7 +2,7 @@ package com.me.rpg.ai;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
@@ -10,7 +10,7 @@ import com.me.rpg.maps.Map;
 public class RandomWalkAI implements WalkAI
 {
 
-	private Character character;
+	private GameCharacter character;
 	private float delaySeconds;
 	private float intervalSeconds;
 	private Rectangle walkingBounds;
@@ -47,7 +47,7 @@ public class RandomWalkAI implements WalkAI
 
 	}
 
-	public RandomWalkAI(Character character, float delaySeconds,
+	public RandomWalkAI(GameCharacter character, float delaySeconds,
 			float intervalSeconds, Rectangle walkingBounds)
 	{
 		this.character = character;

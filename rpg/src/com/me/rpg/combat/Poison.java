@@ -1,6 +1,6 @@
 package com.me.rpg.combat;
 
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 
 public class Poison extends RepeatingEffect {
 
@@ -18,13 +18,13 @@ public class Poison extends RepeatingEffect {
 	}
 
 	@Override
-	protected void doApplyBeforeActive(Character victim) {
+	protected void doApplyBeforeActive(GameCharacter victim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	protected void applyRepeatEffect(Character victim) {
+	protected void applyRepeatEffect(GameCharacter victim) {
 		victim.receiveDamage(power);
 		System.err.printf("%s took %d damage from poison\n", victim.getName(), power);
 	}

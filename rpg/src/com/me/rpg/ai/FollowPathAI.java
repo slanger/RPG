@@ -2,7 +2,7 @@ package com.me.rpg.ai;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
@@ -10,12 +10,12 @@ import com.me.rpg.maps.Map;
 public class FollowPathAI implements WalkAI
 {
 
-	private Character character;
+	private GameCharacter character;
 	//private Map currentMap;
 	private Rectangle[] path;
 	private int currentIndex = 0;
 
-	public FollowPathAI(Character character, Map currentMap)
+	public FollowPathAI(GameCharacter character, Map currentMap)
 	{
 		this.character = character;
 		//this.currentMap = currentMap;

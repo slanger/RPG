@@ -3,14 +3,14 @@ package com.me.rpg.combat;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.Direction;
 
 public abstract class Equippable implements Cloneable {
 	
 	private String itemName;
-	private Character owner;
-	private Character lastOwner;
+	private GameCharacter owner;
+	private GameCharacter lastOwner;
 	
 	private boolean spriteInit;
 	private Sprite spriteRight;
@@ -80,7 +80,7 @@ public abstract class Equippable implements Cloneable {
 	 * @param c Character trying to equip item
 	 * @return indicates success or failure.
 	 */
-	public boolean tryEquip(Character c) {
+	public boolean tryEquip(GameCharacter c) {
 		boolean result = canEquip(c);
 		if (result)
 			equippedBy(c);
@@ -91,9 +91,9 @@ public abstract class Equippable implements Cloneable {
 	 * Indicates whether the current item can be equipped by the given character
 	 * @return indicates yes or no
 	 */
-	protected abstract boolean canEquip(Character c);
+	protected abstract boolean canEquip(GameCharacter c);
 	
-	private void equippedBy(Character c) {
+	private void equippedBy(GameCharacter c) {
 		if (owner != null)
 		{
 			String error = String.format("Cannot equip %s.  It is already equippd by %s.", this, owner);
@@ -112,12 +112,12 @@ public abstract class Equippable implements Cloneable {
 		owner = null;
 	}
 	
-	public Character getOwner() {
+	public GameCharacter getOwner() {
 		return owner;
 	}
 	
-	public Character getLatestOwner() {
-		Character c = getOwner();
+	public GameCharacter getLatestOwner() {
+		GameCharacter c = getOwner();
 		if (c == null)
 			c = lastOwner;
 		return c;

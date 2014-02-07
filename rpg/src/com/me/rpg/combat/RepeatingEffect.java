@@ -1,6 +1,6 @@
 package com.me.rpg.combat;
 
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 
 public abstract class RepeatingEffect extends StatusEffect {
 	
@@ -16,13 +16,13 @@ public abstract class RepeatingEffect extends StatusEffect {
 	}
 
 	@Override
-	protected void doApplyBeforeActive(Character victim) {
+	protected void doApplyBeforeActive(GameCharacter victim) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected final void doApplyAfterActive(Character victim) {
+	protected final void doApplyAfterActive(GameCharacter victim) {
 		float timePassed = getTimePassed();
 		while (timePassed > (appliedCount + 1) * repeatRate) {
 			++appliedCount;
@@ -30,6 +30,6 @@ public abstract class RepeatingEffect extends StatusEffect {
 		}
 	}
 	
-	protected abstract void applyRepeatEffect(Character victim);
+	protected abstract void applyRepeatEffect(GameCharacter victim);
 
 }

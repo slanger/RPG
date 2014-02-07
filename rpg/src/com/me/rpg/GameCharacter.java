@@ -21,7 +21,7 @@ import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 
-public abstract class Character implements IAttackable
+public abstract class GameCharacter implements IAttackable
 {
 	private static final int MAX_HEALTH = 100;
 
@@ -49,7 +49,7 @@ public abstract class Character implements IAttackable
 	protected float strikeImmunity;
 	
 
-	protected Character(String name, Texture spritesheet, int width,
+	protected GameCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration)
 	{
 		this.name = name;
@@ -332,7 +332,7 @@ public abstract class Character implements IAttackable
 		currentMap = null;
 	}
 
-	public abstract void acceptGoodAction(Character characterDoingAction);
+	public abstract void acceptGoodAction(GameCharacter characterDoingAction);
 
 	protected Rectangle getHitboxInFrontOfCharacter()
 	{

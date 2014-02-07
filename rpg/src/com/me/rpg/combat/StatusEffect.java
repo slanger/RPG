@@ -1,6 +1,6 @@
 package com.me.rpg.combat;
 
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 
 public abstract class StatusEffect implements Cloneable {
 	
@@ -64,7 +64,7 @@ public abstract class StatusEffect implements Cloneable {
 		return timePassed;
 	}
 	
-	public final void applyStatusEffect(float deltaTime, Character victim) {
+	public final void applyStatusEffect(float deltaTime, GameCharacter victim) {
 		prototypeCheck();
 		if (!active) {
 			doApplyBeforeActive(victim);
@@ -86,13 +86,13 @@ public abstract class StatusEffect implements Cloneable {
 	 * Hook for code to be applied to victim before effect is active
 	 * @param victim Character that effect is applied to
 	 */
-	protected abstract void doApplyBeforeActive(Character victim);
+	protected abstract void doApplyBeforeActive(GameCharacter victim);
 	
 	/**
 	 * Hook for code to be applied to victim while effect is active
 	 * @param victim Character that effect is applied to
 	 */
-	protected abstract void doApplyAfterActive(Character victim);
+	protected abstract void doApplyAfterActive(GameCharacter victim);
 	
 	public Object clone() {
 		try {

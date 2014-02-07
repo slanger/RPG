@@ -3,7 +3,7 @@ package com.me.rpg.combat;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
 
@@ -112,7 +112,7 @@ public class MeleeWeapon extends Weapon {
 	 * (non-Javadoc) TODO: Determine if we want to have 'levels' or some way to limit weapon equipping
 	 * @see com.me.rpg.combat.Equippable#canEquip(com.me.rpg.Character)
 	 */
-	protected boolean canEquip(Character c) {
+	protected boolean canEquip(GameCharacter c) {
 		return true;
 	}
 }

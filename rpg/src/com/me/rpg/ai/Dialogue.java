@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.Coordinate;
 import com.me.rpg.World;
 import com.me.rpg.maps.Map;
@@ -19,8 +19,8 @@ public class Dialogue {
 	private OrthographicCamera camera;
 	private World world;
 	private Map map;
-	private ArrayList<Character> charactersOnMap;
-	private Character currentCharacter;
+	private ArrayList<GameCharacter> charactersOnMap;
+	private GameCharacter currentCharacter;
 	
 	//Planning on converting this array system to a tree implementation soon
 	private int playerResponsePosition[];  //index locations that require response will have int > 0. The int is how many choices
@@ -62,7 +62,7 @@ public class Dialogue {
 	{
 		return requireResponse;
 	}
-	public void update(Character character)
+	public void update(GameCharacter character)
 	{
 		currentIndex=-1;
 		System.out.println(character.getName());

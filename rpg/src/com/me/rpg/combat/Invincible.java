@@ -1,6 +1,6 @@
 package com.me.rpg.combat;
 
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 
 public class Invincible extends StatusEffect {
 
@@ -10,13 +10,13 @@ public class Invincible extends StatusEffect {
 	}
 
 	@Override
-	protected void doApplyBeforeActive(Character victim) {
+	protected void doApplyBeforeActive(GameCharacter victim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	protected void doApplyAfterActive(Character victim) {
+	protected void doApplyAfterActive(GameCharacter victim) {
 		// TODO Auto-generated method stub
 		
 	}

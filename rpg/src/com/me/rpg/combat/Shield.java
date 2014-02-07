@@ -3,7 +3,7 @@ package com.me.rpg.combat;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.Character;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.Direction;
 
 public class Shield extends Equippable implements IAttackable {
@@ -69,7 +69,7 @@ public class Shield extends Equippable implements IAttackable {
 	}
 
 	@Override
-	protected boolean canEquip(Character c) {
+	protected boolean canEquip(GameCharacter c) {
 		return health != 0;
 	}
 

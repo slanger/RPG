@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.maps.Map;
 
-public class PlayableCharacter extends Character
+public class PlayableCharacter extends GameCharacter
 {
 
 	private boolean enableAttack = true;
@@ -275,7 +275,7 @@ public class PlayableCharacter extends Character
 	private void doGoodAction(float deltaTime, Map currentMap)
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		Character c = currentMap.checkCharacterCollision(hitbox, this);
+		GameCharacter c = currentMap.checkCharacterCollision(hitbox, this);
 		if (c != null)
 		{
 			c.acceptGoodAction(this);
@@ -285,7 +285,7 @@ public class PlayableCharacter extends Character
 	private void initiateDialogue(float deltaTime, Map currentMap)
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		Character c = currentMap.checkCharacterCollision(hitbox, this);
+		GameCharacter c = currentMap.checkCharacterCollision(hitbox, this);
 		if (c != null)
 		{
 			c.setMoving(false);
@@ -300,7 +300,7 @@ public class PlayableCharacter extends Character
 	}
 
 	@Override
-	public void acceptGoodAction(Character characterDoingAction)
+	public void acceptGoodAction(GameCharacter characterDoingAction)
 	{
 		return; // do nothing
 	}
