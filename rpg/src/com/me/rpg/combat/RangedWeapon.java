@@ -1,8 +1,8 @@
 package com.me.rpg.combat;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.Character;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
@@ -10,11 +10,11 @@ import com.me.rpg.maps.Map;
 public class RangedWeapon extends Weapon {
 	
 	private Projectile equippedAmmo;
+	protected float degreeRotation;
 	private int ammoCount;
 	
-	public RangedWeapon(String string, Texture rangedSprite, int width, int height, int tileWidth,
-			int tileHeight) {
-		super(string, rangedSprite, width, height, tileWidth, tileHeight);
+	public RangedWeapon(String weaponName) {
+		super(weaponName);
 		setStatsDefault();
 	}
 	
@@ -24,9 +24,10 @@ public class RangedWeapon extends Weapon {
 		speed = 0.5f;
 		fireRate = 0.2f;
 		range = 250;
-		power = 50;
+		power = 5;
 		setAttacking(false);
 		stateTime = 0f;
+		degreeRotation = 0f;
 	}
 	
 	public void switchStyle() {
@@ -35,10 +36,10 @@ public class RangedWeapon extends Weapon {
 	
 	public void equipProjectile(Projectile projectile, int ammoCount) {
 		if (ammoCount < 0)
-			throw new RuntimeException("You can't equip negative ammo, you punk."); // LOL
+			throw new RuntimeException("You can't equip negative ammo, you punk.");
 		if (projectile == null)
-			throw new RuntimeException("You can't equip a NULL reference, you punkish punky punk"); // Double LOL
-		
+			throw new RuntimeException("You can't equip a NULL reference, you punkish punky punk.");
+		projectile.setFiredWeapon(this);
 		this.equippedAmmo = projectile;
 		this.ammoCount = ammoCount;
 	}
@@ -71,6 +72,21 @@ public class RangedWeapon extends Weapon {
 	@Override
 	protected float doGetWait() {
 		return 0f;
+	}
+
+	@Override
+	/*
+	 * (non-Javadoc) TODO: Determine if we want to limit equipping of RangedWeapons
+	 * @see com.me.rpg.combat.Equippable#canEquip(com.me.rpg.Character)
+	 */
+	protected boolean canEquip(Character c) {
+		return true;
+	}
+
+	@Override
+	protected void doAttackCleanup() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -72,7 +72,7 @@ public class ExampleMap extends Map
 		addCharacterToMap(npc2, npc2Spawn.getRectangle().x, npc2Spawn.getRectangle().y);
 
 		// setup weapons
-		genericWeaponSetup(player);
+		genericWeaponSetup(player, npc1);
 	}
 	
 }

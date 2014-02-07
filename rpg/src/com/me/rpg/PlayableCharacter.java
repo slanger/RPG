@@ -43,7 +43,7 @@ public class PlayableCharacter extends Character
 	}
 
 	@Override
-	public void update(float deltaTime, Map currentMap)
+	public void doUpdate(float deltaTime, Map currentMap)
 	{	
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
@@ -54,7 +54,6 @@ public class PlayableCharacter extends Character
 		float y = oldY;
 		float speed = getSpeed();
 		setMoving(false);
-		addToStateTime(deltaTime);
 
 		// handle input
 		// I use this idiom to get around having the action be executed like

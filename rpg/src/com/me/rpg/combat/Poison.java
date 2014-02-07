@@ -1,23 +1,32 @@
 package com.me.rpg.combat;
 
-public class Poison extends StatusEffect {
+import com.me.rpg.Character;
 
-	private float damageRate;	// time in seconds between negative effects of the poison
+public class Poison extends RepeatingEffect {
+
 	private int power;			// how much damage the poison does, 1:1 with health
-	private float effectLimit; 	// time in seconds until effect wears off naturally
 	
-	public Poison(float damageRate, int power, float effectLimit) {
-		super("Poison", "Poisoned"); // effectName + verbForm
-		this.damageRate = damageRate;
+	/**
+	 * Initialize a Poison status
+	 * @param damageRate How often the damage is applied, in seconds.
+	 * @param power How much damage is applied, 1:1 ratio with health points.
+	 * @param effectLength How long the effect will last before it wears off naturally
+	 */
+	public Poison(int power, int totalReptitions, float repeatRate) {
+		super("Poison", "Poisoned", totalReptitions, repeatRate); // effectName + verbForm
 		this.power = power;
-		this.effectLimit = effectLimit;
 	}
 
 	@Override
-	public boolean applyStatusEffect(float deltaTime, Character victim) {
+	protected void doApplyBeforeActive(Character victim) {
 		// TODO Auto-generated method stub
-		return false;
+		
+	}
+
+	@Override
+	protected void applyRepeatEffect(Character victim) {
+		victim.receiveDamage(power);
+		System.err.printf("%s took %d damage from poison\n", victim.getName(), power);
 	}
 	
-	// maybe want some Boilerplate - prototype pattern here.  Poison (or other stuff) needs only one set of animation, but many different configs
 }

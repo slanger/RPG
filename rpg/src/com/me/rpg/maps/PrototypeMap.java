@@ -78,7 +78,7 @@ public class PrototypeMap extends Map
 		addCharacterToMap(npc3, npc3Spawn.getRectangle().x, npc3Spawn.getRectangle().y);
 
 		// setup weapons
-		genericWeaponSetup(player);
+		genericWeaponSetup(player, npc1);
 	}
 	
 }

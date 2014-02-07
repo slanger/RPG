@@ -1,104 +1,70 @@
 package com.me.rpg.combat;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
-import com.me.rpg.Character;
 
-public abstract class Weapon implements Cloneable {
-	
-	protected Character owner;
+public abstract class Weapon extends Equippable {
 	
 	protected float speed;			// how long it takes for the weapon to reach the end of its stroke, in seconds
 	protected float fireRate; 		// how long the user must wait after attacking to attack or switch weapons, in seconds 
 	protected int range; 			// how far the weapon can reach, in pixels?
 	protected int power; 			// how much damage the weapon does, 1:1 with health
 	
-	private boolean attacking;	// indicates whether the weapon is currently being used to attack
+	private boolean attacking;		// indicates whether the weapon is currently being used to attack
 	protected float stateTime;		// helps determine animation parts
 	private Direction lastDirection; // last direction weapon was facing when used
-
-	private Sprite weaponRight, weaponUp, weaponLeft, weaponDown;
 	
-	public Weapon(String string, Texture weaponSprite, int width, int height, int tileWidth,
-			int tileHeight) {
-		// IMPORTANT: Expects images to be in order "right up left down"
-		//			AND dimensions for right -- up are reversed
-		//			AND that given dimensions are for right
-		TextureRegion[][] sheet = TextureRegion.split(weaponSprite, tileWidth, tileHeight);
-		weaponRight = new Sprite(sheet[0][0], 0, 0, width, height);
-		weaponUp = new Sprite(sheet[0][1], 0, 0, height, width);
-		weaponLeft = new Sprite(sheet[0][2], 0, 0, width, height);
-		weaponDown = new Sprite(sheet[0][3], 0, 0, height, width);
+	protected StatusEffect[] effects; // list of status effects this weapon applies
+	
+	public int getPower() {
+		return power;
+	}
+	
+	public Direction getLastDirection() {
+		return lastDirection;
+	}
+	
+	public Weapon(String weaponName) {
+		super(weaponName);
 		lastDirection = Direction.DOWN;
+		effects = new StatusEffect[0];
 	}
 	
-	public void equippedBy(Character c) {
-		if (owner != null)
-			throw new RuntimeException("Cannot equip weapon.  It is already equippd by " + owner.toString());
-		owner = c;
+	public float getSpeed() {
+		return speed;
 	}
 	
-	public void unequip() {
-		owner = null;
-	}
-	
-	public Character getOwner() {
-		return owner;
-	}
-	
-	protected Sprite getWeaponRight() {
-		return weaponRight;
-	}
-
-	protected void setWeaponRight(Sprite weaponRight) {
-		this.weaponRight = weaponRight;
-	}
-
-	protected Sprite getWeaponUp() {
-		return weaponUp;
-	}
-
-	protected void setWeaponUp(Sprite weaponUp) {
-		this.weaponUp = weaponUp;
-	}
-
-	protected Sprite getWeaponLeft() {
-		return weaponLeft;
-	}
-
-	protected void setWeaponLeft(Sprite weaponLeft) {
-		this.weaponLeft = weaponLeft;
-	}
-
-	protected Sprite getWeaponDown() {
-		return weaponDown;
-	}
-
-	protected void setWeaponDown(Sprite weaponDown) {
-		this.weaponDown = weaponDown;
-	}
-	
-	protected Sprite getWeapon(Direction direction) {
-		switch(direction) {
-			case UP:
-				return getWeaponUp();
-			case DOWN:
-				return getWeaponDown();
-			case LEFT:
-				return getWeaponLeft();
-			case RIGHT:
-				return getWeaponRight();
+	/**
+	 * Returns a copy of the status effects for this weapon
+	 * @param size Desired size of output array
+	 * @return Array of effects. May be empty.
+	 */
+	public StatusEffect[] getEffects() {
+		StatusEffect[] ret = new StatusEffect[effects.length];
+		for (int i = 0; i < effects.length; ++i) {
+			ret[i] = (StatusEffect)effects[i].clone();
 		}
-		throw new RuntimeException("Invalid direction attempted to retrieve for weapon: " + direction);
+		return ret;
+	}
+	
+	public void addEffect(StatusEffect effect) {
+		if (effect == null)
+			throw new RuntimeException("Don't add null effects, you punk.");
+		StatusEffect[] temp = new StatusEffect[effects.length+1];
+		System.arraycopy(effects, 0, temp, 0, effects.length);
+		temp[effects.length] = effect;
+		effects = temp;
+	}
+	
+	protected Sprite getWeaponSprite() {
+		return getItemSprite(lastDirection);
 	}
 	
 	public Rectangle getSpriteBounds() {
-		return getWeapon(lastDirection).getBoundingRectangle();
+		return getWeaponSprite().getBoundingRectangle();
 	}
 	
 	public boolean isAttacking() {
@@ -136,30 +102,30 @@ public abstract class Weapon implements Cloneable {
 	
 	protected abstract float doGetWait();
 	
+	protected abstract void doAttackCleanup();
+	
 	public void update(float deltaTime) {
 		stateTime += deltaTime;
+		doUpdate();
 		if (!attacking) {
 			return;
 		}
 		if (stateTime > doGetWait()) {
 			stateTime = 0f;
 			attacking = false;
+			doAttackCleanup();
 			return;
 		}
-		doUpdate();
 	}
 	
 	protected abstract void doUpdate();
 
 	public abstract void switchStyle();
 	
-	protected Object clone() throws CloneNotSupportedException {
+	public Object clone() {
 		Weapon w = (Weapon)super.clone();
-		w.weaponUp = new Sprite(weaponUp);
-		w.weaponDown = new Sprite(weaponDown);
-		w.weaponLeft = new Sprite(weaponLeft);
-		w.weaponRight = new Sprite(weaponRight);
+		w.lastDirection = lastDirection;
+		w.effects = getEffects();
 		return w;
 	}
-	
 }

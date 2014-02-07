@@ -17,15 +17,17 @@ public class Projectile implements Cloneable {
 	private int piercing;
 	private Coordinate origin;
 	private float stateTime;
-	private float degreeRotation;
 	
 	private Sprite weaponRight, weaponUp, weaponLeft, weaponDown;
 	
-	// obtained from passed in RangedWeapon
-	private float speed;
+	private float speedMultiplier;
+	private float degreeRotation;
 	private int range;
+	private int power;
 	
-	public Projectile(String name, Texture projectile, int width, int height, int tileWidth, int tileHeight, RangedWeapon weapon) {
+	private StatusEffect[] effects;
+	
+	public Projectile(String name, Texture projectile, int width, int height, int tileWidth, int tileHeight) {
 		TextureRegion[][] sheet = TextureRegion.split(projectile, tileWidth, tileHeight);
 		weaponRight = new Sprite(sheet[0][0], 0, 0, width, height);
 		weaponUp = new Sprite(sheet[0][1], 0, 0, height, width);
@@ -34,18 +36,47 @@ public class Projectile implements Cloneable {
 		
 		fired = false;
 		finished = false;
-		piercing = 2;
+		piercing = 1;
 		origin = null;
 		firedDirection = Direction.RIGHT;
-		firedFrom = weapon;
+		firedFrom = null;
 		stateTime = 0f;
 		
-		speed = -1f;
-		range = -1;
+		power = 0;
+		speedMultiplier = 1.0f;
+		range = 0;
+		
+		effects = new StatusEffect[0];
+	}
+	
+	public StatusEffect[] getEffects() {
+		StatusEffect[] partial = firedFrom.getEffects();
+		StatusEffect[] ret = new StatusEffect[effects.length + partial.length];
+		for (int i = 0; i < effects.length; ++i)
+			ret[i] = (StatusEffect)effects[i].clone();
+		System.arraycopy(partial, 0, ret, effects.length, partial.length);
+		return ret;
+	}
+	
+	public void addEffect(StatusEffect effect) {
+		if (effect == null)
+			throw new RuntimeException("Don't add null effects, you punk.");
+		StatusEffect[] temp = new StatusEffect[effects.length+1];
+		System.arraycopy(effects, 0, temp, 0, effects.length);
+		temp[effects.length] = effect;
+		effects = temp;
+	}
+	
+	public void setFiredWeapon(RangedWeapon firedFrom) {
+		this.firedFrom = firedFrom;
 	}
 	
 	public RangedWeapon getFiredWeapon() {
 		return firedFrom;
+	}
+	
+	public Direction getFiredDirection() {
+		return firedDirection;
 	}
 	
 	public void setHasHit() {
@@ -66,17 +97,33 @@ public class Projectile implements Cloneable {
 		if (!fired) {
 			return;
 		}
-		if (stateTime > speed + 0.01) {
+		if (stateTime > getSpeed() + 0.01) {
 			fired = false;
 			finished = true;
 			return;
 		}
 		stateTime += deltaTime;
 		
-		float movement = range * stateTime / speed;
+		float movement = getRange() * stateTime / getSpeed();
 		Sprite sprite = getWeapon();
 		sprite.setPosition(origin.getX() + movement * firedDirection.getDx(), origin.getY() + movement * firedDirection.getDy());
-		sprite.setRotation(degreeRotation * stateTime / speed);
+		sprite.setRotation(getDegreeRotation() * stateTime / getSpeed());
+	}
+	
+	public int getPower() {
+		return power + firedFrom.power;
+	}
+	
+	protected int getRange() {
+		return range + firedFrom.range;
+	}
+	
+	protected float getDegreeRotation() {
+		return degreeRotation + firedFrom.degreeRotation;
+	}
+	
+	public float getSpeed() {
+		return firedFrom.speed * speedMultiplier;
 	}
 	
 	public void render(SpriteBatch batch) {
@@ -113,8 +160,6 @@ public class Projectile implements Cloneable {
 			p.firedDirection = firedDirection;
 			p.origin = Coordinate.copy(origin);
 			p.fired = true;
-			p.speed = firedFrom.speed;
-			p.range = firedFrom.range;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Something really unexpected happened :(");

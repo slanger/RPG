@@ -10,6 +10,7 @@ public enum Direction
 	
 	private int index, dx, dy;
 	private float degrees;
+	private Direction opposite;
 	
 	private Direction(int index, int dx, int dy, float degrees)
 	{
@@ -37,6 +38,34 @@ public enum Direction
 	public float getDegrees()
 	{
 		return degrees;
+	}
+	
+	public Direction opposite() {
+		if (opposite != null)
+			return opposite;
+		setOpposites();
+		return opposite;
+	}
+	
+	private void setOpposites() {
+		for (Direction d : Direction.values()) {
+			switch (d) {
+			case UP:
+				d.opposite = Direction.DOWN;
+				break;
+			case DOWN:
+				d.opposite = Direction.UP;
+				break;
+			case LEFT:
+				d.opposite = Direction.RIGHT;
+				break;
+			case RIGHT:
+				d.opposite = Direction.LEFT;
+				break;
+			default:
+				throw new RuntimeException("Added new direction, need fix here.");
+			}
+		}
 	}
 
 	public static Direction getDirectionByIndex(int index)

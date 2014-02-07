@@ -1,9 +1,9 @@
 package com.me.rpg.combat;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.Character;
 import com.me.rpg.Direction;
 import com.me.rpg.maps.Map;
 
@@ -16,9 +16,8 @@ public class MeleeWeapon extends Weapon {
 	
 	private AttackStyle currentStyle;
 	
-	public MeleeWeapon(String string, Texture swordSprite, int width, int height, int tileWidth,
-			int tileHeight) {
-		super(string, swordSprite, width, height, tileWidth, tileHeight);
+	public MeleeWeapon(String weaponName) {
+		super(weaponName);
 		setStatsDefault();
 	}
 	
@@ -26,7 +25,7 @@ public class MeleeWeapon extends Weapon {
 		speed = 0.2f;
 		fireRate = 0.2f;
 		range = 12; // 12 is good for a melee weapon of length 32
-		power = 50;
+		power = 2;
 		setAttacking(false);
 		stateTime = 0f;
 		currentStyle = AttackStyle.POKING;
@@ -39,10 +38,6 @@ public class MeleeWeapon extends Weapon {
 				break;
 			case SLASHING:
 				currentStyle = AttackStyle.POKING;
-				getWeaponUp().setRotation(0);
-				getWeaponDown().setRotation(0);
-				getWeaponRight().setRotation(0);
-				getWeaponLeft().setRotation(0);
 				break;
 		}
 	}
@@ -51,24 +46,24 @@ public class MeleeWeapon extends Weapon {
 	protected void doRender(Rectangle charRectangle, Direction direction,
 			SpriteBatch batch) {
 
-		Sprite sprite = getWeapon(direction);
+		Sprite sprite = getWeaponSprite();
 		
 		float centerX = charRectangle.getX() + charRectangle.getWidth()/2;
 		float centerY = charRectangle.getY() + charRectangle.getHeight()/2;
-		float leftX = centerX - sprite.getWidth() / 2;
-		float leftY = centerY - sprite.getHeight() / 2;
+		float bottomLeftX = centerX - sprite.getWidth() / 2;
+		float bottomLeftY = centerY - sprite.getHeight() / 2;
 		
 		switch (currentStyle) {
 			// straight poking
 			case POKING:
-				sprite.setPosition(leftX + (getRenderOffset() + charRectangle.getWidth() - 8)*direction.getDx(), leftY + (getRenderOffset() + charRectangle.getHeight() - 8)*direction.getDy());
+				sprite.setPosition(bottomLeftX + (getRenderOffset() + charRectangle.getWidth() - 8)*direction.getDx(), bottomLeftY + (getRenderOffset() + charRectangle.getHeight() - 8)*direction.getDy());
 				break;
 			
 			// slashing
 			case SLASHING:
 				float strangeMultiplier = (direction == Direction.RIGHT ? -1 : 1);
 				sprite.setRotation(getDegreeOffset() * strangeMultiplier);
-				sprite.setPosition(leftX + (charRectangle.getWidth() - 4)*direction.getDx(), leftY + (charRectangle.getHeight() - 4)*direction.getDy());
+				sprite.setPosition(bottomLeftX + (charRectangle.getWidth() - 4)*direction.getDx(), bottomLeftY + (charRectangle.getHeight() - 4)*direction.getDy());
 				sprite.setOrigin(sprite.getWidth()/2 * (-direction.getDx() + 1), sprite.getHeight()/2 * (-direction.getDy() + 1));
 				break;
 		}
@@ -94,8 +89,13 @@ public class MeleeWeapon extends Weapon {
 		return Math.min(degreeRange/2, (degreeRange * stateTime / speed) - degreeRange/2);
 	}
 	
-	protected void doUpdate() {
-		
+	protected void doUpdate() {}
+	
+	protected void doAttackCleanup() {
+		getItemSprite(Direction.UP).setRotation(0);
+		getItemSprite(Direction.LEFT).setRotation(0);
+		getItemSprite(Direction.RIGHT).setRotation(0);
+		getItemSprite(Direction.DOWN).setRotation(0);
 	}
 	
 	protected void doAttack(Map map, Direction direction, Rectangle attackOrigin) {
@@ -105,5 +105,14 @@ public class MeleeWeapon extends Weapon {
 	@Override
 	protected float doGetWait() {
 		return speed;
+	}
+
+	@Override
+	/*
+	 * (non-Javadoc) TODO: Determine if we want to have 'levels' or some way to limit weapon equipping
+	 * @see com.me.rpg.combat.Equippable#canEquip(com.me.rpg.Character)
+	 */
+	protected boolean canEquip(Character c) {
+		return true;
 	}
 }

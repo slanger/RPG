@@ -16,6 +16,7 @@ public class NonplayableCharacter extends Character
 
 	private WalkAI walkAI;
 	private boolean isHappy = false;
+	private Color oldColor = null;
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
@@ -30,27 +31,26 @@ public class NonplayableCharacter extends Character
 	}
 
 	@Override
-	public void render(SpriteBatch batch)
+	protected void doRenderBefore()
 	{
 		if (isHappy)
 		{
 			// add green tint
-			Color oldColor = new Color(getSprite().getColor());
+			oldColor = new Color(getSprite().getColor());
 			getSprite().setColor(new Color(0, 1, 0, oldColor.a));
-			getSprite().draw(batch);
-			getSprite().setColor(oldColor);
+		} else {
+			oldColor = getSprite().getColor();
 		}
-		else
-		{
-			getSprite().draw(batch);
-		}
+	}
+	
+	@Override
+	protected void doRenderAfter() {
+		getSprite().setColor(oldColor);
 	}
 
 	@Override
-	public void update(float deltaTime, Map currentMap)
+	public void doUpdate(float deltaTime, Map currentMap)
 	{
-		addToStateTime(deltaTime);
-
 		// update texture
 		TextureRegion currentFrame = null;
 		switch (getDirection())

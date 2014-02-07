@@ -1,5 +1,10 @@
 package com.me.rpg;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -7,12 +12,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.me.rpg.combat.IAttackable;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 
-public abstract class Character
+public abstract class Character implements IAttackable
 {
+	private static final int MAX_HEALTH = 100;
 
 	private String name;
 	private Sprite sprite;
@@ -28,11 +37,17 @@ public abstract class Character
 	// Combat stuff
 	protected Weapon weaponSlot;
 	protected Weapon weaponSlotExtra;
+	protected Shield shieldSlot;
+	protected LinkedList<StatusEffect> inflictedEffects;
+	protected HashMap<StatusEffect, Float> immunityHash;
+	protected int health;
+	protected float strikeImmunity;
+	
 
 	protected Character(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration)
 	{
-		setName(name);
+		this.name = name;
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
 				tileHeight);
 		int columns = sheet[0].length;
@@ -57,6 +72,10 @@ public abstract class Character
 		downIdle = sheet[Direction.DOWN.getIndex()][0];
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
+		
+		inflictedEffects = new LinkedList<StatusEffect>();
+		immunityHash = new HashMap<StatusEffect, Float>();
+		health = getMaxHealth();
 	}
 
 	public String getName()
@@ -117,6 +136,7 @@ public abstract class Character
 	protected void addToStateTime(float deltaTime)
 	{
 		this.stateTime += deltaTime;
+		this.strikeImmunity -= deltaTime;
 	}
 
 	public Sprite getSprite()
@@ -191,35 +211,129 @@ public abstract class Character
 
 	public void render(SpriteBatch batch)
 	{
+		doRenderBefore();
+		if (strikeImmunity > 0) {
+			Color c = sprite.getColor();
+			sprite.setColor(c.r, c.g, c.b, (float)Math.abs(Math.cos(strikeImmunity*16)));
+		}
 		sprite.draw(batch);
 		if (weaponSlot != null)
 		{
 			weaponSlot.render(sprite.getBoundingRectangle(), getDirection(), batch);
 		}
+		doRenderAfter();
 	}
-
-	/**
-	 * Will modify the currentLocation object to have the new location
-	 * 
-	 * @param deltaTime
-	 *            As reported by Graphics.getDeltaTime()
-	 * @param currentLocation
-	 *            The location of this Character on the current map
-	 * @param mapWidth
-	 *            The map width of the current map
-	 * @param mapHeight
-	 *            The map height of the current map
-	 */
-	public abstract void update(float deltaTime, Map currentMap);
+	
+	protected void doRenderBefore() { }
+	protected void doRenderAfter()  { }
+	
+	public final void update(float deltaTime, Map currentMap) {
+		addToStateTime(deltaTime);
+		Iterator<StatusEffect> iter = inflictedEffects.iterator();
+		while (iter.hasNext()) {
+			StatusEffect effect = iter.next();
+			effect.applyStatusEffect(deltaTime, this);
+			if (effect.hasWornOff()) {
+				iter.remove();
+			}
+		}
+		doUpdate(deltaTime, currentMap);
+	}
+	
+	protected abstract void doUpdate(float deltaTime, Map currentMap);
 
 	public abstract void acceptGoodAction(Character characterDoingAction);
 	
-	public void acceptAttack(Weapon w) {
-		System.out.printf("Ouch, %s was attacked by %s\n", getName(), w.getOwner().getName());
+	@Override
+	public void receiveAttack(Weapon weapon) {
+		if (strikeImmunity > 0)
+			return;
+		
+		boolean result = attemptShieldBlock(weapon);
+		if (result)
+			return;
+		inflictEffects(weapon.getEffects());
+		receiveDamage(weapon.getPower());
+		strikeImmunity = 1.0f;
 	}
 	
-	public void acceptAttack(Projectile p) {
-		System.out.printf("Whoa! %s was hit by a projectile, shot by %s\n", getName(), p.getFiredWeapon().getOwner().getName());
+	@Override
+	public void receiveAttack(Projectile projectile) {
+		if (strikeImmunity > 0)
+			return;
+		
+		boolean result = attemptShieldBlock(projectile);
+		if (result)
+			return;
+		inflictEffects(projectile.getEffects());
+		receiveDamage(projectile.getPower());
+		strikeImmunity = 1.0f;
+	}
+	
+	@Override
+	public void receiveDamage(int damage) {
+		damage = Math.max(damage, 0);
+		int health = getHealth();
+		damage = Math.min(damage, health);
+		health -= damage;
+		System.err.printf("%s takes %d damage. %d left.\n", getName(), damage, health);
+		setHealth(health);
+	}
+	
+	private void inflictEffects(StatusEffect[] effects) {
+		for(StatusEffect effect: effects) {
+			if(!isImmune(effect)) {
+				inflictEffect(effect);
+			}
+		}
+	}
+	
+	private void inflictEffect(StatusEffect effect) {
+		immunityHash.put(effect.getParentRef(), stateTime + effect.getImmunePeriod());
+		inflictedEffects.add(effect);
+		System.out.printf("effect added: %s, immunityHash size =%d\n", effect.getEffectName(), immunityHash.size());
+	}
+	
+	private boolean isImmune(StatusEffect effect) {
+		Float immunityEnd = immunityHash.get(effect.getParentRef());
+		return immunityEnd != null && stateTime < immunityEnd;
+	}
+	
+	public int getHealth() {
+		return health;
+	}
+	
+	public int getMaxHealth() {
+		return MAX_HEALTH;
+	}
+	
+	protected void setHealth(int health) {
+		health = Math.max(health, 0);
+		health = Math.min(getMaxHealth(), health);
+		this.health = health;
+		doHealthCheck();
+	}
+	
+	protected void doHealthCheck() {
+		if (getHealth() == 0)
+			System.err.printf("Yae, %s is dead.\n", getName());
+	}
+	
+	private boolean attemptShieldBlock(Weapon weapon) {
+		if (shieldSlot != null && weapon.getLastDirection().equals(direction.opposite())) {
+			// only allow shield to block if you are facing the attack
+			shieldSlot.receiveAttack(weapon);
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean attemptShieldBlock(Projectile projectile) {
+		if (shieldSlot != null && projectile.getFiredDirection().equals(direction.opposite())) {
+			shieldSlot.receiveAttack(projectile);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -238,17 +352,24 @@ public abstract class Character
 	 * Likely insufficient implementation of equip
 	 * @param sword
 	 */
-	public void equip(Map m, Weapon weapon)
+	public boolean equip(Map m, Weapon weapon)
 	{
 		if (weaponSlot != null)
 		{
 			m.removeEquippedWeapon(weaponSlot);
 			weaponSlot.unequip();
+			weaponSlot = null;
 		}
-		weapon.equippedBy(this);
-		m.addEquippedWeapon(weapon);
-		this.weaponSlotExtra = weaponSlot; // blah
+		
+		boolean result = weapon.tryEquip(this);
+		if (!result)
+		{
+			return result;
+		}
+
 		this.weaponSlot = weapon;
+		m.addEquippedWeapon(weapon);
+		return result;
 	}
 	
 	public void swapWeapon(Map m) {
@@ -258,7 +379,9 @@ public abstract class Character
 		Weapon temp = weaponSlot;
 		weaponSlot = weaponSlotExtra;
 		weaponSlotExtra = temp;
-		weaponSlot.equippedBy(this);
+		if (weaponSlot == null)
+			return;
+		weaponSlot.tryEquip(this);
 		m.addEquippedWeapon(weaponSlot);
 	}
 	
@@ -270,6 +393,26 @@ public abstract class Character
 		r.setHeight(r.getHeight()-8);
 		r.setCenter(center);
 		return r;
+	}
+	
+	public boolean equipShield(Shield s) {
+		if (shieldSlot != null) {
+			shieldSlot.unequip();
+			shieldSlot = null;
+		}
+		
+		boolean result = s.tryEquip(this);
+		if (!result)
+		{
+			return result;
+		}
+		
+		shieldSlot = s;
+		return result;
+	}
+	
+	public void unequipShield() {
+		shieldSlot.unequip();
 	}
 
 }

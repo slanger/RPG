@@ -22,8 +22,11 @@ import com.me.rpg.Coordinate;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.combat.MeleeWeapon;
+import com.me.rpg.combat.Poison;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.RangedWeapon;
+import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 
 public abstract class Map implements Disposable
@@ -159,22 +162,32 @@ public abstract class Map implements Disposable
 		return warpLayer.getObjects();
 	}
 
-	protected void genericWeaponSetup(Character character)
+	protected void genericWeaponSetup(Character character, Character npc)
 	{
 		int width = 32;
 		int height = 32;
 
 		// melee attack test stuff
 		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
-		Weapon sword = new MeleeWeapon("LameSword", swordSprite, width, height, 32, 32);
+		Weapon sword = new MeleeWeapon("LameSword");
+		sword.initSprite(swordSprite, width, height, 32, 32);
+		StatusEffect poison = new Poison(7, 3, 4f);
+		sword.addEffect(poison);
+		
 		character.equip(this, sword);
+		character.swapWeapon(this);
 
 		// ranged attack test stuff
 		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
-		RangedWeapon bow = new RangedWeapon("LameBow", bowSprite, width, height, 32, 32);
+		RangedWeapon bow = new RangedWeapon("LameBow");
+		bow.initSprite(bowSprite, width, height, 32, 32);
+		
 		character.equip(this, bow);
-		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32, bow);
+		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32);
 		bow.equipProjectile(arrow, 1000);
+		
+		Shield shield = new Shield("plain shield");
+		npc.equipShield(shield);
 	}
 
 	private void cameraPanMovement() {
@@ -358,7 +371,7 @@ public abstract class Map implements Disposable
 				if (c.equals(w.getOwner()))
 					continue;
 				if (weaponBox.overlaps(c.getHitBox())) {
-					c.acceptAttack(w);
+					c.receiveAttack(w);
 				}
 			}
 		}
@@ -375,7 +388,7 @@ public abstract class Map implements Disposable
 				if (c.equals(p.getFiredWeapon().getOwner()))
 					continue;
 				if (projectileBox.overlaps(c.getHitBox())) {
-					c.acceptAttack(p);
+					c.receiveAttack(p);
 					p.setHasHit();
 				}
 			}
