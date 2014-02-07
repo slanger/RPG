@@ -122,6 +122,7 @@ public class RPG implements Screen
 		manager.load(SWORD_PATH, Texture.class);
 		manager.load(ARROW_PATH, Texture.class);
 		manager.load(World.WHITE_DOT_PATH, Texture.class);
+		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
 
 		// load sounds and music
 		manager.load(World.WARP_SOUND_PATH, Sound.class);

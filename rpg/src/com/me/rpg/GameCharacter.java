@@ -250,7 +250,7 @@ public abstract class GameCharacter implements IAttackable
 
 	public void render(SpriteBatch batch)
 	{
-		doRenderBefore();
+		doRenderBefore(batch);
 
 		// blink if Character has been hit
 		if (strikeImmunity > 0)
@@ -268,11 +268,11 @@ public abstract class GameCharacter implements IAttackable
 			weaponSlot.render(sprite.getBoundingRectangle(), getDirection(), batch);
 		}
 
-		doRenderAfter();
+		doRenderAfter(batch);
 	}
 	
-	protected void doRenderBefore() { }
-	protected void doRenderAfter()  { }
+	protected void doRenderBefore(SpriteBatch batch) { }
+	protected void doRenderAfter(SpriteBatch batch)  { }
 	
 	public final void update(float deltaTime, Map currentMap) {
 		addToStateTime(deltaTime);
@@ -339,7 +339,7 @@ public abstract class GameCharacter implements IAttackable
 		float width = getSpriteWidth();
 		float height = getSpriteHeight();
 		float x = getBottomLeftX() + width * direction.getDx();
-		float y = getBottomLeftX() + height * direction.getDy();
+		float y = getBottomLeftY() + height * direction.getDy();
 		return new Rectangle(x, y, width, height);
 	}
 

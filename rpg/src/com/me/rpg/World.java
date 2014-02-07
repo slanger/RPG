@@ -18,6 +18,7 @@ public class World implements Disposable
 
 	public static String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
 	public static String WHITE_DOT_PATH = "white_dot.png";
+	public static String FADED_RED_DOT_PATH = "faded_red_dot.png";
 
 	private SpriteBatch batch;
 	private OrthographicCamera camera;

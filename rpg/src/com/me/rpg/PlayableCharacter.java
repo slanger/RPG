@@ -3,11 +3,16 @@ package com.me.rpg;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.maps.Map;
 
 public class PlayableCharacter extends GameCharacter
 {
+
+	// for debugging hitboxes
+	//private Texture redHitboxTexture;
+	//private Rectangle redHitbox = new Rectangle(0, 0, 0, 0);
 
 	private boolean enableAttack = true;
 	private boolean enableWeaponSwitch = true;
@@ -35,6 +40,8 @@ public class PlayableCharacter extends GameCharacter
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
 				animationDuration);
+
+		//redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH, Texture.class);
 	}
 
 	@Override
@@ -47,6 +54,12 @@ public class PlayableCharacter extends GameCharacter
 
 		// update texture
 		updateTexture();
+	}
+
+	@Override
+	public void doRenderAfter(SpriteBatch batch)
+	{
+		//batch.draw(redHitboxTexture, redHitbox.x, redHitbox.y, redHitbox.width, redHitbox.height);
 	}
 
 	private void handleInput(float deltaTime)

@@ -2,6 +2,7 @@ package com.me.rpg;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.ai.FollowPathAI;
@@ -29,20 +30,23 @@ public class NonplayableCharacter extends GameCharacter
 	}
 
 	@Override
-	protected void doRenderBefore()
+	protected void doRenderBefore(SpriteBatch batch)
 	{
 		if (isHappy)
 		{
 			// add green tint
 			oldColor = new Color(getSprite().getColor());
 			getSprite().setColor(new Color(0, 1, 0, oldColor.a));
-		} else {
+		}
+		else
+		{
 			oldColor = getSprite().getColor();
 		}
 	}
 	
 	@Override
-	protected void doRenderAfter() {
+	protected void doRenderAfter(SpriteBatch batch)
+	{
 		getSprite().setColor(oldColor);
 	}
 
