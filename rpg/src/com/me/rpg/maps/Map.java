@@ -17,6 +17,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.Character;
 import com.me.rpg.Coordinate;
 import com.me.rpg.RPG;
@@ -60,6 +61,15 @@ public abstract class Map implements Disposable
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
+	
+	protected Timer timer;
+
+	protected MapType mapType;
+
+	public MapType getMapType()
+	{
+		return mapType;
+	}
 
 	public int getWidth()
 	{
@@ -91,14 +101,9 @@ public abstract class Map implements Disposable
 		return world;
 	}
 
-	public boolean isUpdating()
+	public Timer getTimer()
 	{
-		return updateEnable;
-	}
-
-	public void setUpdateEnable(boolean updateEnable)
-	{
-		this.updateEnable = updateEnable;
+		return timer;
 	}
 
 	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
@@ -106,6 +111,8 @@ public abstract class Map implements Disposable
 		this.world = world;
 		this.batch = batch;
 		this.camera = camera;
+
+		timer = new Timer();
 
 		charactersOnMap = new ArrayList<Character>();
 		flyingProjectiles = new ArrayList<Projectile>();
@@ -162,6 +169,12 @@ public abstract class Map implements Disposable
 		return warpLayer.getObjects();
 	}
 
+	protected MapObjects getWaypoints()
+	{
+		MapLayer waypointsLayer = tiledMap.getLayers().get("Waypoints");
+		return waypointsLayer.getObjects();
+	}
+
 	protected void genericWeaponSetup(Character character, Character npc)
 	{
 		int width = 32;
@@ -215,6 +228,55 @@ public abstract class Map implements Disposable
         }
 	}
 	
+	/**
+	 * This method should be called after construction of Map when control is
+	 * first given to the player. Subclasses will override it with specific
+	 * implementation.
+	 */
+	public void open()
+	{
+		// default implementation
+	}
+
+	/**
+	 * This method should be called right before going to a new Map. Subclasses
+	 * will override it with specific implementation.
+	 */
+	public void close()
+	{
+		// default implementation
+	}
+
+	/**
+	 * This method has a lot of hardcoding and should be used just for testing.
+	 */
+	public Rectangle[] getTestPath()
+	{
+		MapObjects waypointObjects = getWaypoints();
+		RectangleMapObject castleWaypoint = (RectangleMapObject) waypointObjects.get("castle");
+		RectangleMapObject desertWaypoint = (RectangleMapObject) waypointObjects.get("desert");
+		Rectangle[] returnPath = { castleWaypoint.getRectangle(), desertWaypoint.getRectangle() };
+		return returnPath;
+	}
+
+	public Rectangle getEnclosingWalkingBounds(Rectangle characterBoundingRectangle)
+	{
+		MapObjects walkingBoundaries = getWalkingBoundaries();
+		int count = walkingBoundaries.getCount();
+		Rectangle r;
+		for (int i = 0; i < count; i++)
+		{
+			r = ((RectangleMapObject) walkingBoundaries.get(i)).getRectangle();
+			if (r.contains(characterBoundingRectangle))
+			{
+				return r;
+			}
+		}
+		throw new RuntimeException(
+				"Cannot find a walking boundary for Rectangle: "
+						+ characterBoundingRectangle.toString());
+	}
+
 	/**
 	 * Draws the background image of the map, followed by all the Characters
 	 * that are in view nearby the focusedCharacter
@@ -533,25 +595,24 @@ public abstract class Map implements Disposable
 		throw new RuntimeException("Cannot get Map from the given MapType");
 	}
 
+	/*
+	 * ADDING/REMOVING CHARACTERS
+	 */
+
 	public void removeCharacterFromMap(Character removeCharacter)
 	{
-		if (!characterOnMap(removeCharacter))
+		if (!isCharacterOnMap(removeCharacter))
 		{
 			throw new RuntimeException(
 					"Character cannot be removed from map - it is not on the map. Data: "
 							+ removeCharacter);
 		}
 		charactersOnMap.remove(removeCharacter);
+		removeCharacter.removedFromMap(this);
 		if (focusedCharacter.equals(removeCharacter))
 		{
 			focusedCharacter = null;
 		}
-	}
-
-	public void addCharacterToMap(Character newCharacter, float x, float y)
-	{
-		Coordinate newLocation = new Coordinate(x, y);
-		addCharacterToMap(newCharacter, newLocation);
 	}
 
 	public void addCharacterToMap(Character newCharacter, Coordinate newLocation)
@@ -562,7 +623,7 @@ public abstract class Map implements Disposable
 					"Cannot add the Character to the map - null location passed in. Data: "
 							+ newCharacter);
 		}
-		if (characterOnMap(newCharacter))
+		if (isCharacterOnMap(newCharacter))
 		{
 			throw new RuntimeException(
 					"Cannot add the Character to the map - it is already on the map. Data: OldLoc: "
@@ -573,17 +634,26 @@ public abstract class Map implements Disposable
 		}
 		newCharacter.setLocation(newLocation);
 		charactersOnMap.add(newCharacter);
+		newCharacter.addedToMap(this);
 	}
 
 	public void setFocusedCharacter(Character newFocus)
 	{
-		if (!characterOnMap(newFocus))
+		if (!isCharacterOnMap(newFocus))
 		{
 			throw new RuntimeException(
 					"Cannot set character to be focus if it is not already on the map. Data: "
 							+ newFocus);
 		}
 		focusedCharacter = newFocus;
+	}
+
+	// HELPER METHODS
+
+	public void addCharacterToMap(Character newCharacter, float x, float y)
+	{
+		Coordinate newLocation = new Coordinate(x, y);
+		addCharacterToMap(newCharacter, newLocation);
 	}
 
 	public void addFocusedCharacterToMap(Character newFocusedCharacter,
@@ -599,12 +669,17 @@ public abstract class Map implements Disposable
 		setFocusedCharacter(newFocusedCharacter);
 	}
 
-	public boolean characterOnMap(Character character)
+	/*
+	 * END ADDING/REMOVING CHARACTERS
+	 */
+
+	public boolean isCharacterOnMap(Character character)
 	{
 		return charactersOnMap.contains(character);
 	}
-	
-	public void addProjectile(Projectile p) {
+
+	public void addProjectile(Projectile p)
+	{
 		flyingProjectiles.add(p);
 	}
 	

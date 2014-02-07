@@ -7,11 +7,11 @@ public enum Direction
 	LEFT	(1, -1,  0, 180),
 	UP		(2,  0,  1, 90),
 	DOWN	(3,  0, -1, 270);
-	
+
 	private int index, dx, dy;
 	private float degrees;
 	private Direction opposite;
-	
+
 	private Direction(int index, int dx, int dy, float degrees)
 	{
 		this.index = index;

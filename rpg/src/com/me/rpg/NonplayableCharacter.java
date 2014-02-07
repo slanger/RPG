@@ -2,21 +2,19 @@ package com.me.rpg;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
-//import com.me.rpg.ai.StandStillAI;
-import com.me.rpg.ai.WalkAI;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.MapType;
 
 public class NonplayableCharacter extends Character
 {
 
-	private WalkAI walkAI;
 	private boolean isHappy = false;
 	private Color oldColor = null;
+	private MoveToOtherTownTask moveToOtherTownTask;
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
@@ -25,9 +23,9 @@ public class NonplayableCharacter extends Character
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
 				animationDuration);
 
-		walkAI = new RandomWalkAI(this, 1, 1, walkingBounds);
-		//walkAI = new StandStillAI(this, 0, 0, walkingBounds);
-		walkAI.start();
+		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
+
+		moveToOtherTownTask = new MoveToOtherTownTask(this);
 	}
 
 	@Override
@@ -51,39 +49,26 @@ public class NonplayableCharacter extends Character
 	@Override
 	public void doUpdate(float deltaTime, Map currentMap)
 	{
-		// update texture
-		TextureRegion currentFrame = null;
-		switch (getDirection())
-		{
-		case RIGHT:
-			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getRightIdle();
-			break;
-		case LEFT:
-			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getLeftIdle();
-			break;
-		case UP:
-			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getUpIdle();
-			break;
-		case DOWN:
-			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
-					getStateTime(), true) : getDownIdle();
-			break;
-		}
-
-		if (currentFrame != null)
-		{
-			getSprite().setRegion(currentFrame);
-		}
-		
 		// update movement
-		Coordinate newLocation = walkAI.update(deltaTime, currentMap);
-		if (newLocation != null)
+		Coordinate newLocation = new Coordinate();
+		Direction newDirection = walkAI.update(deltaTime, currentMap, newLocation);
+		if (isMoving())
 		{
 			setLocation(newLocation);
 		}
+		if (newDirection != null)
+		{
+			setDirection(newDirection);
+		}
+
+		updateTexture();
+	}
+
+	@Override
+	public void doneFollowingPath()
+	{
+		setWalkAI(new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle())));
+		currentMap.getTimer().scheduleTask(moveToOtherTownTask, 0, 5);
 	}
 
 	private class ChangeColorTask extends Timer.Task
@@ -106,11 +91,38 @@ public class NonplayableCharacter extends Character
 
 	}
 
+	private class MoveToOtherTownTask extends Timer.Task
+	{
+
+		private Character character;
+
+		MoveToOtherTownTask(Character character)
+		{
+			this.character = character;
+		}
+
+		@Override
+		public void run()
+		{
+			int randomInt = (int) (Math.random() * 20);
+			if (randomInt == 0)
+			{
+				if (currentMap.getMapType() == MapType.PROTOTYPE)
+				{
+					System.out.println(getName() + " going to different town");
+					setWalkAI(new FollowPathAI(character, currentMap));
+					this.cancel();
+				}
+			}
+		}
+
+	}
+
 	@Override
 	public void acceptGoodAction(Character characterDoingAction)
 	{
 		isHappy = true;
-		Timer.schedule(new ChangeColorTask(), 1, 0.5f);
+		currentMap.getTimer().scheduleTask(new ChangeColorTask(), 0, 0.5f);
 	}
 
 }

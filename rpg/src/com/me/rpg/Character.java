@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.me.rpg.ai.StandStillAI;
+import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.IAttackable;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.Shield;
@@ -33,6 +35,9 @@ public abstract class Character implements IAttackable
 	private boolean moving = false;
 	private float stateTime = 0f;
 	private float speed = 100f;
+
+	protected WalkAI walkAI;
+	protected Map currentMap = null;
 	
 	// Combat stuff
 	protected Weapon weaponSlot;
@@ -72,6 +77,9 @@ public abstract class Character implements IAttackable
 		downIdle = sheet[Direction.DOWN.getIndex()][0];
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
+		sprite.setRegion(downIdle);
+		// default walk AI
+		walkAI = new StandStillAI();
 		
 		inflictedEffects = new LinkedList<StatusEffect>();
 		immunityHash = new HashMap<StatusEffect, Float>();
@@ -144,6 +152,11 @@ public abstract class Character implements IAttackable
 		return sprite;
 	}
 
+	public Rectangle getBoundingRectangle()
+	{
+		return sprite.getBoundingRectangle();
+	}
+
 	protected TextureRegion getRightIdle()
 	{
 		return rightIdle;
@@ -209,6 +222,26 @@ public abstract class Character implements IAttackable
 		sprite.setPosition(x, y);
 	}
 
+	public WalkAI getWalkAI()
+	{
+		return walkAI;
+	}
+
+	public void setWalkAI(WalkAI walkAI)
+	{
+		this.walkAI = walkAI;
+	}
+
+	public Map getCurrentMap()
+	{
+		return currentMap;
+	}
+
+	public void setCurrentMap(Map currentMap)
+	{
+		this.currentMap = currentMap;
+	}
+
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore();
@@ -237,10 +270,53 @@ public abstract class Character implements IAttackable
 				iter.remove();
 			}
 		}
+		if (weaponSlot != null)
+			weaponSlot.update(deltaTime);
 		doUpdate(deltaTime, currentMap);
 	}
 	
 	protected abstract void doUpdate(float deltaTime, Map currentMap);
+
+	protected void updateTexture()
+	{
+		TextureRegion currentFrame = null;
+		switch (getDirection())
+		{
+		case RIGHT:
+			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getRightIdle();
+					break;
+		case LEFT:
+			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getLeftIdle();
+					break;
+		case UP:
+			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getUpIdle();
+					break;
+		case DOWN:
+			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
+					getStateTime(), true) : getDownIdle();
+					break;
+		}
+
+		if (currentFrame != null)
+		{
+			sprite.setRegion(currentFrame);
+		}
+	}
+
+	public void addedToMap(Map map)
+	{
+		currentMap = map;
+		walkAI.start();
+	}
+
+	public void removedFromMap(Map map)
+	{
+		walkAI.stop();
+		currentMap = null;
+	}
 
 	public abstract void acceptGoodAction(Character characterDoingAction);
 	
@@ -335,6 +411,8 @@ public abstract class Character implements IAttackable
 		}
 		return false;
 	}
+
+	public abstract void doneFollowingPath();
 
 	/**
 	 * May be useful with debugging. Likely will be out of date if Character
