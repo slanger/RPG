@@ -80,9 +80,8 @@ public class RandomWalkAI implements WalkAI
 
 		float spriteWidth = character.getSpriteWidth();
 		float spriteHeight = character.getSpriteHeight();
-		Coordinate currentLocation = character.getLocation();
-		float oldX = currentLocation.getX() - spriteWidth / 2;
-		float oldY = currentLocation.getY() - spriteHeight / 2;
+		float oldX = character.getBottomLeftX();
+		float oldY = character.getBottomLeftY();
 		float x = oldX;
 		float y = oldY;
 		float speed = character.getSpeed();
@@ -117,13 +116,12 @@ public class RandomWalkAI implements WalkAI
 
 		// collision detection with objects on map
 		Coordinate newCoordinate = new Coordinate();
-		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
-				spriteWidth, spriteHeight, character, newCoordinate);
+		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, newCoordinate);
 
 		character.setMoving(didMove);
 
-		newLocation.setX(newCoordinate.getX() + spriteWidth / 2);
-		newLocation.setY(newCoordinate.getY() + spriteHeight / 2);
+		newLocation.setX(newCoordinate.getX());
+		newLocation.setY(newCoordinate.getY());
 
 		return null; // we do not need to return a Direction
 	}

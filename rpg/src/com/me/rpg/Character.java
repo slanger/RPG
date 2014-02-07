@@ -27,7 +27,7 @@ public abstract class Character implements IAttackable
 
 	private String name;
 	private Sprite sprite;
-	private Coordinate location;
+	private Coordinate bottomLeftCorner;
 	private TextureRegion rightIdle, leftIdle, upIdle, downIdle;
 	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation,
 			downWalkAnimation;
@@ -96,24 +96,30 @@ public abstract class Character implements IAttackable
 		this.name = name;
 	}
 
-	public Coordinate getLocation()
+	public Coordinate getBottomLeftCorner()
 	{
-		return location;
+		return bottomLeftCorner;
 	}
 
-	public void setLocation(Coordinate location)
+	public void setBottomLeftCorner(Coordinate bottomLeftCorner)
 	{
-		this.location = location;
+		this.bottomLeftCorner = bottomLeftCorner;
 	}
 
-	public float getX()
+	public Coordinate getCenter()
 	{
-		return location.getX();
+		return new Coordinate(bottomLeftCorner.getX() + getSpriteWidth() / 2,
+				bottomLeftCorner.getY() + getSpriteHeight() / 2);
 	}
 
-	public float getY()
+	public float getBottomLeftX()
 	{
-		return location.getY();
+		return bottomLeftCorner.getX();
+	}
+
+	public float getBottomLeftY()
+	{
+		return bottomLeftCorner.getY();
 	}
 
 	public Direction getDirection()
@@ -245,15 +251,23 @@ public abstract class Character implements IAttackable
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore();
-		if (strikeImmunity > 0) {
+
+		// blink if Character has been hit
+		if (strikeImmunity > 0)
+		{
 			Color c = sprite.getColor();
-			sprite.setColor(c.r, c.g, c.b, (float)Math.abs(Math.cos(strikeImmunity*16)));
+			sprite.setColor(c.r, c.g, c.b, (float)Math.abs(Math.cos(strikeImmunity*16))); // 16 is a good value for blinking rate
 		}
+
+		// draw sprite
 		sprite.draw(batch);
+
+		// draw weapon
 		if (weaponSlot != null)
 		{
 			weaponSlot.render(sprite.getBoundingRectangle(), getDirection(), batch);
 		}
+
 		doRenderAfter();
 	}
 	
@@ -319,7 +333,16 @@ public abstract class Character implements IAttackable
 	}
 
 	public abstract void acceptGoodAction(Character characterDoingAction);
-	
+
+	protected Rectangle getHitboxInFrontOfCharacter()
+	{
+		float width = getSpriteWidth();
+		float height = getSpriteHeight();
+		float x = getBottomLeftX() + width * direction.getDx();
+		float y = getBottomLeftX() + height * direction.getDy();
+		return new Rectangle(x, y, width, height);
+	}
+
 	@Override
 	public void receiveAttack(Weapon weapon) {
 		if (strikeImmunity > 0)
@@ -467,8 +490,8 @@ public abstract class Character implements IAttackable
 		Rectangle r = sprite.getBoundingRectangle();
 		Vector2 center = new Vector2();
 		r.getCenter(center);
-		r.setWidth(r.getWidth()-8);
-		r.setHeight(r.getHeight()-8);
+		r.setWidth(r.getWidth()-8); // why -8?
+		r.setHeight(r.getHeight()-8); // why -8?
 		r.setCenter(center);
 		return r;
 	}

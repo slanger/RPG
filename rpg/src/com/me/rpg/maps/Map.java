@@ -286,7 +286,7 @@ public abstract class Map implements Disposable
 		Coordinate focusedCoordinate = Coordinate.ZERO;
 		if (focusedCharacter != null)
 		{
-			focusedCoordinate = focusedCharacter.getLocation();
+			focusedCoordinate = focusedCharacter.getCenter();
 		}
 
 		float viewportWidth = camera.viewportWidth;
@@ -346,13 +346,8 @@ public abstract class Map implements Disposable
 		while (iter.hasNext())
 		{
 			Character selected = iter.next();
-			Coordinate selectedLocation = selected.getLocation();
-			float selectedX = selectedLocation.getX();
-			float selectedY = selectedLocation.getY();
-			float charWidth = selected.getSpriteWidth();
-			float charHeight = selected.getSpriteHeight();
-			selected.setPosition(selectedX - charWidth / 2, selectedY
-					- charHeight / 2);
+			Coordinate selectedLocation = selected.getBottomLeftCorner();
+			selected.setPosition(selectedLocation.getX(), selectedLocation.getY());
 			// TODO this calculation is not quite right for characters on the
 			// edge of what is being drawn on the map
 			if (selected.getHitBox().overlaps(cameraBounds))
@@ -360,7 +355,7 @@ public abstract class Map implements Disposable
 				selected.render(batch);
 			}
 		}
-		
+
 		Iterator<Projectile> it = flyingProjectiles.iterator();
 		while (it.hasNext())
 		{
@@ -471,11 +466,13 @@ public abstract class Map implements Disposable
 	}
 
 	public boolean checkCollision(float x, float y, float oldX, float oldY,
-			float width, float height, Character thisCharacter, Coordinate newCoordinate)
+			Character thisCharacter, Coordinate newCoordinate)
 	{
 		RectangleMapObject[] objectsOnMap = getObjectsOnMap();
 		ArrayList<Character> charactersOnMap = getCharactersOnMap();
 
+		float width = thisCharacter.getSpriteWidth();
+		float height = thisCharacter.getSpriteHeight();
 		Rectangle boundingBox = new Rectangle(x, y, width, height);
 		Rectangle boundingBoxWithNewY = new Rectangle(oldX, y, width, height);
 		Rectangle boundingBoxWithNewX = new Rectangle(x, oldY, width, height);
@@ -508,12 +505,7 @@ public abstract class Map implements Disposable
 			{
 				continue;
 			}
-			Coordinate location = selected.getLocation();
-			float tempWidth = selected.getSpriteWidth();
-			float tempHeight = selected.getSpriteHeight();
-			float tempX = location.getX() - tempWidth / 2;
-			float tempY = location.getY() - tempHeight / 2;
-			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
+			Rectangle r = selected.getBoundingRectangle();
 			if (r.overlaps(boundingBox))
 			{
 				if (r.overlaps(boundingBoxWithNewY))
@@ -549,12 +541,7 @@ public abstract class Map implements Disposable
 			{
 				continue;
 			}
-			Coordinate location = selected.getLocation();
-			float tempWidth = selected.getSpriteWidth();
-			float tempHeight = selected.getSpriteHeight();
-			float tempX = location.getX() - tempWidth / 2;
-			float tempY = location.getY() - tempHeight / 2;
-			Rectangle r = new Rectangle(tempX, tempY, tempWidth, tempHeight);
+			Rectangle r = selected.getBoundingRectangle();
 			if (hitbox.overlaps(r))
 			{
 				return selected;
@@ -627,12 +614,12 @@ public abstract class Map implements Disposable
 		{
 			throw new RuntimeException(
 					"Cannot add the Character to the map - it is already on the map. Data: OldLoc: "
-							+ newCharacter.getLocation()
+							+ newCharacter.getBottomLeftCorner()
 							+ " "
 							+ newCharacter
 							+ " " + newLocation);
 		}
-		newCharacter.setLocation(newLocation);
+		newCharacter.setBottomLeftCorner(newLocation);
 		charactersOnMap.add(newCharacter);
 		newCharacter.addedToMap(this);
 	}

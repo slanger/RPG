@@ -62,9 +62,8 @@ public class PlayableCharacter extends Character
 
 		float spriteWidth = getSpriteWidth();
 		float spriteHeight = getSpriteHeight();
-		Coordinate currentLocation = getLocation();
-		float oldX = currentLocation.getX() - spriteWidth / 2;
-		float oldY = currentLocation.getY() - spriteHeight / 2;
+		float oldX = getBottomLeftX();
+		float oldY = getBottomLeftY();
 		float x = oldX;
 		float y = oldY;
 		float speed = getSpeed();
@@ -115,19 +114,17 @@ public class PlayableCharacter extends Character
 		{
 			// collision detection with objects on map
 			Coordinate newCoordinate = new Coordinate();
-			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY,
-					spriteWidth, spriteHeight, this, newCoordinate);
+			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, this, newCoordinate);
 
 			setMoving(didMove);
 
 			if (didMove)
 			{
-				x = newCoordinate.getX();
-				y = newCoordinate.getY();
-				currentLocation.setX(x + spriteWidth / 2);
-				currentLocation.setY(y + spriteHeight / 2);
+				setBottomLeftCorner(newCoordinate);
 
 				// check warp point collision
+				x = newCoordinate.getX();
+				y = newCoordinate.getY();
 				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(
 						x, y, spriteWidth, spriteHeight));
 				if (newMap != null)
@@ -277,11 +274,7 @@ public class PlayableCharacter extends Character
 
 	private void doGoodAction(float deltaTime, Map currentMap)
 	{
-		float width = getSpriteWidth();
-		float height = getSpriteHeight();
-		float x = getX() + getSpriteWidth() * getDirection().getDx();
-		float y = getY() + getSpriteHeight() * getDirection().getDy();
-		Rectangle hitbox = new Rectangle(x, y, width, height);
+		Rectangle hitbox = getHitboxInFrontOfCharacter();
 		Character c = currentMap.checkCharacterCollision(hitbox, this);
 		if (c != null)
 		{
@@ -291,11 +284,7 @@ public class PlayableCharacter extends Character
 
 	private void initiateDialogue(float deltaTime, Map currentMap)
 	{
-		float width = getSpriteWidth();
-		float height = getSpriteHeight();
-		float x = getX() + getSpriteWidth() * getDirection().getDx();
-		float y = getY() + getSpriteHeight() * getDirection().getDy();
-		Rectangle hitbox = new Rectangle(x, y, width, height);
+		Rectangle hitbox = getHitboxInFrontOfCharacter();
 		Character c = currentMap.checkCharacterCollision(hitbox, this);
 		if (c != null)
 		{

@@ -54,7 +54,7 @@ public class NonplayableCharacter extends Character
 		Direction newDirection = walkAI.update(deltaTime, currentMap, newLocation);
 		if (isMoving())
 		{
-			setLocation(newLocation);
+			setBottomLeftCorner(newLocation);
 		}
 		if (newDirection != null)
 		{

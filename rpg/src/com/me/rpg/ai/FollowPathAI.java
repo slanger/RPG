@@ -52,8 +52,16 @@ public class FollowPathAI implements WalkAI
 		float hE = (float) Math.sqrt(xE * xE + yE * yE);
 
 		float speed = character.getSpeed();
-		float x = character.getX() + (xE / hE) * speed * deltaTime;
-		float y = character.getY() + (yE / hE) * speed * deltaTime;
+		float x = character.getBottomLeftX() + (xE / hE) * speed * deltaTime;
+		float y = character.getBottomLeftY() + (yE / hE) * speed * deltaTime;
+
+		float oldX = character.getBottomLeftX();
+		float oldY = character.getBottomLeftY();
+		Coordinate afterCollision = new Coordinate(x, y);
+		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, afterCollision);
+		character.setMoving(didMove);
+		x = afterCollision.getX();
+		y = afterCollision.getY();
 		newLocation.setX(x);
 		newLocation.setY(y);
 
