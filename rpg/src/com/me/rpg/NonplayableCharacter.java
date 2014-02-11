@@ -30,6 +30,18 @@ public class NonplayableCharacter extends GameCharacter
 	}
 
 	@Override
+	public void addedToMap(Map map)
+	{
+		super.addedToMap(map);
+		startMoveTask();
+	}
+
+	private void startMoveTask()
+	{
+		currentMap.getTimer().scheduleTask(moveToOtherTownTask, 0, 5);
+	}
+
+	@Override
 	protected void doRenderBefore(SpriteBatch batch)
 	{
 		if (isHappy)
@@ -43,7 +55,7 @@ public class NonplayableCharacter extends GameCharacter
 			oldColor = getSprite().getColor();
 		}
 	}
-	
+
 	@Override
 	protected void doRenderAfter(SpriteBatch batch)
 	{
@@ -71,8 +83,10 @@ public class NonplayableCharacter extends GameCharacter
 	@Override
 	public void doneFollowingPath()
 	{
-		setWalkAI(new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle())));
-		currentMap.getTimer().scheduleTask(moveToOtherTownTask, 0, 5);
+		walkAI.stop();
+		walkAI = new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle()));
+		walkAI.start();
+		startMoveTask();
 	}
 
 	private class ChangeColorTask extends Timer.Task
@@ -113,8 +127,9 @@ public class NonplayableCharacter extends GameCharacter
 			{
 				if (currentMap.getMapType() == MapType.PROTOTYPE)
 				{
-					System.out.println(getName() + " going to different town");
-					setWalkAI(new FollowPathAI(character, currentMap));
+					walkAI.stop();
+					walkAI = new FollowPathAI(character, currentMap);
+					walkAI.start();
 					this.cancel();
 				}
 			}

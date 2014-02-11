@@ -125,7 +125,7 @@ public class StartScreen implements Screen, InputProcessor
 			{
 				if (keycode == Keys.ENTER)
 				{
-					System.out.println("Enter was pressed");
+					stage.removeListener(this);
 					screenHandler.setScreen(screenHandler.rpgScreen);
 				}
 				return true;

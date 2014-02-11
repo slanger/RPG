@@ -20,29 +20,28 @@ public class FollowPathAI implements WalkAI
 		this.character = character;
 		//this.currentMap = currentMap;
 
-		Rectangle[] tempPath = currentMap.getTestPath();
-		path = new Rectangle[tempPath.length + 1];
-		path[0] = character.getBoundingRectangle();
-		System.arraycopy(tempPath, 0, path, 1, tempPath.length);
+		path = currentMap.getTestPath();
 	}
 
 	@Override
 	public void start()
 	{
+		System.out.println(character.getName() + " going to different town");
 		character.setMoving(true);
 	}
 
 	@Override
 	public void stop()
 	{
+		System.out.println(character.getName() + " has arrived!");
 		character.setMoving(false);
 	}
 
 	@Override
 	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
 	{
-		Rectangle currentWaypoint = path[currentIndex];
-		Rectangle nextWaypoint = path[currentIndex + 1];
+		Rectangle currentWaypoint = character.getBoundingRectangle();
+		Rectangle nextWaypoint = path[currentIndex];
 		Vector2 currentCenter = new Vector2();
 		Vector2 nextCenter = new Vector2();
 		currentWaypoint.getCenter(currentCenter);
@@ -52,16 +51,17 @@ public class FollowPathAI implements WalkAI
 		float hE = (float) Math.sqrt(xE * xE + yE * yE);
 
 		float speed = character.getSpeed();
-		float x = character.getBottomLeftX() + (xE / hE) * speed * deltaTime;
-		float y = character.getBottomLeftY() + (yE / hE) * speed * deltaTime;
-
 		float oldX = character.getBottomLeftX();
 		float oldY = character.getBottomLeftY();
-		Coordinate afterCollision = new Coordinate(x, y);
-		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, afterCollision);
+		float x = oldX + (xE / hE) * speed * deltaTime;
+		float y = oldY + (yE / hE) * speed * deltaTime;
+
+		Coordinate newCoordinate = new Coordinate();
+		boolean didMove = currentMap.checkCollisionWithObjects(x, y, oldX, oldY,
+				character.getSpriteWidth(), character.getSpriteHeight(), newCoordinate);
 		character.setMoving(didMove);
-		x = afterCollision.getX();
-		y = afterCollision.getY();
+		x = newCoordinate.getX();
+		y = newCoordinate.getY();
 		newLocation.setX(x);
 		newLocation.setY(y);
 
@@ -89,14 +89,13 @@ public class FollowPathAI implements WalkAI
 			}
 		}
 
-		if (nextWaypoint.contains(x, y))
+		if (nextWaypoint.contains(character.getCenterX(), character.getCenterY()))
 		{
 			currentIndex++;
 		}
 
-		if (currentIndex >= path.length - 1)
+		if (currentIndex >= path.length)
 		{
-			System.out.println(character.getName() + " has arrived!");
 			character.doneFollowingPath();
 		}
 

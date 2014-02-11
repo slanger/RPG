@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.ai.Dialogue;
 import com.me.rpg.maps.Map;
 
 public class PlayableCharacter extends GameCharacter
@@ -19,6 +20,7 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableStyleSwitch = true;
 	private boolean enableGoodAction = true;
 	private boolean enableControls = true;
+	private boolean enablePushing = true;
 
 	private boolean enableInputE = true;
 	private boolean enableInput1 = true;
@@ -138,7 +140,7 @@ public class PlayableCharacter extends GameCharacter
 				// check warp point collision
 				x = newCoordinate.getX();
 				y = newCoordinate.getY();
-				Map newMap = currentMap.checkWarpPointCollision(new Rectangle(
+				Map newMap = currentMap.checkCollisionWithWarpPoints(new Rectangle(
 						x, y, spriteWidth, spriteHeight));
 				if (newMap != null)
 				{
@@ -151,19 +153,41 @@ public class PlayableCharacter extends GameCharacter
 		 * END MOVEMENT
 		 */
 
+		/*
+		 * ACTIONS
+		 */
+
 		// do good action
 		if (Gdx.input.isKeyPressed(Keys.A))
 		{
 			if (enableGoodAction)
 			{
 				enableGoodAction = false;
-				doGoodAction(deltaTime, currentMap);
+				doGoodAction();
 			}
 		}
 		else
 		{
 			enableGoodAction = true;
 		}
+
+		// push a character
+		if (Gdx.input.isKeyPressed(Keys.S))
+		{
+			if (enablePushing)
+			{
+				enablePushing = false;
+				doPush();
+			}
+		}
+		else
+		{
+			enablePushing = true;
+		}
+
+		/*
+		 * END ACTIONS
+		 */
 
 		/*
 		 * DIALOGUE
@@ -176,12 +200,12 @@ public class PlayableCharacter extends GameCharacter
 				enableInputE = false;
 				if (!currentMap.getWorld().getDialogue().getInDialogue())
 				{
-					initiateDialogue(deltaTime, currentMap);
-					advanceDialogue(deltaTime, currentMap, "E");
+					initiateDialogue();
+					advanceDialogue("E");
 				}
 				else
 				{ // currently in dialogue
-					advanceDialogue(deltaTime, currentMap, "E");
+					advanceDialogue("E");
 				}
 			}
 		}
@@ -195,7 +219,7 @@ public class PlayableCharacter extends GameCharacter
 			if (enableInput1)
 			{
 				enableInput1 = false;
-				advanceDialogue(deltaTime, currentMap, "NUM_1");
+				advanceDialogue("NUM_1");
 			}
 		}
 		else
@@ -208,7 +232,7 @@ public class PlayableCharacter extends GameCharacter
 			if (enableInput2)
 			{
 				enableInput2 = false;
-				advanceDialogue(deltaTime, currentMap, "NUM_2");
+				advanceDialogue("NUM_2");
 			}
 		}
 		else
@@ -221,7 +245,7 @@ public class PlayableCharacter extends GameCharacter
 			if (enableInput3)
 			{
 				enableInput3 = false;
-				advanceDialogue(deltaTime, currentMap, "NUM_3");
+				advanceDialogue("NUM_3");
 			}
 		}
 		else
@@ -285,31 +309,43 @@ public class PlayableCharacter extends GameCharacter
 		 */
 	}
 
-	private void doGoodAction(float deltaTime, Map currentMap)
+	private void doGoodAction()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		GameCharacter c = currentMap.checkCharacterCollision(hitbox, this);
+		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox, this);
 		if (c != null)
 		{
 			c.acceptGoodAction(this);
 		}
 	}
 
-	private void initiateDialogue(float deltaTime, Map currentMap)
+	private void doPush()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		GameCharacter c = currentMap.checkCharacterCollision(hitbox, this);
+		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox, this);
 		if (c != null)
 		{
-			c.setMoving(false);
-			currentMap.getWorld().getDialogue().setInDialogue(true);
-			currentMap.getWorld().getDialogue().update(c);
+			c.acceptPush(this);
 		}
 	}
 
-	private void advanceDialogue(float deltaTime, Map currentMap, String key)
+	private void initiateDialogue()
 	{
-		currentMap.getWorld().getDialogue().advanceDialogue(key);
+		Map currentMap = getCurrentMap();
+		Rectangle hitbox = getHitboxInFrontOfCharacter();
+		GameCharacter c = currentMap.checkCollisionWithCharacters(hitbox, this);
+		if (c != null)
+		{
+			c.setMoving(false);
+			Dialogue dialogue = currentMap.getWorld().getDialogue();
+			dialogue.setInDialogue(true);
+			dialogue.update(c);
+		}
+	}
+
+	private void advanceDialogue(String key)
+	{
+		getCurrentMap().getWorld().getDialogue().advanceDialogue(key);
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import com.me.rpg.maps.Map;
 
 public abstract class GameCharacter implements IAttackable
 {
+
 	private static final int MAX_HEALTH = 100;
 
 	private String name;
@@ -101,6 +102,16 @@ public abstract class GameCharacter implements IAttackable
 		return bottomLeftCorner;
 	}
 
+	public float getBottomLeftX()
+	{
+		return bottomLeftCorner.getX();
+	}
+
+	public float getBottomLeftY()
+	{
+		return bottomLeftCorner.getY();
+	}
+
 	public void setBottomLeftCorner(Coordinate bottomLeftCorner)
 	{
 		this.bottomLeftCorner = bottomLeftCorner;
@@ -112,14 +123,21 @@ public abstract class GameCharacter implements IAttackable
 				bottomLeftCorner.getY() + getSpriteHeight() / 2);
 	}
 
-	public float getBottomLeftX()
+	public float getCenterX()
 	{
-		return bottomLeftCorner.getX();
+		return getCenter().getX();
 	}
 
-	public float getBottomLeftY()
+	public float getCenterY()
 	{
-		return bottomLeftCorner.getY();
+		return getCenter().getY();
+	}
+
+	public void setCenter(Coordinate center)
+	{
+		this.bottomLeftCorner = new Coordinate(
+				center.getX() - getSpriteWidth() / 2,
+				center.getY() - getSpriteHeight() / 2);
 	}
 
 	public Direction getDirection()
@@ -272,6 +290,7 @@ public abstract class GameCharacter implements IAttackable
 	}
 	
 	protected void doRenderBefore(SpriteBatch batch) { }
+
 	protected void doRenderAfter(SpriteBatch batch)  { }
 	
 	public final void update(float deltaTime, Map currentMap) {
@@ -333,6 +352,22 @@ public abstract class GameCharacter implements IAttackable
 	}
 
 	public abstract void acceptGoodAction(GameCharacter characterDoingAction);
+
+	public void acceptPush(GameCharacter pushingCharacter)
+	{
+		Direction pushingDirection = pushingCharacter.getDirection();
+		direction = pushingDirection.opposite();
+		float oldX = getBottomLeftX();
+		float oldY = getBottomLeftY();
+		float x = oldX + (getSpriteWidth() / 2) * pushingDirection.getDx();
+		float y = oldY + (getSpriteHeight() / 2) * pushingDirection.getDy();
+		Coordinate newCoordinate = new Coordinate();
+		boolean didMove = getCurrentMap().checkCollision(x, y, oldX, oldY, this, newCoordinate);
+		if (didMove)
+		{
+			setBottomLeftCorner(newCoordinate);
+		}
+	}
 
 	protected Rectangle getHitboxInFrontOfCharacter()
 	{
