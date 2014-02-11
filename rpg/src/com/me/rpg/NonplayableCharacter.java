@@ -66,16 +66,7 @@ public class NonplayableCharacter extends GameCharacter
 	public void doUpdate(float deltaTime, Map currentMap)
 	{
 		// update movement
-		Coordinate newLocation = new Coordinate();
-		Direction newDirection = walkAI.update(deltaTime, currentMap, newLocation);
-		if (isMoving())
-		{
-			setBottomLeftCorner(newLocation);
-		}
-		if (newDirection != null)
-		{
-			setDirection(newDirection);
-		}
+		walkAI.update(deltaTime, currentMap);
 
 		updateTexture();
 	}

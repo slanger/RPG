@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.maps.ExampleMap;
@@ -22,6 +23,10 @@ public class RPG implements Screen
 	public static final String NPC_TEXTURE_PATH = "villain.png";
 	public static final String SWORD_PATH = "sword.png";
 	public static final String ARROW_PATH = "arrow.png";
+	public static final String GRAVESTONE_PATH = "gravestones.png";
+	
+	public static TextureRegion gravestone1;
+	public static TextureRegion gravestone2;
 
 	public static AssetManager manager = new AssetManager();
 
@@ -41,6 +46,9 @@ public class RPG implements Screen
 
 		batch = new SpriteBatch();
 		world = new World(batch, camera);
+		
+		Texture graves = RPG.manager.get(GRAVESTONE_PATH);
+		gravestone1 = new TextureRegion(graves, 0, 0, 34, 41);
 	}
 
 	@Override
@@ -121,6 +129,7 @@ public class RPG implements Screen
 		manager.load(NPC_TEXTURE_PATH, Texture.class);
 		manager.load(SWORD_PATH, Texture.class);
 		manager.load(ARROW_PATH, Texture.class);
+		manager.load(GRAVESTONE_PATH, Texture.class);
 		manager.load(World.WHITE_DOT_PATH, Texture.class);
 		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
 

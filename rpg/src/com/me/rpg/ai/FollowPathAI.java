@@ -38,7 +38,7 @@ public class FollowPathAI implements WalkAI
 	}
 
 	@Override
-	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
+	public void update(float deltaTime, Map currentMap)
 	{
 		Rectangle currentWaypoint = character.getBoundingRectangle();
 		Rectangle nextWaypoint = path[currentIndex];
@@ -62,8 +62,6 @@ public class FollowPathAI implements WalkAI
 		character.setMoving(didMove);
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
-		newLocation.setX(x);
-		newLocation.setY(y);
 
 		Direction newDirection;
 		if (Math.abs(yE) >= Math.abs(xE))
@@ -98,8 +96,10 @@ public class FollowPathAI implements WalkAI
 		{
 			character.doneFollowingPath();
 		}
-
-		return newDirection;
+		
+		character.setMoving(didMove);
+		character.setDirection(newDirection);
+		character.setBottomLeftCorner(newCoordinate);
 	}
 
 }

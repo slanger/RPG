@@ -7,7 +7,7 @@ import com.me.rpg.maps.Map;
 public interface WalkAI
 {
 
-	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation);
+	public void update(float deltaTime, Map currentMap);
 
 	public void start();
 

@@ -383,25 +383,25 @@ public abstract class GameCharacter implements IAttackable
 		if (strikeImmunity > 0)
 			return;
 		
+		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(weapon);
 		if (result)
 			return;
 		inflictEffects(weapon.getEffects());
 		receiveDamage(weapon.getPower());
-		strikeImmunity = 1.0f;
 	}
 	
 	@Override
 	public void receiveAttack(Projectile projectile) {
 		if (strikeImmunity > 0)
 			return;
-		
+
+		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(projectile);
 		if (result)
 			return;
 		inflictEffects(projectile.getEffects());
 		receiveDamage(projectile.getPower());
-		strikeImmunity = 1.0f;
 	}
 	
 	@Override
@@ -425,7 +425,6 @@ public abstract class GameCharacter implements IAttackable
 	private void inflictEffect(StatusEffect effect) {
 		immunityHash.put(effect.getParentRef(), stateTime + effect.getImmunePeriod());
 		inflictedEffects.add(effect);
-		System.out.printf("effect added: %s, immunityHash size =%d\n", effect.getEffectName(), immunityHash.size());
 	}
 	
 	private boolean isImmune(StatusEffect effect) {
@@ -445,12 +444,10 @@ public abstract class GameCharacter implements IAttackable
 		health = Math.max(health, 0);
 		health = Math.min(getMaxHealth(), health);
 		this.health = health;
-		doHealthCheck();
 	}
 	
-	protected void doHealthCheck() {
-		if (getHealth() == 0)
-			System.err.printf("Yae, %s is dead.\n", getName());
+	public boolean isDead() {
+		return getHealth() == 0;
 	}
 	
 	private boolean attemptShieldBlock(Weapon weapon) {

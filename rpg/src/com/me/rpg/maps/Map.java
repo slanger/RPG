@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
@@ -18,8 +19,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
-import com.me.rpg.GameCharacter;
 import com.me.rpg.Coordinate;
+import com.me.rpg.DeadCharacter;
+import com.me.rpg.GameCharacter;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.combat.MeleeWeapon;
@@ -44,6 +46,7 @@ public abstract class Map implements Disposable
 	protected ArrayList<GameCharacter> charactersOnMap;
 	protected ArrayList<Projectile> flyingProjectiles;
 	protected ArrayList<Weapon> equippedWeapons;
+	protected ArrayList<DeadCharacter> corpses;
 
 	protected RectangleMapObject[] collidables;
 	protected RectangleMapObject[] warpPoints;
@@ -117,6 +120,7 @@ public abstract class Map implements Disposable
 		charactersOnMap = new ArrayList<GameCharacter>();
 		flyingProjectiles = new ArrayList<Projectile>();
 		equippedWeapons = new ArrayList<Weapon>();
+		corpses = new ArrayList<DeadCharacter>();
 	}
 
 	protected void setup()
@@ -184,7 +188,7 @@ public abstract class Map implements Disposable
 		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
 		Weapon sword = new MeleeWeapon("LameSword");
 		sword.initSprite(swordSprite, width, height, 32, 32);
-		StatusEffect poison = new Poison(7, 3, 4f);
+		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		
 		character.equip(this, sword);
@@ -340,9 +344,19 @@ public abstract class Map implements Disposable
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
-		Iterator<GameCharacter> iter = charactersOnMap.iterator();
 		Rectangle cameraBounds = new Rectangle(camera.position.x - camera.zoom*viewportWidth/2, camera.position.y - camera.zoom*viewportHeight/2,
 				camera.zoom*viewportWidth, camera.zoom*viewportHeight);
+		
+		
+		Iterator<DeadCharacter> deadIter = corpses.iterator();
+		while (deadIter.hasNext()) {
+			DeadCharacter dead = deadIter.next();
+			if (dead.getHitBox().overlaps(cameraBounds)) {
+				dead.render(batch);
+			}
+		}
+		
+		Iterator<GameCharacter> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
 		{
 			GameCharacter selected = iter.next();
@@ -410,9 +424,26 @@ public abstract class Map implements Disposable
 			return;
 		}
 		
+		// update dead character fade
+		Iterator<DeadCharacter> deadIter = corpses.iterator();
+		while (deadIter.hasNext()) {
+			DeadCharacter deadChar = deadIter.next();
+			deadChar.update(deltaTime);
+		}
+		
+		// check for dead characters
+		Iterator<GameCharacter> charIter;
+		charIter = charactersOnMap.iterator();
+		while (charIter.hasNext()) {
+			GameCharacter character = charIter.next();
+			if (character.isDead()) {
+				charIter.remove();
+				corpses.add(new DeadCharacter(character, new Sprite(RPG.gravestone1), 2.0f));
+			}
+		}
+		
 		// check intersections with weapons
 		Iterator<Weapon> weaponIter = equippedWeapons.iterator();
-		Iterator<GameCharacter> charIter;
 		Iterator<Projectile> projIter;
 		while (weaponIter.hasNext())
 		{

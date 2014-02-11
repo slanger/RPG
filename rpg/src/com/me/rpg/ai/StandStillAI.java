@@ -25,9 +25,8 @@ public class StandStillAI implements WalkAI
 	}
 
 	@Override
-	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
+	public void update(float deltaTime, Map currentMap)
 	{
-		return null;
 	}
 
 }

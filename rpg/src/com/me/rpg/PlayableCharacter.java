@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.ai.Dialogue;
+import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
 
 public class PlayableCharacter extends GameCharacter
@@ -42,7 +43,7 @@ public class PlayableCharacter extends GameCharacter
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
 				animationDuration);
-
+		setWalkAI(new PlayerControlledWalkAI(this));
 		//redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH, Texture.class);
 	}
 
@@ -74,80 +75,8 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * MOVEMENT
 		 */
-
-		float spriteWidth = getSpriteWidth();
-		float spriteHeight = getSpriteHeight();
-		float oldX = getBottomLeftX();
-		float oldY = getBottomLeftY();
-		float x = oldX;
-		float y = oldY;
-		float speed = getSpeed();
-		int dx = 0;
-		int dy = 0;
-		if (Gdx.input.isKeyPressed(Keys.LEFT))
-		{
-			dx += Direction.LEFT.getDx();
-			dy += Direction.LEFT.getDy();
-		}
-		if (Gdx.input.isKeyPressed(Keys.RIGHT))
-		{
-			dx += Direction.RIGHT.getDx();
-			dy += Direction.RIGHT.getDy();
-		}
-		if (Gdx.input.isKeyPressed(Keys.UP))
-		{
-			dx += Direction.UP.getDx();
-			dy += Direction.UP.getDy();
-		}
-		if (Gdx.input.isKeyPressed(Keys.DOWN))
-		{
-			dx += Direction.DOWN.getDx();
-			dy += Direction.DOWN.getDy();
-		}
-
-		// decode Direction from input
-		int diff = Math.abs(dx) + Math.abs(dy);
-		if (diff >= 2)
-		{
-			// moving diagonally, slow down movement in x and y
-			x += (dx * speed * deltaTime) / Math.sqrt(2);
-			y += (dy * speed * deltaTime) / Math.sqrt(2);
-			setDirection(Direction.getDirectionByDiff(0, dy));
-			setMoving(true);
-		}
-		else if (diff >= 1)
-		{
-			// moving in 1 direction
-			x += dx * speed * deltaTime;
-			y += dy * speed * deltaTime;
-			setDirection(Direction.getDirectionByDiff(dx, dy));
-			setMoving(true);
-		}
-
-		// update x and y
-		if (isMoving())
-		{
-			// collision detection with objects on map
-			Coordinate newCoordinate = new Coordinate();
-			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, this, newCoordinate);
-
-			setMoving(didMove);
-
-			if (didMove)
-			{
-				setBottomLeftCorner(newCoordinate);
-
-				// check warp point collision
-				x = newCoordinate.getX();
-				y = newCoordinate.getY();
-				Map newMap = currentMap.checkCollisionWithWarpPoints(new Rectangle(
-						x, y, spriteWidth, spriteHeight));
-				if (newMap != null)
-				{
-					currentMap.getWorld().warpToAnotherMap(newMap);
-				}
-			}
-		}
+		
+		walkAI.update(deltaTime, currentMap);
 
 		/*
 		 * END MOVEMENT
