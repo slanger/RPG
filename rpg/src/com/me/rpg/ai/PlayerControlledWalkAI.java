@@ -6,6 +6,7 @@ import static com.me.rpg.Direction.RIGHT;
 import static com.me.rpg.Direction.UP;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
@@ -16,6 +17,7 @@ public class PlayerControlledWalkAI implements WalkAI
 {
 	private GameCharacter character;
 	private KeyMap keyMap = KeyMap.DEFAULT;
+	private boolean strafeEnabler = false;
 	
 	public PlayerControlledWalkAI (GameCharacter character) {
 		this.character = character;
@@ -52,6 +54,14 @@ public class PlayerControlledWalkAI implements WalkAI
 		{
 			dx += DOWN.getDx();
 			dy += DOWN.getDy();
+		}
+		if (Gdx.input.isKeyPressed(Keys.U)){
+			if (strafeEnabler) {
+				strafeEnabler = false;
+				character.setStrafing(!character.isStrafing());
+			}
+		} else {
+			strafeEnabler = true;
 		}
 
 		// decode Direction from input
@@ -98,7 +108,7 @@ public class PlayerControlledWalkAI implements WalkAI
 		}
 		character.setMoving(moving);
 		if (ret != null) {
-			character.setDirection(ret);
+			character.setMoveDirection(ret);
 		}
 		character.setBottomLeftCorner(newCoordinate);
 	}

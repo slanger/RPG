@@ -438,7 +438,7 @@ public abstract class Map implements Disposable
 			GameCharacter character = charIter.next();
 			if (character.isDead()) {
 				charIter.remove();
-				corpses.add(new DeadCharacter(character, new Sprite(RPG.gravestone1), 2.0f));
+				corpses.add(new DeadCharacter(character, new Sprite(RPG.gravestone1), 3.0f));
 			}
 		}
 		

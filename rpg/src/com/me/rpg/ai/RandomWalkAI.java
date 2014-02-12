@@ -40,7 +40,7 @@ public class RandomWalkAI implements WalkAI
 			else
 			{
 				character.setMoving(true);
-				character.setDirection(Direction.getDirectionByIndex(randomInt));
+				character.setMoveDirection(Direction.getDirectionByIndex(randomInt));
 			}
 			toggleWalking = !toggleWalking;
 		}
@@ -86,7 +86,7 @@ public class RandomWalkAI implements WalkAI
 		float y = oldY;
 		float speed = character.getSpeed();
 
-		Direction direction = character.getDirection();
+		Direction direction = character.getMoveDirection();
 		x += speed * deltaTime * direction.getDx();
 		y += speed * deltaTime * direction.getDy();
 
@@ -119,7 +119,7 @@ public class RandomWalkAI implements WalkAI
 		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, newCoordinate);
 
 		character.setMoving(didMove);
-		character.setDirection(direction);
+		character.setMoveDirection(direction);
 		character.setBottomLeftCorner(newCoordinate);
 	}
 

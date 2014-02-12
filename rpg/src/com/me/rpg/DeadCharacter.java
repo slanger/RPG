@@ -29,6 +29,7 @@ public class DeadCharacter {
 			deceased.getSprite().setColor(1f, 1f, 1f, (fadeTime - passedTime)/fadeTime);
 			deceased.getSprite().draw(batch);
 			gravestone.setColor(1f, 1f, 1f, passedTime/fadeTime);
+			gravestone.setX(deceased.getSprite().getX()+(float)Math.cos(passedTime*200*Math.PI));
 			gravestone.draw(batch, passedTime/fadeTime);
 			return;
 		}

@@ -98,7 +98,7 @@ public class FollowPathAI implements WalkAI
 		}
 		
 		character.setMoving(didMove);
-		character.setDirection(newDirection);
+		character.setMoveDirection(newDirection);
 		character.setBottomLeftCorner(newCoordinate);
 	}
 

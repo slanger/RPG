@@ -32,7 +32,8 @@ public abstract class GameCharacter implements IAttackable
 	private TextureRegion rightIdle, leftIdle, upIdle, downIdle;
 	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation,
 			downWalkAnimation;
-	private Direction direction = Direction.DOWN;
+	private Direction moveDirection = Direction.DOWN;
+	private Direction faceDirection = Direction.DOWN;
 	private boolean moving = false;
 	private float stateTime = 0f;
 	private float speed = 100f;
@@ -48,6 +49,7 @@ public abstract class GameCharacter implements IAttackable
 	protected HashMap<StatusEffect, Float> immunityHash;
 	protected int health;
 	protected float strikeImmunity;
+	protected boolean strafing;
 	
 
 	protected GameCharacter(String name, Texture spritesheet, int width,
@@ -140,14 +142,32 @@ public abstract class GameCharacter implements IAttackable
 				center.getY() - getSpriteHeight() / 2);
 	}
 
-	public Direction getDirection()
+	public Direction getMoveDirection()
 	{
-		return direction;
+		return moveDirection;
 	}
 
-	public void setDirection(Direction direction)
+	public void setMoveDirection(Direction moveDirection)
 	{
-		this.direction = direction;
+		this.moveDirection = moveDirection;
+		if (!strafing)
+			setFaceDirection(moveDirection);
+	}
+	
+	public boolean isStrafing() {
+		return strafing;
+	}
+	
+	public void setStrafing(boolean strafing) {
+		this.strafing = strafing;
+	}
+	
+	public Direction getFaceDirection() {
+		return faceDirection;
+	}
+	
+	public void setFaceDirection(Direction faceDirection) {
+		this.faceDirection = faceDirection;
 	}
 
 	public boolean isMoving()
@@ -223,7 +243,9 @@ public abstract class GameCharacter implements IAttackable
 
 	public float getSpeed()
 	{
-		return speed;
+		if (!strafing || moveDirection == faceDirection)
+			return speed;
+		return speed * 0.6f;
 	}
 
 	public void setSpeed(float newSpeed)
@@ -283,7 +305,7 @@ public abstract class GameCharacter implements IAttackable
 		// draw weapon
 		if (weaponSlot != null)
 		{
-			weaponSlot.render(sprite.getBoundingRectangle(), getDirection(), batch);
+			weaponSlot.render(sprite.getBoundingRectangle(), getFaceDirection(), batch);
 		}
 
 		doRenderAfter(batch);
@@ -313,7 +335,7 @@ public abstract class GameCharacter implements IAttackable
 	protected void updateTexture()
 	{
 		TextureRegion currentFrame = null;
-		switch (getDirection())
+		switch (getFaceDirection())
 		{
 		case RIGHT:
 			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
@@ -355,8 +377,9 @@ public abstract class GameCharacter implements IAttackable
 
 	public void acceptPush(GameCharacter pushingCharacter)
 	{
-		Direction pushingDirection = pushingCharacter.getDirection();
-		direction = pushingDirection.opposite();
+		Direction pushingDirection = pushingCharacter.getMoveDirection();
+		faceDirection = pushingDirection.opposite();
+		moveDirection = pushingDirection; 
 		float oldX = getBottomLeftX();
 		float oldY = getBottomLeftY();
 		float x = oldX + (getSpriteWidth() / 2) * pushingDirection.getDx();
@@ -373,8 +396,8 @@ public abstract class GameCharacter implements IAttackable
 	{
 		float width = getSpriteWidth();
 		float height = getSpriteHeight();
-		float x = getBottomLeftX() + width * direction.getDx();
-		float y = getBottomLeftY() + height * direction.getDy();
+		float x = getBottomLeftX() + width * faceDirection.getDx();
+		float y = getBottomLeftY() + height * faceDirection.getDy();
 		return new Rectangle(x, y, width, height);
 	}
 
@@ -451,7 +474,7 @@ public abstract class GameCharacter implements IAttackable
 	}
 	
 	private boolean attemptShieldBlock(Weapon weapon) {
-		if (shieldSlot != null && weapon.getLastDirection().equals(direction.opposite())) {
+		if (shieldSlot != null && weapon.getLastDirection().equals(faceDirection.opposite())) {
 			// only allow shield to block if you are facing the attack
 			shieldSlot.receiveAttack(weapon);
 			return true;
@@ -460,7 +483,7 @@ public abstract class GameCharacter implements IAttackable
 	}
 	
 	private boolean attemptShieldBlock(Projectile projectile) {
-		if (shieldSlot != null && projectile.getFiredDirection().equals(direction.opposite())) {
+		if (shieldSlot != null && projectile.getFiredDirection().equals(faceDirection.opposite())) {
 			shieldSlot.receiveAttack(projectile);
 			return true;
 		}
@@ -477,8 +500,8 @@ public abstract class GameCharacter implements IAttackable
 	public String toString()
 	{
 		return String
-				.format("(CharacterToString){name:%s, sprite:%s, direction:%s, moving:%s, stateTime:%lf}",
-						name, sprite, direction, moving, stateTime);
+				.format("(CharacterToString){name:%s, sprite:%s, facing:%s, moving:%s, stateTime:%lf}",
+						name, sprite, faceDirection, moving, stateTime);
 	}
 
 	/**
