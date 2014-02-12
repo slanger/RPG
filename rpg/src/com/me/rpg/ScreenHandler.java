@@ -10,6 +10,7 @@ public class ScreenHandler extends Game
 	private SpriteBatch spriteBatch;
 	public RPG rpgScreen;
 	public StartScreen startScreen;
+	public GameOverScreen endScreen;
 
 	@Override
 	public void create()
@@ -17,7 +18,8 @@ public class ScreenHandler extends Game
 		Texture.setEnforcePotImages(false);
 		spriteBatch = new SpriteBatch();
 		startScreen = new StartScreen(this, spriteBatch);
-		rpgScreen = new RPG();
+		rpgScreen = new RPG(this);
+		endScreen = new GameOverScreen(this, spriteBatch);
 		setScreen(startScreen);
 	}
 

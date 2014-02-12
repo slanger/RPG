@@ -185,6 +185,10 @@ public class World implements Disposable
 
 		batch.end();
 	}
+	
+	public boolean isGameOver() {
+		return map.isGameOver();
+	}
 
 	public void update(float deltaTime)
 	{

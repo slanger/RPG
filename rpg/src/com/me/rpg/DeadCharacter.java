@@ -45,4 +45,10 @@ public class DeadCharacter {
 	public String getDeadName() {
 		return deceased.getName();
 	}
+	
+	public boolean isGameOver() {
+		if (passedTime < fadeTime)
+			return false;
+		return deceased.isGameOver();
+	}
 }

@@ -64,6 +64,7 @@ public abstract class Map implements Disposable
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
+	private boolean gameOver = false;
 	
 	protected Timer timer;
 
@@ -107,6 +108,13 @@ public abstract class Map implements Disposable
 	public Timer getTimer()
 	{
 		return timer;
+	}
+	
+	public boolean isGameOver() {
+		return gameOver;
+	}
+	public void setGameOver() {
+		gameOver = true;
 	}
 
 	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
@@ -187,12 +195,16 @@ public abstract class Map implements Disposable
 		// melee attack test stuff
 		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
 		Weapon sword = new MeleeWeapon("LameSword");
+		Weapon sword2 = new MeleeWeapon("Sword2");
+		sword2.initSprite(swordSprite, width, height, 32, 32);
 		sword.initSprite(swordSprite, width, height, 32, 32);
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
+		sword2.addEffect(poison);
 		
 		character.equip(this, sword);
 		character.swapWeapon(this);
+		npc.equip(this, sword2);
 
 		// ranged attack test stuff
 		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
@@ -429,6 +441,10 @@ public abstract class Map implements Disposable
 		while (deadIter.hasNext()) {
 			DeadCharacter deadChar = deadIter.next();
 			deadChar.update(deltaTime);
+			if (deadChar.isGameOver()) {
+				// TODO: fix this awful code
+				setGameOver();
+			}
 		}
 		
 		// check for dead characters

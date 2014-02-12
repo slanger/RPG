@@ -473,6 +473,10 @@ public abstract class GameCharacter implements IAttackable
 		return getHealth() == 0;
 	}
 	
+	public boolean isGameOver() {
+		return false;
+	}
+	
 	private boolean attemptShieldBlock(Weapon weapon) {
 		if (shieldSlot != null && weapon.getLastDirection().equals(faceDirection.opposite())) {
 			// only allow shield to block if you are facing the attack

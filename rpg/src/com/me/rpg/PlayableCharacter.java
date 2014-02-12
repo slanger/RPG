@@ -271,6 +271,11 @@ public class PlayableCharacter extends GameCharacter
 			dialogue.update(c);
 		}
 	}
+	
+	@Override
+	public boolean isGameOver() {
+		return isDead();
+	}
 
 	private void advanceDialogue(String key)
 	{

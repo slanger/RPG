@@ -29,15 +29,18 @@ public class RPG implements Screen
 	public static TextureRegion gravestone2;
 
 	public static AssetManager manager = new AssetManager();
+	public ScreenHandler screenHandler;
 
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 
 	private World world;
 
-	public RPG()
+	public RPG(ScreenHandler screenHandler)
 	{
 		loadAssets();
+		
+		this.screenHandler = screenHandler;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(),
@@ -77,6 +80,9 @@ public class RPG implements Screen
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		camera.update();
 		world.update(deltaTime);
+		if (world.isGameOver()) {
+			screenHandler.setScreen(screenHandler.endScreen);
+		}
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.me.rpg;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,6 +16,7 @@ public class NonplayableCharacter extends GameCharacter
 {
 
 	private boolean isHappy = false;
+	private boolean enableAttack = false;
 	private Color oldColor = null;
 	private MoveToOtherTownTask moveToOtherTownTask;
 
@@ -67,7 +70,20 @@ public class NonplayableCharacter extends GameCharacter
 	{
 		// update movement
 		walkAI.update(deltaTime, currentMap);
-
+		
+		// auto attack
+		// attack
+		if (weaponSlot != null && enableAttack)
+		{
+			weaponSlot.attack(currentMap, getFaceDirection(), getSprite()
+					.getBoundingRectangle());
+			enableAttack = false;
+		}
+		else
+		{
+			enableAttack = true;
+		}
+		
 		updateTexture();
 	}
 
