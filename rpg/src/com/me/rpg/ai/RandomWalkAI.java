@@ -40,7 +40,7 @@ public class RandomWalkAI implements WalkAI
 			else
 			{
 				character.setMoving(true);
-				character.setDirection(Direction.getDirectionByIndex(randomInt));
+				character.setMoveDirection(Direction.getDirectionByIndex(randomInt));
 			}
 			toggleWalking = !toggleWalking;
 		}
@@ -71,11 +71,11 @@ public class RandomWalkAI implements WalkAI
 	}
 
 	@Override
-	public Direction update(float deltaTime, Map currentMap, Coordinate newLocation)
+	public void update(float deltaTime, Map currentMap)
 	{
 		if (!character.isMoving())
 		{
-			return null;
+			return;
 		}
 
 		float spriteWidth = character.getSpriteWidth();
@@ -86,7 +86,7 @@ public class RandomWalkAI implements WalkAI
 		float y = oldY;
 		float speed = character.getSpeed();
 
-		Direction direction = character.getDirection();
+		Direction direction = character.getMoveDirection();
 		x += speed * deltaTime * direction.getDx();
 		y += speed * deltaTime * direction.getDy();
 
@@ -119,11 +119,8 @@ public class RandomWalkAI implements WalkAI
 		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, newCoordinate);
 
 		character.setMoving(didMove);
-
-		newLocation.setX(newCoordinate.getX());
-		newLocation.setY(newCoordinate.getY());
-
-		return null; // we do not need to return a Direction
+		character.setMoveDirection(direction);
+		character.setBottomLeftCorner(newCoordinate);
 	}
 
 }

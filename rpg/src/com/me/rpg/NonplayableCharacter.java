@@ -1,7 +1,10 @@
 package com.me.rpg;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.ai.FollowPathAI;
@@ -13,6 +16,7 @@ public class NonplayableCharacter extends GameCharacter
 {
 
 	private boolean isHappy = false;
+	private boolean enableAttack = false;
 	private Color oldColor = null;
 	private MoveToOtherTownTask moveToOtherTownTask;
 
@@ -29,20 +33,35 @@ public class NonplayableCharacter extends GameCharacter
 	}
 
 	@Override
-	protected void doRenderBefore()
+	public void addedToMap(Map map)
+	{
+		super.addedToMap(map);
+		startMoveTask();
+	}
+
+	private void startMoveTask()
+	{
+		currentMap.getTimer().scheduleTask(moveToOtherTownTask, 0, 5);
+	}
+
+	@Override
+	protected void doRenderBefore(SpriteBatch batch)
 	{
 		if (isHappy)
 		{
 			// add green tint
 			oldColor = new Color(getSprite().getColor());
 			getSprite().setColor(new Color(0, 1, 0, oldColor.a));
-		} else {
+		}
+		else
+		{
 			oldColor = getSprite().getColor();
 		}
 	}
-	
+
 	@Override
-	protected void doRenderAfter() {
+	protected void doRenderAfter(SpriteBatch batch)
+	{
 		getSprite().setColor(oldColor);
 	}
 
@@ -50,25 +69,31 @@ public class NonplayableCharacter extends GameCharacter
 	public void doUpdate(float deltaTime, Map currentMap)
 	{
 		// update movement
-		Coordinate newLocation = new Coordinate();
-		Direction newDirection = walkAI.update(deltaTime, currentMap, newLocation);
-		if (isMoving())
+		walkAI.update(deltaTime, currentMap);
+		
+		// auto attack
+		// attack
+		if (weaponSlot != null && enableAttack)
 		{
-			setBottomLeftCorner(newLocation);
+			weaponSlot.attack(currentMap, getFaceDirection(), getSprite()
+					.getBoundingRectangle());
+			enableAttack = false;
 		}
-		if (newDirection != null)
+		else
 		{
-			setDirection(newDirection);
+			enableAttack = true;
 		}
-
+		
 		updateTexture();
 	}
 
 	@Override
 	public void doneFollowingPath()
 	{
-		setWalkAI(new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle())));
-		currentMap.getTimer().scheduleTask(moveToOtherTownTask, 0, 5);
+		walkAI.stop();
+		walkAI = new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle()));
+		walkAI.start();
+		startMoveTask();
 	}
 
 	private class ChangeColorTask extends Timer.Task
@@ -109,8 +134,9 @@ public class NonplayableCharacter extends GameCharacter
 			{
 				if (currentMap.getMapType() == MapType.PROTOTYPE)
 				{
-					System.out.println(getName() + " going to different town");
-					setWalkAI(new FollowPathAI(character, currentMap));
+					walkAI.stop();
+					walkAI = new FollowPathAI(character, currentMap);
+					walkAI.start();
 					this.cancel();
 				}
 			}
