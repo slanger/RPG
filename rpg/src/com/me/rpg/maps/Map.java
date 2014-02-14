@@ -19,7 +19,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
-import com.me.rpg.Coordinate;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.characters.DeadCharacter;
@@ -31,6 +30,7 @@ import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
+import com.me.rpg.utils.Coordinate;
 
 public abstract class Map implements Disposable
 {

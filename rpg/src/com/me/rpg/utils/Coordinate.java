@@ -1,4 +1,4 @@
-package com.me.rpg;
+package com.me.rpg.utils;
 
 import com.badlogic.gdx.math.Vector2;
 

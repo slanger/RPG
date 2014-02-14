@@ -1,4 +1,4 @@
-package com.me.rpg;
+package com.me.rpg.utils;
 
 public enum Direction
 {

@@ -1,7 +1,7 @@
 package com.me.rpg.ai;
 
 import com.badlogic.gdx.Input.Keys;
-import com.me.rpg.Direction;
+import com.me.rpg.utils.Direction;
 
 public class KeyMap {
 	

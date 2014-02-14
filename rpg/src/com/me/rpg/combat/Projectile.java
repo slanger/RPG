@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.Coordinate;
-import com.me.rpg.Direction;
+import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Direction;
 
 public class Projectile implements Cloneable {
 	
