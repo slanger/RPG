@@ -20,6 +20,7 @@ import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
+import com.me.rpg.reputation.NPCMemory;
 
 public abstract class GameCharacter implements IAttackable
 {
@@ -51,6 +52,9 @@ public abstract class GameCharacter implements IAttackable
 	protected float strikeImmunity;
 	protected boolean strafing;
 	
+	//Reputation Stuff
+	private NPCMemory npcMemory; 
+	//
 
 	protected GameCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration)
@@ -87,6 +91,7 @@ public abstract class GameCharacter implements IAttackable
 		inflictedEffects = new LinkedList<StatusEffect>();
 		immunityHash = new HashMap<StatusEffect, Float>();
 		health = getMaxHealth();
+		//npcMemory = new NPCMemory();
 	}
 
 	public String getName()
@@ -287,7 +292,12 @@ public abstract class GameCharacter implements IAttackable
 	{
 		this.currentMap = currentMap;
 	}
-
+	
+	public NPCMemory getNPCMemory()
+	{
+		return npcMemory;
+	}
+	
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);

@@ -1,25 +1,28 @@
+//Each NPC will have an instance of this class 
+
 package com.me.rpg.reputation;
 
 import java.util.ArrayList;
 
 public class NPCMemory {
-	private static ArrayList<ReputationEvent> MasterEventList;
+	private ArrayList<ReputationEvent> MasterEventList;
 	private ArrayList<NPCMemoryElement> PerNPCLongTermMemory;
 	
-	public boolean merge(NPCMemory npcMemory)
+	NPCMemory(ArrayList<ReputationEvent> MasterEventList)
 	{
-		return false;
+		this.MasterEventList = MasterEventList;
+		PerNPCLongTermMemory = new ArrayList<NPCMemoryElement>();
 	}
+	
+	public void addMemory(ReputationEvent reputationEvent)
+	{
+		NPCMemoryElement temp = new NPCMemoryElement(reputationEvent);
+		PerNPCLongTermMemory.add(temp);
+	}
+	
 	public void update(ReputationEvent reputationEvent)
 	{
 		
 	}
-	public void AddNewMemoryElement(ReputationEvent reputationEvent)
-	{
-		
-	}
-	public void ReplaceMemoryElement(ReputationEvent reputationEvent, int index)
-	{
-		
-	}
+	
 }

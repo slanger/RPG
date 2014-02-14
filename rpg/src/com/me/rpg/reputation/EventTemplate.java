@@ -4,7 +4,7 @@ public class EventTemplate {
 	
 	private String eventName; 
 	private int magnitude;
-	//private String repEffects;
+	//individual group effects
 	
 	EventTemplate(String eventName, int magnitude)
 	{

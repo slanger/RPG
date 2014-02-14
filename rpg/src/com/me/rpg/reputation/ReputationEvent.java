@@ -13,8 +13,8 @@ public class ReputationEvent {
 	
 	public ReputationEvent(String eventType, String groupAffected, GameCharacter characterAffected, EventTemplate eventTemplate	)
 	{
-		//this.eventType=eventType;
-		//this.
+		id = new EventID(eventType,groupAffected,characterAffected);
+		this.eventTemplate=eventTemplate;
 	}
 	
 	public EventID getEventID()
