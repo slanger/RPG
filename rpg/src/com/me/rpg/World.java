@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
+import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.ai.Dialogue;
 
 public class World implements Disposable
@@ -27,7 +28,8 @@ public class World implements Disposable
 	private boolean updateEnable = true;
 
 	private Dialogue dialogue;
-
+	private ReputationSystem reputationSystem;
+	
 	private boolean warping = false;
 	private float warpingAlpha;
 	private Sound warpSound;
@@ -146,6 +148,7 @@ public class World implements Disposable
 
 		// create map
 		dialogue = new Dialogue(this, batch, camera);
+		reputationSystem = new ReputationSystem(this);
 		map = new ExampleMap(this, batch, camera);
 
 		// create debug font

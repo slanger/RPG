@@ -6,7 +6,6 @@ public class EventID {
 	private String eventType;
 	private String groupAffected;
 	private GameCharacter characterAffected; 
-	private int id;
 	
 	public EventID(String eventType, String groupAffected, GameCharacter characterAffected){
 		this.eventType=eventType;
@@ -24,9 +23,5 @@ public class EventID {
 	}
 	public GameCharacter getCharacterAffected(){
 		return characterAffected;
-	}
-	public int getID()
-	{
-		return id;
 	}
 }
