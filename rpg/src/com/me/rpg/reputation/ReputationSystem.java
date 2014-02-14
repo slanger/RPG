@@ -35,6 +35,18 @@ public class ReputationSystem {
 	
 	public void addNewEvent(String eventType, String groupAffected, GameCharacter characterAffected) 
 	{
+		Iterator<ReputationEvent> iter = MasterEventList.iterator();
+		while (iter.hasNext())
+		{
+			ReputationEvent tempRepEvent = iter.next();
+			if(tempRepEvent.getEventID().getEventType().equals(eventType) && tempRepEvent.getEventID().getGroupAffected().equals(groupAffected)
+					&& tempRepEvent.getEventID().getCharacterAffected().equals(characterAffected))
+			{
+				System.out.println("Event already exists");
+				return;
+			}
+		}
+		
 		for(int i=0;i<6;i++)
 		{
 			if(EventTemplateList[i].getEventName().equals(eventType))
@@ -47,7 +59,7 @@ public class ReputationSystem {
 				{
 					AlertWitnessNPCS(masterListIndex,reputationEvent);
 				}
-				else
+				if(masterListIndex <0)
 				{
 					System.out.println("Event not found in MasterEventList");
 				}
@@ -61,7 +73,7 @@ public class ReputationSystem {
 	{
 		//for every alerted NPC, increment the reference count for the RepEvent
 		
-		//check coordinate of repevent, check what characters are around,
+		//check coordinate of repEvent, check what characters are around,
 		//For each character within radius, character.getNPCMemory.addNewMemoryElement();
 		
 		
@@ -71,7 +83,9 @@ public class ReputationSystem {
 			GameCharacter selected = iter.next();
 			//Coordinate selectedLocation = selected.getBottomLeftCorner();
 			//for now just add to all characters
-			//GameCharacter.getNPCMemory().addMemory(reputationEvent);
+			if(selected.getNPCMemory() != null){ //player will have a null NPCMemory
+				selected.getNPCMemory().addMemory(reputationEvent);
+			}
 		}
 	}
 }

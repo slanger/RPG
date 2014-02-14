@@ -8,7 +8,7 @@ public class NPCMemory {
 	private ArrayList<ReputationEvent> MasterEventList;
 	private ArrayList<NPCMemoryElement> PerNPCLongTermMemory;
 	
-	NPCMemory(ArrayList<ReputationEvent> MasterEventList)
+	public NPCMemory(ArrayList<ReputationEvent> MasterEventList)
 	{
 		this.MasterEventList = MasterEventList;
 		PerNPCLongTermMemory = new ArrayList<NPCMemoryElement>();
@@ -18,6 +18,7 @@ public class NPCMemory {
 	{
 		NPCMemoryElement temp = new NPCMemoryElement(reputationEvent);
 		PerNPCLongTermMemory.add(temp);
+		System.out.println("Added Event to a Single NPC");
 	}
 	
 	public void update(ReputationEvent reputationEvent)

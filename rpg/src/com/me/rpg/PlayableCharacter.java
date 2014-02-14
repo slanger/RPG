@@ -39,10 +39,10 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	public PlayableCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration)
+			int height, int tileWidth, int tileHeight, float animationDuration, World world)
 	{
-		super(name, spritesheet, width, height, tileWidth, tileHeight,
-				animationDuration);
+		super(name, spritesheet, width, height, tileWidth, tileHeight, animationDuration, world);
+		npcMemory = null;
 		setWalkAI(new PlayerControlledWalkAI(this));
 		//redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH, Texture.class);
 	}

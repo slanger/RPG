@@ -53,11 +53,13 @@ public abstract class GameCharacter implements IAttackable
 	protected boolean strafing;
 	
 	//Reputation Stuff
-	private NPCMemory npcMemory; 
+	protected NPCMemory npcMemory; 
+	protected World world;
 	//
+		
 
 	protected GameCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration)
+			int height, int tileWidth, int tileHeight, float animationDuration, World world)
 	{
 		this.name = name;
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
@@ -91,7 +93,9 @@ public abstract class GameCharacter implements IAttackable
 		inflictedEffects = new LinkedList<StatusEffect>();
 		immunityHash = new HashMap<StatusEffect, Float>();
 		health = getMaxHealth();
-		//npcMemory = new NPCMemory();
+		
+		this.world=world;
+		npcMemory = new NPCMemory(world.getReputationSystem().getMasterEventList());
 	}
 
 	public String getName()
@@ -293,11 +297,6 @@ public abstract class GameCharacter implements IAttackable
 		this.currentMap = currentMap;
 	}
 	
-	public NPCMemory getNPCMemory()
-	{
-		return npcMemory;
-	}
-	
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);
@@ -422,6 +421,9 @@ public abstract class GameCharacter implements IAttackable
 			return;
 		inflictEffects(weapon.getEffects());
 		receiveDamage(weapon.getPower());
+		if(!name.equals("Player")){
+			world.getReputationSystem().addNewEvent("Attacked", "test group", this);
+		}
 	}
 	
 	@Override
@@ -435,6 +437,9 @@ public abstract class GameCharacter implements IAttackable
 			return;
 		inflictEffects(projectile.getEffects());
 		receiveDamage(projectile.getPower());
+		if(!name.equals("Player")){
+			world.getReputationSystem().addNewEvent("Attacked", "test group", this);
+		}
 	}
 	
 	@Override
@@ -583,6 +588,10 @@ public abstract class GameCharacter implements IAttackable
 	
 	public void unequipShield() {
 		shieldSlot.unequip();
+	}
+
+	public NPCMemory getNPCMemory() {
+		return npcMemory;
 	}
 
 }

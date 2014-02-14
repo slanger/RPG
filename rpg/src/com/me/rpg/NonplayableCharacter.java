@@ -1,5 +1,6 @@
 package com.me.rpg;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -11,6 +12,7 @@ import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
+import com.me.rpg.reputation.NPCMemory;
 
 public class NonplayableCharacter extends GameCharacter
 {
@@ -19,17 +21,20 @@ public class NonplayableCharacter extends GameCharacter
 	private boolean enableAttack = false;
 	private Color oldColor = null;
 	private MoveToOtherTownTask moveToOtherTownTask;
-
+	
+	
+	
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
-			Rectangle walkingBounds)
+			World world, Rectangle walkingBounds)
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
-				animationDuration);
+				animationDuration, world);
 
 		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
 
 		moveToOtherTownTask = new MoveToOtherTownTask(this);
+		
 	}
 
 	@Override
