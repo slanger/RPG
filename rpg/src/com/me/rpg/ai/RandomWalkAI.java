@@ -2,9 +2,9 @@ package com.me.rpg.ai;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
-import com.me.rpg.GameCharacter;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
+import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
 
 public class RandomWalkAI implements WalkAI

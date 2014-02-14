@@ -1,7 +1,5 @@
 package com.me.rpg;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -13,7 +11,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
-import com.me.rpg.reputation.ReputationEvent;
 import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.ai.Dialogue;
 
@@ -32,7 +29,7 @@ public class World implements Disposable
 
 	private Dialogue dialogue;
 	private ReputationSystem reputationSystem;
-	
+
 	private boolean warping = false;
 	private float warpingAlpha;
 	private Sound warpSound;
@@ -128,7 +125,7 @@ public class World implements Disposable
 	{
 		return reputationSystem;
 	}
-	
+
 	public boolean isUpdating()
 	{
 		return updateEnable;
@@ -155,9 +152,9 @@ public class World implements Disposable
 		this.camera = camera;
 
 		// create map
-		dialogue = new Dialogue(this, batch, camera);
+		dialogue = new Dialogue(batch, camera);
 		reputationSystem = new ReputationSystem(this);
-		
+
 		map = new ExampleMap(this, batch, camera);
 
 		// create debug font
@@ -185,7 +182,8 @@ public class World implements Disposable
 		if (warping)
 		{
 			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
-			whiteScreen.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
+			whiteScreen.setPosition(camera.position.x - camera.viewportWidth
+					/ 2, camera.position.y - camera.viewportHeight / 2);
 			whiteScreen.draw(batch, warpingAlpha);
 		}
 
@@ -197,8 +195,9 @@ public class World implements Disposable
 
 		batch.end();
 	}
-	
-	public boolean isGameOver() {
+
+	public boolean isGameOver()
+	{
 		return map.isGameOver();
 	}
 

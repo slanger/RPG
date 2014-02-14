@@ -11,8 +11,8 @@ public class Coordinate
 	private float y;
 
 	/**
-	 * Empty constructor.
-	 * Use this if you want to set x and y after construction.
+	 * Empty constructor. Use this if you want to set x and y after
+	 * construction.
 	 */
 	public Coordinate()
 	{
@@ -59,8 +59,10 @@ public class Coordinate
 	{
 		return String.format("(%f, %f)", x, y);
 	}
-	
-	public static Coordinate copy(Coordinate c) {
+
+	public static Coordinate copy(Coordinate c)
+	{
 		return new Coordinate(c.getX(), c.getY());
 	}
+
 }

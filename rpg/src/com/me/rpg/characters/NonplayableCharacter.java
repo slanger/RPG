@@ -1,18 +1,15 @@
-package com.me.rpg;
+package com.me.rpg.characters;
 
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.World;
 import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
-import com.me.rpg.reputation.NPCMemory;
 
 public class NonplayableCharacter extends GameCharacter
 {
@@ -21,9 +18,7 @@ public class NonplayableCharacter extends GameCharacter
 	private boolean enableAttack = false;
 	private Color oldColor = null;
 	private MoveToOtherTownTask moveToOtherTownTask;
-	
-	
-	
+
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
 			World world, Rectangle walkingBounds)
@@ -34,7 +29,6 @@ public class NonplayableCharacter extends GameCharacter
 		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
 
 		moveToOtherTownTask = new MoveToOtherTownTask(this);
-		
 	}
 
 	@Override
@@ -75,7 +69,7 @@ public class NonplayableCharacter extends GameCharacter
 	{
 		// update movement
 		walkAI.update(deltaTime, currentMap);
-		
+
 		// auto attack
 		// attack
 		if (weaponSlot != null && enableAttack)
@@ -88,7 +82,7 @@ public class NonplayableCharacter extends GameCharacter
 		{
 			enableAttack = true;
 		}
-		
+
 		updateTexture();
 	}
 
@@ -96,7 +90,8 @@ public class NonplayableCharacter extends GameCharacter
 	public void doneFollowingPath()
 	{
 		walkAI.stop();
-		walkAI = new RandomWalkAI(this, 1, 1, currentMap.getEnclosingWalkingBounds(getBoundingRectangle()));
+		walkAI = new RandomWalkAI(this, 1, 1,
+				currentMap.getEnclosingWalkingBounds(getBoundingRectangle()));
 		walkAI.start();
 		startMoveTask();
 	}

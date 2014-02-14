@@ -1,4 +1,4 @@
-package com.me.rpg;
+package com.me.rpg.characters;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +12,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.me.rpg.Coordinate;
+import com.me.rpg.Direction;
+import com.me.rpg.World;
 import com.me.rpg.ai.StandStillAI;
 import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.IAttackable;

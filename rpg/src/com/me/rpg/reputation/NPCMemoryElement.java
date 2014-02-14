@@ -1,6 +1,6 @@
 package com.me.rpg.reputation;
 
-import com.me.rpg.GameCharacter;
+import com.me.rpg.characters.GameCharacter;
 
 public class NPCMemoryElement {
 	private EventID id;
