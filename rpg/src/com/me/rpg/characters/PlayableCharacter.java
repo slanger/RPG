@@ -1,10 +1,11 @@
-package com.me.rpg;
+package com.me.rpg.characters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.World;
 import com.me.rpg.ai.Dialogue;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;

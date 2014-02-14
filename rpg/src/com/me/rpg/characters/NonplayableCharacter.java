@@ -1,10 +1,11 @@
-package com.me.rpg;
+package com.me.rpg.characters;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.World;
 import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;

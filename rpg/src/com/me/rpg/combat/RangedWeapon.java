@@ -2,9 +2,9 @@ package com.me.rpg.combat;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.GameCharacter;
 import com.me.rpg.Coordinate;
 import com.me.rpg.Direction;
+import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
 
 public class RangedWeapon extends Weapon {

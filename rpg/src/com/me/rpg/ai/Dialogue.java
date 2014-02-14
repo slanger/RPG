@@ -3,7 +3,7 @@ package com.me.rpg.ai;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.me.rpg.GameCharacter;
+import com.me.rpg.characters.GameCharacter;
 
 public class Dialogue
 {

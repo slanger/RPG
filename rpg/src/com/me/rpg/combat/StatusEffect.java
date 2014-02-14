@@ -1,6 +1,6 @@
 package com.me.rpg.combat;
 
-import com.me.rpg.GameCharacter;
+import com.me.rpg.characters.GameCharacter;
 
 public abstract class StatusEffect implements Cloneable {
 	

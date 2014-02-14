@@ -3,9 +3,8 @@ package com.me.rpg.reputation;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.me.rpg.Coordinate;
-import com.me.rpg.GameCharacter;
 import com.me.rpg.World;
+import com.me.rpg.characters.GameCharacter;
 
 public class ReputationSystem {
 	private World world;

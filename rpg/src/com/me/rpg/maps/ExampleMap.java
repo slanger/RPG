@@ -7,10 +7,10 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.me.rpg.NonplayableCharacter;
-import com.me.rpg.PlayableCharacter;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
+import com.me.rpg.characters.NonplayableCharacter;
+import com.me.rpg.characters.PlayableCharacter;
 
 public class ExampleMap extends Map
 {
