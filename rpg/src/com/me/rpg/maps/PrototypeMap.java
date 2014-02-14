@@ -59,21 +59,21 @@ public class PrototypeMap extends Map
 		// create characters
 		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
 		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width, height, 16, 16,
-				0.15f);
+				0.15f, world);
 		player.setSpeed(200f);
 
 		Texture spritesheet2 = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
 		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries.get("castle");
 		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, boundary1.getRectangle());
+				0.15f, world, boundary1.getRectangle());
 
 		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries.get("desert");
 		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, boundary2.getRectangle());
+				0.15f, world, boundary2.getRectangle());
 
 		RectangleMapObject boundary3 = (RectangleMapObject) walkingBoundaries.get("town");
 		npc3 = new NonplayableCharacter(NPC3_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, boundary3.getRectangle());
+				0.15f, world, boundary3.getRectangle());
 
 		// add characters to map
 		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints.get(PLAYER_NAME);

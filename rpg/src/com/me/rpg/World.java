@@ -1,5 +1,7 @@
 package com.me.rpg;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
+import com.me.rpg.reputation.ReputationEvent;
 import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.ai.Dialogue;
 
@@ -121,6 +124,11 @@ public class World implements Disposable
 		return dialogue;
 	}
 
+	public ReputationSystem getReputationSystem()
+	{
+		return reputationSystem;
+	}
+	
 	public boolean isUpdating()
 	{
 		return updateEnable;
@@ -149,6 +157,7 @@ public class World implements Disposable
 		// create map
 		dialogue = new Dialogue(this, batch, camera);
 		reputationSystem = new ReputationSystem(this);
+		
 		map = new ExampleMap(this, batch, camera);
 
 		// create debug font
