@@ -4,12 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Timer;
 import com.me.rpg.World;
 import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
+import com.me.rpg.utils.Task;
 
 public class NonplayableCharacter extends GameCharacter
 {
@@ -96,7 +96,7 @@ public class NonplayableCharacter extends GameCharacter
 		startMoveTask();
 	}
 
-	private class ChangeColorTask extends Timer.Task
+	private class ChangeColorTask extends Task
 	{
 
 		@Override
@@ -116,7 +116,7 @@ public class NonplayableCharacter extends GameCharacter
 
 	}
 
-	private class MoveToOtherTownTask extends Timer.Task
+	private class MoveToOtherTownTask extends Task
 	{
 
 		private GameCharacter character;
