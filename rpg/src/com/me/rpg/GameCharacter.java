@@ -485,7 +485,15 @@ public abstract class GameCharacter implements IAttackable
 	}
 	
 	public boolean isDead() {
-		return getHealth() == 0;
+		boolean result = getHealth() == 0;
+		if (result)
+			deathCleanup();
+		return result;
+	}
+	
+	private void deathCleanup() {
+		if (weaponSlot != null)
+			weaponSlot.quickFinishAttack();
 	}
 	
 	public boolean isGameOver() {

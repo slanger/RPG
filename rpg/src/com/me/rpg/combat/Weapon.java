@@ -75,6 +75,10 @@ public abstract class Weapon extends Equippable {
 		this.attacking = attacking;
 	}
 	
+	public void quickFinishAttack() {
+		attacking = false;
+	}
+	
 	public void render(Rectangle charRectangle, Direction direction,
 			SpriteBatch batch) {
 		if (!attacking)
