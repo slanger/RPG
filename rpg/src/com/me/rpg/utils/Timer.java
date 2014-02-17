@@ -30,7 +30,7 @@ public class Timer
 	}
 
 	/**
-	 * Cancels all Tasks;
+	 * Cancels all Tasks
 	 */
 	public void clear()
 	{
@@ -44,7 +44,6 @@ public class Timer
 	public void scheduleTask(Task task, float delaySeconds,
 			float intervalSeconds, int repeatCount)
 	{
-		System.out.println(task.timeLeftBeforeExecute);
 		if (task.repeatCount != CANCELLED)
 		{
 			throw new IllegalArgumentException(

@@ -99,7 +99,7 @@ public class PrototypeMap extends Map
 	{
 		super.open();
 		startMusic.play();
-		timer.scheduleTask(startLoopMusicTask, 7.192f); // length of intro music
+		timer.scheduleTask(startLoopMusicTask, 7.0f); // length of intro music
 	}
 
 	@Override
