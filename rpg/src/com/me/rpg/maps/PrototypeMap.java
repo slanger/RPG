@@ -8,11 +8,11 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.utils.Timer;
-import com.me.rpg.NonplayableCharacter;
-import com.me.rpg.PlayableCharacter;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
+import com.me.rpg.characters.NonplayableCharacter;
+import com.me.rpg.characters.PlayableCharacter;
+import com.me.rpg.utils.Task;
 
 public class PrototypeMap extends Map
 {
@@ -88,7 +88,7 @@ public class PrototypeMap extends Map
 
 		// setup weapons
 		genericWeaponSetup(player, npc1);
-		
+
 		// get music
 		startMusic = RPG.manager.get(BACKGROUND_MUSIC_START);
 		loopMusic = RPG.manager.get(BACKGROUND_MUSIC_LOOP);
@@ -97,21 +97,21 @@ public class PrototypeMap extends Map
 	@Override
 	public void open()
 	{
-		world.setUpdateEnable(true);
+		super.open();
 		startMusic.play();
-		timer.scheduleTask(startLoopMusicTask, 7.192f); // length of intro music
+		timer.scheduleTask(startLoopMusicTask, 7.0f); // length of intro music
 	}
 
 	@Override
 	public void close()
 	{
-		timer.stop();
+		super.close();
 		startLoopMusicTask.cancel();
 		startMusic.stop();
 		loopMusic.stop();
 	}
 
-	private class StartLoopMusicTask extends Timer.Task
+	private class StartLoopMusicTask extends Task
 	{
 
 		@Override

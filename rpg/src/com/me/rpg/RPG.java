@@ -80,7 +80,8 @@ public class RPG implements Screen
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		camera.update();
 		world.update(deltaTime);
-		if (world.isGameOver()) {
+		if (world.isGameOver())
+		{
 			screenHandler.setScreen(screenHandler.endScreen);
 		}
 	}

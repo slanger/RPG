@@ -1,7 +1,7 @@
 package com.me.rpg.reputation;
 
-import com.me.rpg.Coordinate;
-import com.me.rpg.GameCharacter;
+import com.me.rpg.characters.GameCharacter;
+import com.me.rpg.utils.Coordinate;
 
 public class ReputationEvent {
 	private EventID id;

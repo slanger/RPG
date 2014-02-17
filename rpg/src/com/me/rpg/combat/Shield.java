@@ -3,8 +3,8 @@ package com.me.rpg.combat;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.GameCharacter;
-import com.me.rpg.Direction;
+import com.me.rpg.characters.GameCharacter;
+import com.me.rpg.utils.Direction;
 
 public class Shield extends Equippable implements IAttackable {
 	

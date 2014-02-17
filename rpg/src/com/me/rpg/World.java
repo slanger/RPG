@@ -1,7 +1,5 @@
 package com.me.rpg;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -10,12 +8,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Timer;
+import com.me.rpg.ai.Dialogue;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
-import com.me.rpg.reputation.ReputationEvent;
 import com.me.rpg.reputation.ReputationSystem;
-import com.me.rpg.ai.Dialogue;
+import com.me.rpg.utils.Task;
+import com.me.rpg.utils.Timer;
 
 public class World implements Disposable
 {
@@ -28,15 +26,16 @@ public class World implements Disposable
 	private OrthographicCamera camera;
 	private BitmapFont debugFont;
 	private Map map;
-	private boolean updateEnable = true;
 
 	private Dialogue dialogue;
 	private ReputationSystem reputationSystem;
-	
+
 	private boolean warping = false;
 	private float warpingAlpha;
 	private Sound warpSound;
 	private Sprite whiteScreen;
+
+	private Timer timer = new Timer();
 
 	public Map getMap()
 	{
@@ -55,11 +54,10 @@ public class World implements Disposable
 	public void warpToAnotherMap(Map map)
 	{
 		this.map.close();
-		updateEnable = false;
 		warping = true;
 		warpingAlpha = 0f;
 		warpSound.play();
-		map.getTimer().scheduleTask(new Timer.Task()
+		timer.scheduleTask(new Task()
 		{
 
 			@Override
@@ -74,10 +72,10 @@ public class World implements Disposable
 			}
 
 		}, 0f, 0.1f);
-		map.getTimer().scheduleTask(new WarpToAnotherMapTask(map), 3.0f);
+		timer.scheduleTask(new WarpToAnotherMapTask(map), 3.0f);
 	}
 
-	private class WarpToAnotherMapTask extends Timer.Task
+	private class WarpToAnotherMapTask extends Task
 	{
 
 		private Map newMap;
@@ -92,7 +90,7 @@ public class World implements Disposable
 		{
 			setMap(newMap);
 
-			newMap.getTimer().scheduleTask(new Timer.Task()
+			timer.scheduleTask(new Task()
 			{
 
 				@Override
@@ -103,13 +101,12 @@ public class World implements Disposable
 
 			}, 0f, 0.1f, 10);
 
-			newMap.getTimer().scheduleTask(new Timer.Task()
+			timer.scheduleTask(new Task()
 			{
 
 				@Override
 				public void run()
 				{
-					updateEnable = true;
 					warping = false;
 					newMap.open();
 				}
@@ -128,26 +125,6 @@ public class World implements Disposable
 	{
 		return reputationSystem;
 	}
-	
-	public boolean isUpdating()
-	{
-		return updateEnable;
-	}
-
-	public void setUpdateEnable(boolean updateEnable)
-	{
-		this.updateEnable = updateEnable;
-
-		// turn on/off Map Timer
-		if (updateEnable)
-		{
-			map.getTimer().start();
-		}
-		else
-		{
-			map.getTimer().stop();
-		}
-	}
 
 	public World(SpriteBatch batch, OrthographicCamera camera)
 	{
@@ -155,9 +132,9 @@ public class World implements Disposable
 		this.camera = camera;
 
 		// create map
-		dialogue = new Dialogue(this, batch, camera);
+		dialogue = new Dialogue(batch, camera);
 		reputationSystem = new ReputationSystem(this);
-		
+
 		map = new ExampleMap(this, batch, camera);
 
 		// create debug font
@@ -185,7 +162,8 @@ public class World implements Disposable
 		if (warping)
 		{
 			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
-			whiteScreen.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
+			whiteScreen.setPosition(camera.position.x - camera.viewportWidth
+					/ 2, camera.position.y - camera.viewportHeight / 2);
 			whiteScreen.draw(batch, warpingAlpha);
 		}
 
@@ -197,17 +175,16 @@ public class World implements Disposable
 
 		batch.end();
 	}
-	
-	public boolean isGameOver() {
+
+	public boolean isGameOver()
+	{
 		return map.isGameOver();
 	}
 
 	public void update(float deltaTime)
 	{
-		if (updateEnable)
-		{
-			map.update(deltaTime);
-		}
+		timer.update(deltaTime);
+		map.update(deltaTime);
 	}
 
 	@Override

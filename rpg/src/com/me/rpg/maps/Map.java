@@ -18,12 +18,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Timer;
-import com.me.rpg.Coordinate;
-import com.me.rpg.DeadCharacter;
-import com.me.rpg.GameCharacter;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
+import com.me.rpg.characters.DeadCharacter;
+import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Poison;
 import com.me.rpg.combat.Projectile;
@@ -31,6 +29,8 @@ import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
+import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Timer;
 
 public abstract class Map implements Disposable
 {
@@ -42,7 +42,7 @@ public abstract class Map implements Disposable
 	protected GameCharacter focusedCharacter;
 	protected int mapWidth;
 	protected int mapHeight;
-	
+
 	protected ArrayList<GameCharacter> charactersOnMap;
 	protected ArrayList<Projectile> flyingProjectiles;
 	protected ArrayList<Weapon> equippedWeapons;
@@ -60,12 +60,12 @@ public abstract class Map implements Disposable
 	// Tiled layers drawn in front of characters, labeled by index
 	protected int[] foregroundLayers;
 
-	private boolean updateEnable = true;
+	protected boolean updateEnable = true;
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
 	private boolean gameOver = false;
-	
+
 	protected Timer timer;
 
 	protected MapType mapType;
@@ -109,11 +109,14 @@ public abstract class Map implements Disposable
 	{
 		return timer;
 	}
-	
-	public boolean isGameOver() {
+
+	public boolean isGameOver()
+	{
 		return gameOver;
 	}
-	public void setGameOver() {
+
+	public void setGameOver()
+	{
 		gameOver = true;
 	}
 
@@ -171,7 +174,8 @@ public abstract class Map implements Disposable
 
 	protected MapObjects getWalkingBoundaries()
 	{
-		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get("WalkingBoundaries");
+		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get(
+				"WalkingBoundaries");
 		return walkingBoundariesLayer.getObjects();
 	}
 
@@ -201,7 +205,7 @@ public abstract class Map implements Disposable
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		sword2.addEffect(poison);
-		
+
 		character.equip(this, sword);
 		character.swapWeapon(this);
 		npc.equip(this, sword2);
@@ -210,40 +214,48 @@ public abstract class Map implements Disposable
 		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
 		RangedWeapon bow = new RangedWeapon("LameBow");
 		bow.initSprite(bowSprite, width, height, 32, 32);
-		
+
 		character.equip(this, bow);
-		Projectile arrow = new Projectile("arrow", bowSprite, width, height, 32, 32);
+		Projectile arrow = new Projectile("arrow", bowSprite, width, height,
+				32, 32);
 		bow.equipProjectile(arrow, 1000);
-		
+
 		Shield shield = new Shield("plain shield");
 		npc.equipShield(shield);
 	}
 
-	private void cameraPanMovement() {
-        if(Gdx.input.isKeyPressed(Keys.A)) {
-            camera.zoom += 0.02;
-        }
-        if(Gdx.input.isKeyPressed(Keys.Q)) {
-        	camera.zoom -= 0.02;
-        }
-        if(Gdx.input.isKeyPressed(Keys.LEFT)) {
-            if (camera.position.x > 0)
-            	camera.translate(-3, 0, 0);
-        }
-        if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            if (camera.position.x < mapWidth)
-            	camera.translate(3, 0, 0);
-        }
-        if(Gdx.input.isKeyPressed(Keys.DOWN)) {
-            if (camera.position.y > 0)
-            	camera.translate(0, -3, 0);
-        }
-        if(Gdx.input.isKeyPressed(Keys.UP)) {
-            if (camera.position.y < mapHeight)
-            	camera.translate(0, 3, 0);
-        }
+	private void cameraPanMovement()
+	{
+		if (Gdx.input.isKeyPressed(Keys.A))
+		{
+			camera.zoom += 0.02;
+		}
+		if (Gdx.input.isKeyPressed(Keys.Q))
+		{
+			camera.zoom -= 0.02;
+		}
+		if (Gdx.input.isKeyPressed(Keys.LEFT))
+		{
+			if (camera.position.x > 0)
+				camera.translate(-3, 0, 0);
+		}
+		if (Gdx.input.isKeyPressed(Keys.RIGHT))
+		{
+			if (camera.position.x < mapWidth)
+				camera.translate(3, 0, 0);
+		}
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			if (camera.position.y > 0)
+				camera.translate(0, -3, 0);
+		}
+		if (Gdx.input.isKeyPressed(Keys.UP))
+		{
+			if (camera.position.y < mapHeight)
+				camera.translate(0, 3, 0);
+		}
 	}
-	
+
 	/**
 	 * This method should be called after construction of Map when control is
 	 * first given to the player. Subclasses will override it with specific
@@ -252,6 +264,7 @@ public abstract class Map implements Disposable
 	public void open()
 	{
 		// default implementation
+		updateEnable = true;
 	}
 
 	/**
@@ -261,6 +274,7 @@ public abstract class Map implements Disposable
 	public void close()
 	{
 		// default implementation
+		updateEnable = false;
 	}
 
 	/**
@@ -269,13 +283,17 @@ public abstract class Map implements Disposable
 	public Rectangle[] getTestPath()
 	{
 		MapObjects waypointObjects = getWaypoints();
-		RectangleMapObject castleWaypoint = (RectangleMapObject) waypointObjects.get("castle");
-		RectangleMapObject desertWaypoint = (RectangleMapObject) waypointObjects.get("desert");
-		Rectangle[] returnPath = { castleWaypoint.getRectangle(), desertWaypoint.getRectangle() };
+		RectangleMapObject castleWaypoint = (RectangleMapObject) waypointObjects
+				.get("castle");
+		RectangleMapObject desertWaypoint = (RectangleMapObject) waypointObjects
+				.get("desert");
+		Rectangle[] returnPath = { castleWaypoint.getRectangle(),
+				desertWaypoint.getRectangle() };
 		return returnPath;
 	}
 
-	public Rectangle getEnclosingWalkingBounds(Rectangle characterBoundingRectangle)
+	public Rectangle getEnclosingWalkingBounds(
+			Rectangle characterBoundingRectangle)
 	{
 		MapObjects walkingBoundaries = getWalkingBoundaries();
 		int count = walkingBoundaries.getCount();
@@ -311,8 +329,8 @@ public abstract class Map implements Disposable
 		float focusY = focusedCoordinate.getY();
 		float bottomLeftX = focusX - viewportWidth / 2;
 		float bottomLeftY = focusY - viewportHeight / 2;
-		//int width = Math.min(mapWidth, viewportWidth);
-		//int height = Math.min(mapHeight, viewportHeight);
+		// int width = Math.min(mapWidth, viewportWidth);
+		// int height = Math.min(mapHeight, viewportHeight);
 		if (mapWidth >= viewportWidth)
 		{
 			if (bottomLeftX > mapWidth - viewportWidth)
@@ -344,36 +362,41 @@ public abstract class Map implements Disposable
 		{
 			bottomLeftY = (mapHeight - viewportHeight) / 2;
 		}
-		
+
 		if (!cameraPan)
 		{
-			camera.position.set(bottomLeftX + viewportWidth / 2, bottomLeftY + viewportHeight / 2, 0);
+			camera.position.set(bottomLeftX + viewportWidth / 2, bottomLeftY
+					+ viewportHeight / 2, 0);
 		}
-		
+
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render(backgroundLayers);
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
-		Rectangle cameraBounds = new Rectangle(camera.position.x - camera.zoom*viewportWidth/2, camera.position.y - camera.zoom*viewportHeight/2,
-				camera.zoom*viewportWidth, camera.zoom*viewportHeight);
-		
-		
+		Rectangle cameraBounds = new Rectangle(camera.position.x - camera.zoom
+				* viewportWidth / 2, camera.position.y - camera.zoom
+				* viewportHeight / 2, camera.zoom * viewportWidth, camera.zoom
+				* viewportHeight);
+
 		Iterator<DeadCharacter> deadIter = corpses.iterator();
-		while (deadIter.hasNext()) {
+		while (deadIter.hasNext())
+		{
 			DeadCharacter dead = deadIter.next();
-			if (dead.getHitBox().overlaps(cameraBounds)) {
+			if (dead.getHitBox().overlaps(cameraBounds))
+			{
 				dead.render(batch);
 			}
 		}
-		
+
 		Iterator<GameCharacter> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
 		{
 			GameCharacter selected = iter.next();
 			Coordinate selectedLocation = selected.getBottomLeftCorner();
-			selected.setPosition(selectedLocation.getX(), selectedLocation.getY());
+			selected.setPosition(selectedLocation.getX(),
+					selectedLocation.getY());
 			// TODO this calculation is not quite right for characters on the
 			// edge of what is being drawn on the map
 			if (selected.getHitBox().overlaps(cameraBounds))
@@ -407,57 +430,65 @@ public abstract class Map implements Disposable
 	{
 		if (Gdx.input.isKeyPressed(Keys.C))
 		{
-			if (enableCameraSwitch) {
-				 enableCameraSwitch = false;
-				 cameraPan = !cameraPan;
-				 if (cameraPan)
-				 {
-					 oldCameraZoom = camera.zoom;
-				 }
-				 else
-				 {
-					 camera.zoom = oldCameraZoom;
-				 }
+			if (enableCameraSwitch)
+			{
+				enableCameraSwitch = false;
+				cameraPan = !cameraPan;
+				if (cameraPan)
+				{
+					oldCameraZoom = camera.zoom;
+				}
+				else
+				{
+					camera.zoom = oldCameraZoom;
+				}
 			}
 		}
 		else
 		{
 			enableCameraSwitch = true;
 		}
-		
+
 		if (cameraPan)
 		{
 			cameraPanMovement();
 			return;
 		}
-		
+
 		if (!updateEnable)
 		{
 			return;
 		}
-		
+
+		timer.update(deltaTime);
+
 		// update dead character fade
 		Iterator<DeadCharacter> deadIter = corpses.iterator();
-		while (deadIter.hasNext()) {
+		while (deadIter.hasNext())
+		{
 			DeadCharacter deadChar = deadIter.next();
 			deadChar.update(deltaTime);
-			if (deadChar.isGameOver()) {
+			if (deadChar.isGameOver())
+			{
 				// TODO: fix this awful code
 				setGameOver();
 			}
 		}
-		
+
 		// check for dead characters
 		Iterator<GameCharacter> charIter;
 		charIter = charactersOnMap.iterator();
-		while (charIter.hasNext()) {
+		while (charIter.hasNext())
+		{
 			GameCharacter character = charIter.next();
-			if (character.isDead()) {
+			if (character.isDead())
+			{
 				charIter.remove();
-				corpses.add(new DeadCharacter(character, new Sprite(RPG.gravestone1), 3.0f));
+				corpses.add(new DeadCharacter(character, new Sprite(
+						RPG.gravestone1), 3.0f));
 			}
 		}
-		
+
 		// check intersections with weapons
 		Iterator<Weapon> weaponIter = equippedWeapons.iterator();
 		Iterator<Projectile> projIter;
@@ -470,16 +501,18 @@ public abstract class Map implements Disposable
 			}
 			charIter = charactersOnMap.iterator();
 			Rectangle weaponBox = w.getSpriteBounds();
-			while (charIter.hasNext()) {
+			while (charIter.hasNext())
+			{
 				GameCharacter c = charIter.next();
 				if (c.equals(w.getOwner()))
 					continue;
-				if (weaponBox.overlaps(c.getHitBox())) {
+				if (weaponBox.overlaps(c.getHitBox()))
+				{
 					c.receiveAttack(w);
 				}
 			}
 		}
-		
+
 		// check if projectiles hit
 		projIter = flyingProjectiles.iterator();
 		while (projIter.hasNext())
@@ -487,17 +520,19 @@ public abstract class Map implements Disposable
 			Projectile p = projIter.next();
 			charIter = charactersOnMap.iterator();
 			Rectangle projectileBox = p.getSpriteBounds();
-			while (charIter.hasNext()) {
+			while (charIter.hasNext())
+			{
 				GameCharacter c = charIter.next();
 				if (c.equals(p.getFiredWeapon().getOwner()))
 					continue;
-				if (projectileBox.overlaps(c.getHitBox())) {
+				if (projectileBox.overlaps(c.getHitBox()))
+				{
 					c.receiveAttack(p);
 					p.setHasHit();
 				}
 			}
 		}
-		
+
 		// move characters, projectiles
 		Iterator<GameCharacter> iter = charactersOnMap.iterator();
 		while (iter.hasNext())
@@ -539,7 +574,8 @@ public abstract class Map implements Disposable
 		}
 
 		// collision detection with characters
-		GameCharacter c = checkCollisionWithCharacters(boundingBox, thisCharacter);
+		GameCharacter c = checkCollisionWithCharacters(boundingBox,
+				thisCharacter);
 		if (c != null)
 		{
 			c = checkCollisionWithCharacters(boundingBoxWithNewX, thisCharacter);
@@ -579,7 +615,8 @@ public abstract class Map implements Disposable
 		return true;
 	}
 
-	public boolean checkCollisionWithObjects(float x, float y, float oldX, float oldY, float width, float height, Coordinate newCoordinate)
+	public boolean checkCollisionWithObjects(float x, float y, float oldX,
+			float oldY, float width, float height, Coordinate newCoordinate)
 	{
 		newCoordinate.setX(x);
 		newCoordinate.setY(y);
@@ -611,12 +648,12 @@ public abstract class Map implements Disposable
 	/**
 	 * A collision check that only checks characters. For example, you can check
 	 * if a weapon's hitbox collided with any characters without having to worry
-	 * about other objects on the map.
-	 * Returns a reference to a Character object if the input hitbox collides
-	 * with the Character's hitbox.
-	 * Returns null otherwise.
+	 * about other objects on the map. Returns a reference to a Character object
+	 * if the input hitbox collides with the Character's hitbox. Returns null
+	 * otherwise.
 	 */
-	public GameCharacter checkCollisionWithCharacters(Rectangle hitbox, GameCharacter thisCharacter)
+	public GameCharacter checkCollisionWithCharacters(Rectangle hitbox,
+			GameCharacter thisCharacter)
 	{
 		ArrayList<GameCharacter> charactersOnMap = getCharactersOnMap();
 		Iterator<GameCharacter> iter = charactersOnMap.iterator();
@@ -637,10 +674,9 @@ public abstract class Map implements Disposable
 	}
 
 	/**
-	 * A collision check that only checks warp points.
-	 * Returns a reference to a Map object if the input hitbox collides with a
-	 * warp point.
-	 * Returns null otherwise.
+	 * A collision check that only checks warp points. Returns a reference to a
+	 * Map object if the input hitbox collides with a warp point. Returns null
+	 * otherwise.
 	 */
 	public Map checkCollisionWithWarpPoints(Rectangle hitbox)
 	{
@@ -688,7 +724,8 @@ public abstract class Map implements Disposable
 		}
 	}
 
-	public void addCharacterToMap(GameCharacter newCharacter, Coordinate newLocation)
+	public void addCharacterToMap(GameCharacter newCharacter,
+			Coordinate newLocation)
 	{
 		if (newLocation == null)
 		{
@@ -702,8 +739,7 @@ public abstract class Map implements Disposable
 					"Cannot add the Character to the map - it is already on the map. Data: OldLoc: "
 							+ newCharacter.getBottomLeftCorner()
 							+ " "
-							+ newCharacter
-							+ " " + newLocation);
+							+ newCharacter + " " + newLocation);
 		}
 		newCharacter.setBottomLeftCorner(newLocation);
 		charactersOnMap.add(newCharacter);
@@ -755,12 +791,12 @@ public abstract class Map implements Disposable
 	{
 		flyingProjectiles.add(p);
 	}
-	
+
 	public void addEquippedWeapon(Weapon w)
 	{
 		equippedWeapons.add(w);
 	}
-	
+
 	public void removeEquippedWeapon(Weapon w)
 	{
 		equippedWeapons.remove(w);

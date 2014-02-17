@@ -1,4 +1,4 @@
-package com.me.rpg;
+package com.me.rpg.characters;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.me.rpg.World;
 import com.me.rpg.ai.StandStillAI;
 import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.IAttackable;
@@ -21,6 +22,8 @@ import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 import com.me.rpg.reputation.NPCMemory;
+import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Direction;
 
 public abstract class GameCharacter implements IAttackable
 {

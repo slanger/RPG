@@ -2,10 +2,10 @@ package com.me.rpg.ai;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.me.rpg.GameCharacter;
-import com.me.rpg.Coordinate;
-import com.me.rpg.Direction;
+import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
+import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Direction;
 
 public class FollowPathAI implements WalkAI
 {
