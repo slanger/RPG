@@ -643,6 +643,30 @@ public abstract class Map implements Disposable
 		}
 		return null;
 	}
+	
+	/**
+	 * Currently lazy implementation - it will just return characters in a certain radius
+	 * from the given character
+	 * @param mainChar
+	 * @return List of Characters than the input Character can see
+	 */
+	// TODO: make this based off of the line-of-sight cone of the character
+	public ArrayList<GameCharacter> canSeeCharacters(GameCharacter mainChar, int dist) {
+		Iterator<GameCharacter> iter = charactersOnMap.iterator();
+		Coordinate mainCenter = mainChar.getCenter();
+		ArrayList<GameCharacter> result = new ArrayList<GameCharacter>();
+		while (iter.hasNext()) {
+			GameCharacter next = iter.next();
+			if (next == mainChar)
+				continue;
+			Coordinate center = next.getCenter();
+			float diffx = center.getX() - mainCenter.getX();
+			float diffy = center.getY() - mainCenter.getY();
+			if (diffx*diffx + diffy*diffy < dist*dist)
+				result.add(next);
+		}
+		return result;
+	}
 
 	private Coordinate getWarpCoordinate(RectangleMapObject warpPoint)
 	{

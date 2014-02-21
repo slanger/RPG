@@ -306,7 +306,11 @@ public abstract class GameCharacter implements IAttackable
 	{
 		this.currentMap = currentMap;
 	}
-
+	
+	public Weapon getEquippedWeapon() {
+		return weaponSlot;
+	}
+	
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);
@@ -424,6 +428,32 @@ public abstract class GameCharacter implements IAttackable
 		{
 			setBottomLeftCorner(newCoordinate);
 		}
+	}
+	
+	/**
+	 * Will update the location and direction based on moving directly toward the goal
+	 * Won't avoid obstacles
+	 * @param target Target location
+	 * @param deltaTime Time in seconds of movement
+	 */
+	public void basicMoveToward(Coordinate target, float deltaTime) {
+		Coordinate center = getCenter();
+		float diffx = target.getX() - center.getX();
+		float diffy = target.getY() - center.getY();
+		float dist = diffx*diffx + diffy*diffy;
+		float travelDist = deltaTime*getSpeed() * deltaTime*getSpeed();
+		if (travelDist > dist) {
+			setCenter(target);
+			return;
+		}
+		float xDist = Math.signum(diffx)*(float)(deltaTime*getSpeed()*Math.tan(diffx/diffy));
+		float yDist = Math.signum(diffy)*(float)(deltaTime*getSpeed()*Math.tan(diffy/diffx));
+		
+		center.setX(center.getX() + xDist);
+		center.setY(center.getY() + yDist);
+		Direction movement = Direction.getDirectionByDiff((int)Math.signum(diffx), (int)Math.signum(diffy));
+		setMoveDirection(movement);
+		setCenter(center);
 	}
 
 	protected Rectangle getHitboxInFrontOfCharacter()

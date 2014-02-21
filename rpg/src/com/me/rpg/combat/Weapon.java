@@ -132,4 +132,8 @@ public abstract class Weapon extends Equippable {
 		w.effects = getEffects();
 		return w;
 	}
+
+	public int getRange() {
+		return range;
+	}
 }
