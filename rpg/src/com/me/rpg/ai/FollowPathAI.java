@@ -14,7 +14,7 @@ public class FollowPathAI implements WalkAI
 	private Rectangle[] path;
 	private int currentIndex = 0;
 
-	public FollowPathAI(GameCharacter character, Map currentMap, Rectangle[] path)
+	public FollowPathAI(GameCharacter character, Rectangle[] path)
 	{
 		this.character = character;
 		this.path = path;
@@ -23,14 +23,12 @@ public class FollowPathAI implements WalkAI
 	@Override
 	public void start()
 	{
-		System.out.println(character.getName() + " going to different town");
 		character.setMoving(true);
 	}
 
 	@Override
 	public void stop()
 	{
-		System.out.println(character.getName() + " has arrived!");
 		character.setMoving(false);
 	}
 
@@ -54,8 +52,9 @@ public class FollowPathAI implements WalkAI
 		float y = oldY + (yE / hE) * speed * deltaTime;
 
 		Coordinate newCoordinate = new Coordinate();
-		boolean didMove = currentMap.checkCollisionWithObjects(x, y, oldX, oldY,
-				character.getSpriteWidth(), character.getSpriteHeight(), newCoordinate);
+		boolean didMove = currentMap.checkCollisionWithObjects(x, y, oldX,
+				oldY, character.getSpriteWidth(), character.getSpriteHeight(),
+				newCoordinate);
 		character.setMoving(didMove);
 		x = newCoordinate.getX();
 		y = newCoordinate.getY();
@@ -84,7 +83,8 @@ public class FollowPathAI implements WalkAI
 			}
 		}
 
-		if (nextWaypoint.contains(character.getCenterX(), character.getCenterY()))
+		if (nextWaypoint.contains(character.getCenterX(),
+				character.getCenterY()))
 		{
 			currentIndex++;
 		}
@@ -93,7 +93,7 @@ public class FollowPathAI implements WalkAI
 		{
 			character.doneFollowingPath();
 		}
-		
+
 		character.setMoving(didMove);
 		character.setMoveDirection(newDirection);
 		character.setBottomLeftCorner(newCoordinate);
