@@ -58,6 +58,7 @@ public abstract class GameCharacter implements IAttackable
 	//Reputation Stuff
 	protected NPCMemory npcMemory; 
 	protected World world;
+	protected float sightDistance;
 	//
 		
 
@@ -99,6 +100,7 @@ public abstract class GameCharacter implements IAttackable
 		
 		this.world=world;
 		npcMemory = new NPCMemory(world.getReputationSystem().getMasterEventList());
+		sightDistance = 250.0f;
 	}
 
 	public String getName()
@@ -425,7 +427,7 @@ public abstract class GameCharacter implements IAttackable
 		inflictEffects(weapon.getEffects());
 		receiveDamage(weapon.getPower());
 		if(!name.equals("Player")){
-			world.getReputationSystem().addNewEvent("Attacked", "test group", this);
+			world.getReputationSystem().addNewEvent("Attacked", "test group", this, bottomLeftCorner);
 		}
 	}
 	
@@ -441,7 +443,7 @@ public abstract class GameCharacter implements IAttackable
 		inflictEffects(projectile.getEffects());
 		receiveDamage(projectile.getPower());
 		if(!name.equals("Player")){
-			world.getReputationSystem().addNewEvent("Attacked", "test group", this);
+			world.getReputationSystem().addNewEvent("Attacked", "test group", this, bottomLeftCorner);
 		}
 	}
 	
@@ -603,6 +605,10 @@ public abstract class GameCharacter implements IAttackable
 
 	public NPCMemory getNPCMemory() {
 		return npcMemory;
+	}
+
+	public float getSightDistance() {
+		return sightDistance;
 	}
 
 }

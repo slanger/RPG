@@ -1,5 +1,8 @@
 package com.me.rpg;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -7,13 +10,24 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.utils.Disposable;
 import com.me.rpg.ai.Dialogue;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
+import com.me.rpg.reputation.ReputationEvent;
 import com.me.rpg.reputation.ReputationSystem;
+
+import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Direction;
+import com.me.rpg.ai.Dialogue;
+import com.me.rpg.characters.GameCharacter;
+
 import com.me.rpg.utils.Task;
 import com.me.rpg.utils.Timer;
+
 
 public class World implements Disposable
 {
@@ -152,7 +166,9 @@ public class World implements Disposable
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-
+		
+		temporaryVisionConeTest();
+		reputationSystem.CheckForWitnesses(null,null);
 		// temporary dialogue stuff
 		if (dialogue.getInDialogue())
 		{
@@ -175,7 +191,7 @@ public class World implements Disposable
 
 		batch.end();
 	}
-
+	
 	public boolean isGameOver()
 	{
 		return map.isGameOver();
@@ -192,6 +208,85 @@ public class World implements Disposable
 	{
 		map.dispose();
 		debugFont.dispose();
+	}
+	
+	
+	public void temporaryVisionConeTest()  
+	{
+				float tempX=0.0f;
+				float tempY=0.0f;
+				float tempSightDistance = 0.0f;
+				Direction tempDirection = null;
+				float visionFieldPoints[] = new float[8];
+		
+		
+				ShapeRenderer shapeRenderer = new ShapeRenderer();
+				
+				
+			    shapeRenderer.setProjectionMatrix(camera.combined);
+			    shapeRenderer.begin(ShapeType.Line);
+				
+				ArrayList<GameCharacter> charactersOnMap = map.getCharactersOnMap();
+				Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
+				while (iterator1.hasNext())
+				{
+					GameCharacter tempCharacter = iterator1.next();
+					if(tempCharacter.getName() != "Player")
+					{
+						tempSightDistance = tempCharacter.getSightDistance();
+						tempDirection = tempCharacter.getFaceDirection();
+						tempX = tempCharacter.getCenterX();
+						tempY = tempCharacter.getCenterY();
+						if(tempDirection.name().equalsIgnoreCase("up"))
+						{
+							visionFieldPoints[0] = tempX; //x value of point centered on NPC
+							visionFieldPoints[1] = tempY; //y value of point centered on NPC
+							visionFieldPoints[2] = tempX - 0.8f*(tempSightDistance); 
+							visionFieldPoints[3] = tempY + 0.8f*(tempSightDistance);
+							visionFieldPoints[4] = tempX;
+							visionFieldPoints[5] = tempY + tempSightDistance;
+							visionFieldPoints[6] = tempX +  0.8f*(tempSightDistance);
+							visionFieldPoints[7] = tempY +  0.8f*(tempSightDistance); 
+						}
+						else if(tempDirection.name().equalsIgnoreCase("down"))
+						{
+							visionFieldPoints[0] = tempX; //x value of point centered on NPC
+							visionFieldPoints[1] = tempY; //y value of point centered on NPC
+							visionFieldPoints[2] = tempX -  0.8f*(tempSightDistance); 
+							visionFieldPoints[3] = tempY -  0.8f*(tempSightDistance);
+							visionFieldPoints[4] = tempX;
+							visionFieldPoints[5] = tempY - tempSightDistance;
+							visionFieldPoints[6] = tempX +  0.8f*(tempSightDistance);
+							visionFieldPoints[7] = tempY -  0.8f*(tempSightDistance); 
+						}
+						else if(tempDirection.name().equalsIgnoreCase("left"))
+						{
+							visionFieldPoints[0] = tempX; //x value of point centered on NPC
+							visionFieldPoints[1] = tempY; //y value of point centered on NPC
+							visionFieldPoints[2] = tempX -  0.8f*(tempSightDistance); 
+							visionFieldPoints[3] = tempY - 0.8f*(tempSightDistance);
+							visionFieldPoints[4] = tempX - tempSightDistance;
+							visionFieldPoints[5] = tempY;
+							visionFieldPoints[6] = tempX - 0.8f*(tempSightDistance);
+							visionFieldPoints[7] = tempY + 0.8f*(tempSightDistance); 
+						}
+						else //facing right
+						{
+							visionFieldPoints[0] = tempX; //x value of point centered on NPC
+							visionFieldPoints[1] = tempY; //y value of point centered on NPC
+							visionFieldPoints[2] = tempX + 0.8f*(tempSightDistance); 
+							visionFieldPoints[3] = tempY - 0.8f*(tempSightDistance);
+							visionFieldPoints[4] = tempX + tempSightDistance;
+							visionFieldPoints[5] = tempY;
+							visionFieldPoints[6] = tempX + 0.8f*(tempSightDistance);
+							visionFieldPoints[7] = tempY + 0.8f*(tempSightDistance); 
+						}
+						
+						shapeRenderer.setColor(0, 1, 0, 0.025f);
+						shapeRenderer.polygon(visionFieldPoints);
+					}
+				}
+				shapeRenderer.end();
 	}
 
 }
