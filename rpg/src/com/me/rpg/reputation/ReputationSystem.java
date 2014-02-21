@@ -92,11 +92,6 @@ public class ReputationSystem
 		// check coordinate of repEvent, check what characters are around,
 		// For each character within radius,
 		// character.getNPCMemory.addNewMemoryElement();
-		float tempX=0.0f;
-		float tempY=0.0f;
-		float tempSightDistance = 0.0f;
-		Direction tempDirection = null;
-		float visionFieldPoints[] = new float[8];
 		
 		ArrayList<GameCharacter> charactersOnMap = world.getMap().getCharactersOnMap();
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
@@ -105,60 +100,8 @@ public class ReputationSystem
 			GameCharacter tempCharacter = iterator1.next();
 			if(tempCharacter.getName() != "Player")
 			{
-				tempSightDistance = tempCharacter.getSightDistance();
-				tempDirection = tempCharacter.getFaceDirection();
-				tempX = tempCharacter.getCenterX();
-				tempY = tempCharacter.getCenterY();
-				if(tempDirection.name().equalsIgnoreCase("up"))
-				{
-					visionFieldPoints[0] = tempX; //x value of point centered on NPC
-					visionFieldPoints[1] = tempY; //y value of point centered on NPC
-					visionFieldPoints[2] = tempX - 0.8f*(tempSightDistance); 
-					visionFieldPoints[3] = tempY + 0.8f*(tempSightDistance);
-					visionFieldPoints[4] = tempX;
-					visionFieldPoints[5] = tempY + tempSightDistance;
-					visionFieldPoints[6] = tempX +  0.8f*(tempSightDistance);
-					visionFieldPoints[7] = tempY +  0.8f*(tempSightDistance); 
-				}
-				else if(tempDirection.name().equalsIgnoreCase("down"))
-				{
-					visionFieldPoints[0] = tempX; //x value of point centered on NPC
-					visionFieldPoints[1] = tempY; //y value of point centered on NPC
-					visionFieldPoints[2] = tempX -  0.8f*(tempSightDistance); 
-					visionFieldPoints[3] = tempY -  0.8f*(tempSightDistance);
-					visionFieldPoints[4] = tempX;
-					visionFieldPoints[5] = tempY - tempSightDistance;
-					visionFieldPoints[6] = tempX +  0.8f*(tempSightDistance);
-					visionFieldPoints[7] = tempY -  0.8f*(tempSightDistance); 
-				}
-				else if(tempDirection.name().equalsIgnoreCase("left"))
-				{
-					visionFieldPoints[0] = tempX; //x value of point centered on NPC
-					visionFieldPoints[1] = tempY; //y value of point centered on NPC
-					visionFieldPoints[2] = tempX -  0.8f*(tempSightDistance); 
-					visionFieldPoints[3] = tempY - 0.8f*(tempSightDistance);
-					visionFieldPoints[4] = tempX - tempSightDistance;
-					visionFieldPoints[5] = tempY;
-					visionFieldPoints[6] = tempX - 0.8f*(tempSightDistance);
-					visionFieldPoints[7] = tempY + 0.8f*(tempSightDistance); 
-				}
-				else //facing right
-				{
-					visionFieldPoints[0] = tempX; //x value of point centered on NPC
-					visionFieldPoints[1] = tempY; //y value of point centered on NPC
-					visionFieldPoints[2] = tempX + 0.8f*(tempSightDistance); 
-					visionFieldPoints[3] = tempY - 0.8f*(tempSightDistance);
-					visionFieldPoints[4] = tempX + tempSightDistance;
-					visionFieldPoints[5] = tempY;
-					visionFieldPoints[6] = tempX + 0.8f*(tempSightDistance);
-					visionFieldPoints[7] = tempY + 0.8f*(tempSightDistance); 
-				}
-				
-				Polygon visionCone = new Polygon(visionFieldPoints);
-				if(visionCone.contains(world.getMap().getFocusedCharacter().getCenterX(),world.getMap().getFocusedCharacter().getCenterY()))
-				{
-					System.out.println("NPC "+tempCharacter.getName()+" sees you!");
-				}
+				tempCharacter.checkCoordinateInVision(world.getMap().getFocusedCharacter().getCenterX(), 
+							world.getMap().getFocusedCharacter().getCenterY());
 //				if (tempCharacter.getNPCMemory() != null)
 //				{
 //					if (visionCone.contains(coordinate.getX(), coordinate.getY()))

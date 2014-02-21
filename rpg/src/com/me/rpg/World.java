@@ -174,7 +174,8 @@ public class World implements Disposable
 		{
 			dialogue.render();
 		}
-
+		//end dialogue stuff
+		
 		if (warping)
 		{
 			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);

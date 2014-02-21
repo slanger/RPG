@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
@@ -609,6 +610,65 @@ public abstract class GameCharacter implements IAttackable
 
 	public float getSightDistance() {
 		return sightDistance;
+	}
+	
+	public boolean checkCoordinateInVision(float x, float y)
+	{
+		float tempX = getCenterX();
+		float tempY = getCenterY();
+		float visionFieldPoints[] = new float[8];
+		
+		if(faceDirection.name().equalsIgnoreCase("up"))
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX - 0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY + 0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX;
+			visionFieldPoints[5] = tempY + sightDistance;
+			visionFieldPoints[6] = tempX +  0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY +  0.8f*(sightDistance); 
+		}
+		else if(faceDirection.name().equalsIgnoreCase("down"))
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX -  0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY -  0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX;
+			visionFieldPoints[5] = tempY - sightDistance;
+			visionFieldPoints[6] = tempX +  0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY -  0.8f*(sightDistance); 
+		}
+		else if(faceDirection.name().equalsIgnoreCase("left"))
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX -  0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY - 0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX - sightDistance;
+			visionFieldPoints[5] = tempY;
+			visionFieldPoints[6] = tempX - 0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f*(sightDistance); 
+		}
+		else //facing right
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX + 0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY - 0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX + sightDistance;
+			visionFieldPoints[5] = tempY;
+			visionFieldPoints[6] = tempX + 0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f*(sightDistance); 
+		}
+		
+		Polygon visionCone = new Polygon(visionFieldPoints);
+		if(visionCone.contains(x,y))
+		{
+			return true;
+		}
+		return false;
 	}
 
 }
