@@ -11,16 +11,13 @@ public class FollowPathAI implements WalkAI
 {
 
 	private GameCharacter character;
-	//private Map currentMap;
 	private Rectangle[] path;
 	private int currentIndex = 0;
 
-	public FollowPathAI(GameCharacter character, Map currentMap)
+	public FollowPathAI(GameCharacter character, Map currentMap, Rectangle[] path)
 	{
 		this.character = character;
-		//this.currentMap = currentMap;
-
-		path = currentMap.getTestPath();
+		this.path = path;
 	}
 
 	@Override
