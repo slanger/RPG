@@ -8,6 +8,7 @@ import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
+import com.me.rpg.state.State;
 import com.me.rpg.utils.Timer;
 
 public class NonplayableCharacter extends GameCharacter
@@ -17,6 +18,7 @@ public class NonplayableCharacter extends GameCharacter
 	private boolean enableAttack = false;
 	private Color oldColor = null;
 	private MoveToOtherTownTask moveToOtherTownTask;
+	private State stateMachine;
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
@@ -28,6 +30,11 @@ public class NonplayableCharacter extends GameCharacter
 		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
 
 		moveToOtherTownTask = new MoveToOtherTownTask(this);
+		stateMachine = null;
+	}
+	
+	public void setStateMachine(State s) {
+		stateMachine = s;
 	}
 
 	@Override
@@ -67,7 +74,10 @@ public class NonplayableCharacter extends GameCharacter
 	public void doUpdate(float deltaTime, Map currentMap)
 	{
 		// update movement
-		walkAI.update(deltaTime, currentMap);
+		if (stateMachine != null)
+			stateMachine.update(deltaTime);
+		else
+			walkAI.update(deltaTime, currentMap);
 
 		// auto attack
 		// attack

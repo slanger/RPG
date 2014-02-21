@@ -17,13 +17,13 @@ public class CompositeState extends State {
 		super(goal);
 		this.transitions = transitions;
 		this.substates = substates;
-		currentStateIdx = 0;
+		setCurrentState(0);
 		timeInSubstate = new MutableFloat();
 	}
 	
 	@Override
 	public void enterState() {
-		currentStateIdx = 0;
+		setCurrentState(0);
 		timeInSubstate.setValue(0f);
 	}
 	
@@ -49,11 +49,16 @@ public class CompositeState extends State {
 				substates[currentStateIdx].leaveState();
 				substates[nextIdx].enterState();
 				
-				currentStateIdx = nextIdx;
+				setCurrentState(nextIdx);
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	private void setCurrentState(int idx) {
+		this.currentStateIdx = idx;
+		setCurrentState(substates[idx]);
 	}
 	
 	@Override

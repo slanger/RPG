@@ -35,6 +35,7 @@ public abstract class State {
 		this.goal = goal;
 		this.mainCharacter = mainCharacter;
 		timeInState = new MutableFloat();
+		currentState = this;
 	}
 	
 	/**
@@ -78,6 +79,7 @@ public abstract class State {
 	 * @param deltaTime Time in seconds which have passed since last update
 	 */
 	public final void update(float deltaTime) {
+		//System.err.printf("goal:%s\n", getGoal());
 		calledTransition = false;
 		if (currentState != this)
 			currentState.update(deltaTime);

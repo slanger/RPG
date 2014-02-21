@@ -35,6 +35,8 @@ public class FollowPathAI implements WalkAI
 	@Override
 	public void update(float deltaTime, Map currentMap)
 	{
+		if (currentIndex == path.length)
+			return;
 		Rectangle currentWaypoint = character.getBoundingRectangle();
 		Rectangle nextWaypoint = path[currentIndex];
 		Vector2 currentCenter = new Vector2();

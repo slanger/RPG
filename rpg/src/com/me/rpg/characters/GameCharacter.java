@@ -446,14 +446,39 @@ public abstract class GameCharacter implements IAttackable
 			setCenter(target);
 			return;
 		}
-		float xDist = Math.signum(diffx)*(float)(deltaTime*getSpeed()*Math.tan(diffx/diffy));
-		float yDist = Math.signum(diffy)*(float)(deltaTime*getSpeed()*Math.tan(diffy/diffx));
-		
+		float diffh = (float)Math.sqrt(diffx*diffx + diffy*diffy);
+		float xDist = (float)(deltaTime*getSpeed()*diffx/diffh);
+		float yDist = (float)(deltaTime*getSpeed()*diffy/diffh);
+		System.out.printf("xDist=%f, yDist=%f\n", xDist, yDist);
 		center.setX(center.getX() + xDist);
 		center.setY(center.getY() + yDist);
-		Direction movement = Direction.getDirectionByDiff((int)Math.signum(diffx), (int)Math.signum(diffy));
+		Direction movement;// = Direction.getDirectionByDiff((int)Math.signum(diffx), (int)Math.signum(diffy));
+		if (Math.abs(yDist) >= Math.abs(xDist))
+		{
+			if (yDist > 0)
+			{
+				movement = Direction.UP;
+			}
+			else
+			{
+				movement = Direction.DOWN;
+			}
+		}
+		else
+		{
+			if (xDist >= 0)
+			{
+				movement = Direction.RIGHT;
+			}
+			else
+			{
+				movement = Direction.LEFT;
+			}
+		}
+		setMoving(true);
 		setMoveDirection(movement);
-		setCenter(center);
+		getCurrentMap().checkCollision(center.getX()-16, center.getY()-16, getCenter().getX()-16, getCenter().getY()-16, this, center);
+		setBottomLeftCorner(center);
 	}
 
 	protected Rectangle getHitboxInFrontOfCharacter()
