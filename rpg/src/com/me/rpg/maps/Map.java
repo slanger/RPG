@@ -808,7 +808,8 @@ public abstract class Map implements Disposable
 		tiledMapRenderer.dispose();
 	}
 
-	public GameCharacter getFocusedCharacter() {
+	public GameCharacter getFocusedCharacter()
+	{
 		return focusedCharacter;
 	}
 

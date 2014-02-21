@@ -14,7 +14,7 @@ import com.me.rpg.characters.PlayableCharacter;
 
 public class ExampleMap extends Map
 {
-	
+
 	public static final String MAP_TMX_PATH = "maps/example/example.tmx";
 
 	public ExampleMap(World world, SpriteBatch batch, OrthographicCamera camera)
@@ -51,30 +51,37 @@ public class ExampleMap extends Map
 
 		// create characters
 		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
-		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width, height, 16, 16,
-				0.15f, world);
+		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width,
+				height, 16, 16, 0.15f, world);
 		player.setSpeed(200f);
 
 		Texture spritesheet2 = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
-		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries.get(NPC1_NAME);
-		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, world, boundary1.getRectangle());
+		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries
+				.get(NPC1_NAME);
+		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height,
+				16, 16, 0.15f, world, boundary1.getRectangle());
 
-		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries.get(NPC2_NAME);
-		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height, 16, 16,
-				0.15f, world, boundary2.getRectangle());
+		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries
+				.get(NPC2_NAME);
+		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height,
+				16, 16, 0.15f, world, boundary2.getRectangle());
 
 		// add characters to map
-		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints.get(PLAYER_NAME);
+		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints
+				.get(PLAYER_NAME);
 		addFocusedCharacterToMap(player, playerSpawn.getRectangle().x,
 				playerSpawn.getRectangle().y);
-		RectangleMapObject npc1Spawn = (RectangleMapObject) spawnPoints.get(NPC1_NAME);
-		addCharacterToMap(npc1, npc1Spawn.getRectangle().x, npc1Spawn.getRectangle().y);
-		RectangleMapObject npc2Spawn = (RectangleMapObject) spawnPoints.get(NPC2_NAME);
-		addCharacterToMap(npc2, npc2Spawn.getRectangle().x, npc2Spawn.getRectangle().y);
+		RectangleMapObject npc1Spawn = (RectangleMapObject) spawnPoints
+				.get(NPC1_NAME);
+		addCharacterToMap(npc1, npc1Spawn.getRectangle().x,
+				npc1Spawn.getRectangle().y);
+		RectangleMapObject npc2Spawn = (RectangleMapObject) spawnPoints
+				.get(NPC2_NAME);
+		addCharacterToMap(npc2, npc2Spawn.getRectangle().x,
+				npc2Spawn.getRectangle().y);
 
 		// setup weapons
 		genericWeaponSetup(player, npc1);
 	}
-	
+
 }

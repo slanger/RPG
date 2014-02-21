@@ -14,8 +14,8 @@ public class PlayableCharacter extends GameCharacter
 {
 
 	// for debugging hitboxes
-	//private Texture redHitboxTexture;
-	//private Rectangle redHitbox = new Rectangle(0, 0, 0, 0);
+	// private Texture redHitboxTexture;
+	// private Rectangle redHitbox = new Rectangle(0, 0, 0, 0);
 
 	private boolean enableAttack = true;
 	private boolean enableWeaponSwitch = true;
@@ -40,12 +40,15 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	public PlayableCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration, World world)
+			int height, int tileWidth, int tileHeight, float animationDuration,
+			World world)
 	{
-		super(name, spritesheet, width, height, tileWidth, tileHeight, animationDuration, world);
+		super(name, spritesheet, width, height, tileWidth, tileHeight,
+				animationDuration, world);
 		npcMemory = null;
 		setWalkAI(new PlayerControlledWalkAI(this));
-		//redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH, Texture.class);
+		// redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH,
+		// Texture.class);
 	}
 
 	@Override
@@ -63,7 +66,8 @@ public class PlayableCharacter extends GameCharacter
 	@Override
 	public void doRenderAfter(SpriteBatch batch)
 	{
-		//batch.draw(redHitboxTexture, redHitbox.x, redHitbox.y, redHitbox.width, redHitbox.height);
+		// batch.draw(redHitboxTexture, redHitbox.x, redHitbox.y,
+		// redHitbox.width, redHitbox.height);
 	}
 
 	private void handleInput(float deltaTime)
@@ -76,7 +80,7 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * MOVEMENT
 		 */
-		
+
 		walkAI.update(deltaTime, currentMap);
 
 		/*
@@ -242,7 +246,8 @@ public class PlayableCharacter extends GameCharacter
 	private void doGoodAction()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox, this);
+		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox,
+				this);
 		if (c != null)
 		{
 			c.acceptGoodAction(this);
@@ -252,7 +257,8 @@ public class PlayableCharacter extends GameCharacter
 	private void doPush()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox, this);
+		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox,
+				this);
 		if (c != null)
 		{
 			c.acceptPush(this);
@@ -272,9 +278,10 @@ public class PlayableCharacter extends GameCharacter
 			dialogue.update(c);
 		}
 	}
-	
+
 	@Override
-	public boolean isGameOver() {
+	public boolean isGameOver()
+	{
 		return isDead();
 	}
 

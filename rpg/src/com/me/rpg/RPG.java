@@ -24,7 +24,7 @@ public class RPG implements Screen
 	public static final String SWORD_PATH = "sword.png";
 	public static final String ARROW_PATH = "arrow.png";
 	public static final String GRAVESTONE_PATH = "gravestones.png";
-	
+
 	public static TextureRegion gravestone1;
 	public static TextureRegion gravestone2;
 
@@ -39,17 +39,17 @@ public class RPG implements Screen
 	public RPG(ScreenHandler screenHandler)
 	{
 		loadAssets();
-		
+
 		this.screenHandler = screenHandler;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
-		//camera.zoom -= 0.1f;
+		// camera.zoom -= 0.1f;
 
 		batch = new SpriteBatch();
 		world = new World(batch, camera);
-		
+
 		Texture graves = RPG.manager.get(GRAVESTONE_PATH);
 		gravestone1 = new TextureRegion(graves, 0, 0, 34, 41);
 	}
@@ -89,26 +89,24 @@ public class RPG implements Screen
 	@Override
 	public void resize(int width, int height)
 	{
-        //--Aspect Ratio Maintenance--
-        // calculate new viewport
-        /*float aspectRatio = (float)width/(float)height;
-        float scale = 1f;
-        Vector2 crop = new Vector2(0f, 0f);
-
-        if(aspectRatio > ASPECT_RATIO) {
-            scale = (float) height / (float) VIRTUAL_HEIGHT;
-            crop.x = (width - VIRTUAL_WIDTH * scale) / 2f;
-        } else if(aspectRatio < ASPECT_RATIO) {
-            scale = (float) width / (float) VIRTUAL_WIDTH;
-            crop.y = (height - VIRTUAL_HEIGHT * scale) / 2f;
-        } else {
-            scale = (float) width / (float) VIRTUAL_WIDTH;
-        }
-
-        float w = (float) VIRTUAL_WIDTH * scale;
-        float h = (float) VIRTUAL_HEIGHT * scale;
-        viewport = new Rectangle(crop.x, crop.y, w, h);
-        //Maintenance ends here--*/
+		// TODO calculate new viewport
+		// float aspectRatio = (float)width/(float)height;
+		// float scale = 1f;
+		// Vector2 crop = new Vector2(0f, 0f);
+		//
+		// if(aspectRatio > ASPECT_RATIO) {
+		// scale = (float) height / (float) VIRTUAL_HEIGHT;
+		// crop.x = (width - VIRTUAL_WIDTH * scale) / 2f;
+		// } else if(aspectRatio < ASPECT_RATIO) {
+		// scale = (float) width / (float) VIRTUAL_WIDTH;
+		// crop.y = (height - VIRTUAL_HEIGHT * scale) / 2f;
+		// } else {
+		// scale = (float) width / (float) VIRTUAL_WIDTH;
+		// }
+		//
+		// float w = (float) VIRTUAL_WIDTH * scale;
+		// float h = (float) VIRTUAL_HEIGHT * scale;
+		// viewport = new Rectangle(crop.x, crop.y, w, h);
 	}
 
 	@Override
