@@ -12,7 +12,6 @@ import com.me.rpg.ai.Dialogue;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
 import com.me.rpg.reputation.ReputationSystem;
-import com.me.rpg.utils.Task;
 import com.me.rpg.utils.Timer;
 
 public class World implements Disposable
@@ -57,7 +56,7 @@ public class World implements Disposable
 		warping = true;
 		warpingAlpha = 0f;
 		warpSound.play();
-		timer.scheduleTask(new Task()
+		timer.scheduleTask(new Timer.Task()
 		{
 
 			@Override
@@ -75,7 +74,7 @@ public class World implements Disposable
 		timer.scheduleTask(new WarpToAnotherMapTask(map), 3.0f);
 	}
 
-	private class WarpToAnotherMapTask extends Task
+	private class WarpToAnotherMapTask extends Timer.Task
 	{
 
 		private Map newMap;
@@ -90,7 +89,7 @@ public class World implements Disposable
 		{
 			setMap(newMap);
 
-			timer.scheduleTask(new Task()
+			timer.scheduleTask(new Timer.Task()
 			{
 
 				@Override
@@ -101,7 +100,7 @@ public class World implements Disposable
 
 			}, 0f, 0.1f, 10);
 
-			timer.scheduleTask(new Task()
+			timer.scheduleTask(new Timer.Task()
 			{
 
 				@Override

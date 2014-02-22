@@ -9,7 +9,7 @@ import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
-import com.me.rpg.utils.Task;
+import com.me.rpg.utils.Timer;
 
 public class NonplayableCharacter extends GameCharacter
 {
@@ -96,7 +96,7 @@ public class NonplayableCharacter extends GameCharacter
 		startMoveTask();
 	}
 
-	private class ChangeColorTask extends Task
+	private class ChangeColorTask extends Timer.Task
 	{
 
 		@Override
@@ -116,7 +116,7 @@ public class NonplayableCharacter extends GameCharacter
 
 	}
 
-	private class MoveToOtherTownTask extends Task
+	private class MoveToOtherTownTask extends Timer.Task
 	{
 
 		private GameCharacter character;

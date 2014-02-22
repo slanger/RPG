@@ -5,7 +5,7 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
-import com.me.rpg.utils.Task;
+import com.me.rpg.utils.Timer;
 
 public class RandomWalkAI implements WalkAI
 {
@@ -17,7 +17,7 @@ public class RandomWalkAI implements WalkAI
 	private MoveTask moveTask;
 	private boolean toggleWalking = false;
 
-	private class MoveTask extends Task
+	private class MoveTask extends Timer.Task
 	{
 
 		@Override

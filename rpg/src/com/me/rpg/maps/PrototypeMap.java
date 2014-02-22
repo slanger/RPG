@@ -12,7 +12,7 @@ import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.characters.NonplayableCharacter;
 import com.me.rpg.characters.PlayableCharacter;
-import com.me.rpg.utils.Task;
+import com.me.rpg.utils.Timer;
 
 public class PrototypeMap extends Map
 {
@@ -111,7 +111,7 @@ public class PrototypeMap extends Map
 		loopMusic.stop();
 	}
 
-	private class StartLoopMusicTask extends Task
+	private class StartLoopMusicTask extends Timer.Task
 	{
 
 		@Override
