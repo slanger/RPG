@@ -135,7 +135,8 @@ public class NonplayableCharacter extends GameCharacter
 				if (currentMap.getMapType() == MapType.PROTOTYPE)
 				{
 					walkAI.stop();
-					walkAI = new FollowPathAI(character, currentMap);
+					walkAI = new FollowPathAI(character,
+							currentMap.getTestPath());
 					walkAI.start();
 					this.cancel();
 				}

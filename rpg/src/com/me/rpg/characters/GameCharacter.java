@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
@@ -28,7 +29,7 @@ import com.me.rpg.utils.Direction;
 public abstract class GameCharacter implements IAttackable
 {
 
-	private static final int MAX_HEALTH = 100;
+	private static final int MAX_HEALTH = 1000;
 
 	private String name;
 	private Sprite sprite;
@@ -44,7 +45,7 @@ public abstract class GameCharacter implements IAttackable
 
 	protected WalkAI walkAI;
 	protected Map currentMap = null;
-	
+
 	// Combat stuff
 	protected Weapon weaponSlot;
 	protected Weapon weaponSlotExtra;
@@ -54,15 +55,15 @@ public abstract class GameCharacter implements IAttackable
 	protected int health;
 	protected float strikeImmunity;
 	protected boolean strafing;
-	
-	//Reputation Stuff
-	protected NPCMemory npcMemory; 
+
+	// Reputation Stuff
+	protected NPCMemory npcMemory;
 	protected World world;
-	//
-		
+	protected float sightDistance;
 
 	protected GameCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration, World world)
+			int height, int tileWidth, int tileHeight, float animationDuration,
+			World world)
 	{
 		this.name = name;
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
@@ -92,13 +93,15 @@ public abstract class GameCharacter implements IAttackable
 		sprite.setRegion(downIdle);
 		// default walk AI
 		walkAI = new StandStillAI();
-		
+
 		inflictedEffects = new LinkedList<StatusEffect>();
 		immunityHash = new HashMap<StatusEffect, Float>();
 		health = getMaxHealth();
-		
-		this.world=world;
-		npcMemory = new NPCMemory(world.getReputationSystem().getMasterEventList());
+
+		this.world = world;
+		npcMemory = new NPCMemory(world.getReputationSystem()
+				.getMasterEventList());
+		sightDistance = 250.0f;
 	}
 
 	public String getName()
@@ -149,9 +152,8 @@ public abstract class GameCharacter implements IAttackable
 
 	public void setCenter(Coordinate center)
 	{
-		this.bottomLeftCorner = new Coordinate(
-				center.getX() - getSpriteWidth() / 2,
-				center.getY() - getSpriteHeight() / 2);
+		this.bottomLeftCorner = new Coordinate(center.getX() - getSpriteWidth()
+				/ 2, center.getY() - getSpriteHeight() / 2);
 	}
 
 	public Direction getMoveDirection()
@@ -165,20 +167,24 @@ public abstract class GameCharacter implements IAttackable
 		if (!strafing)
 			setFaceDirection(moveDirection);
 	}
-	
-	public boolean isStrafing() {
+
+	public boolean isStrafing()
+	{
 		return strafing;
 	}
-	
-	public void setStrafing(boolean strafing) {
+
+	public void setStrafing(boolean strafing)
+	{
 		this.strafing = strafing;
 	}
-	
-	public Direction getFaceDirection() {
+
+	public Direction getFaceDirection()
+	{
 		return faceDirection;
 	}
-	
-	public void setFaceDirection(Direction faceDirection) {
+
+	public void setFaceDirection(Direction faceDirection)
+	{
 		this.faceDirection = faceDirection;
 	}
 
@@ -299,7 +305,7 @@ public abstract class GameCharacter implements IAttackable
 	{
 		this.currentMap = currentMap;
 	}
-	
+
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);
@@ -308,7 +314,13 @@ public abstract class GameCharacter implements IAttackable
 		if (strikeImmunity > 0)
 		{
 			Color c = sprite.getColor();
-			sprite.setColor(c.r, c.g, c.b, (float)Math.abs(Math.cos(strikeImmunity*16))); // 16 is a good value for blinking rate
+			sprite.setColor(c.r, c.g, c.b,
+					(float) Math.abs(Math.cos(strikeImmunity * 16))); // 16 is a
+																		// good
+																		// value
+																		// for
+																		// blinking
+																		// rate
 		}
 
 		// draw sprite
@@ -317,23 +329,31 @@ public abstract class GameCharacter implements IAttackable
 		// draw weapon
 		if (weaponSlot != null)
 		{
-			weaponSlot.render(sprite.getBoundingRectangle(), getFaceDirection(), batch);
+			weaponSlot.render(sprite.getBoundingRectangle(),
+					getFaceDirection(), batch);
 		}
 
 		doRenderAfter(batch);
 	}
-	
-	protected void doRenderBefore(SpriteBatch batch) { }
 
-	protected void doRenderAfter(SpriteBatch batch)  { }
-	
-	public final void update(float deltaTime, Map currentMap) {
+	protected void doRenderBefore(SpriteBatch batch)
+	{
+	}
+
+	protected void doRenderAfter(SpriteBatch batch)
+	{
+	}
+
+	public final void update(float deltaTime, Map currentMap)
+	{
 		addToStateTime(deltaTime);
 		Iterator<StatusEffect> iter = inflictedEffects.iterator();
-		while (iter.hasNext()) {
+		while (iter.hasNext())
+		{
 			StatusEffect effect = iter.next();
 			effect.applyStatusEffect(deltaTime, this);
-			if (effect.hasWornOff()) {
+			if (effect.hasWornOff())
+			{
 				iter.remove();
 			}
 		}
@@ -341,7 +361,7 @@ public abstract class GameCharacter implements IAttackable
 			weaponSlot.update(deltaTime);
 		doUpdate(deltaTime, currentMap);
 	}
-	
+
 	protected abstract void doUpdate(float deltaTime, Map currentMap);
 
 	protected void updateTexture()
@@ -352,19 +372,19 @@ public abstract class GameCharacter implements IAttackable
 		case RIGHT:
 			currentFrame = isMoving() ? getRightWalkAnimation().getKeyFrame(
 					getStateTime(), true) : getRightIdle();
-					break;
+			break;
 		case LEFT:
 			currentFrame = isMoving() ? getLeftWalkAnimation().getKeyFrame(
 					getStateTime(), true) : getLeftIdle();
-					break;
+			break;
 		case UP:
 			currentFrame = isMoving() ? getUpWalkAnimation().getKeyFrame(
 					getStateTime(), true) : getUpIdle();
-					break;
+			break;
 		case DOWN:
 			currentFrame = isMoving() ? getDownWalkAnimation().getKeyFrame(
 					getStateTime(), true) : getDownIdle();
-					break;
+			break;
 		}
 
 		if (currentFrame != null)
@@ -391,13 +411,14 @@ public abstract class GameCharacter implements IAttackable
 	{
 		Direction pushingDirection = pushingCharacter.getMoveDirection();
 		faceDirection = pushingDirection.opposite();
-		moveDirection = pushingDirection; 
+		moveDirection = pushingDirection;
 		float oldX = getBottomLeftX();
 		float oldY = getBottomLeftY();
 		float x = oldX + (getSpriteWidth() / 2) * pushingDirection.getDx();
 		float y = oldY + (getSpriteHeight() / 2) * pushingDirection.getDy();
 		Coordinate newCoordinate = new Coordinate();
-		boolean didMove = getCurrentMap().checkCollision(x, y, oldX, oldY, this, newCoordinate);
+		boolean didMove = getCurrentMap().checkCollision(x, y, oldX, oldY,
+				this, newCoordinate);
 		if (didMove)
 		{
 			setBottomLeftCorner(newCoordinate);
@@ -414,23 +435,27 @@ public abstract class GameCharacter implements IAttackable
 	}
 
 	@Override
-	public void receiveAttack(Weapon weapon) {
+	public void receiveAttack(Weapon weapon)
+	{
 		if (strikeImmunity > 0)
 			return;
-		
+
 		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(weapon);
 		if (result)
 			return;
 		inflictEffects(weapon.getEffects());
 		receiveDamage(weapon.getPower());
-		if(!name.equals("Player")){
-			world.getReputationSystem().addNewEvent("Attacked", "test group", this);
+		if (!name.equals("Player"))
+		{
+			world.getReputationSystem().addNewEvent("Attacked", "test group",
+					this, bottomLeftCorner);
 		}
 	}
-	
+
 	@Override
-	public void receiveAttack(Projectile projectile) {
+	public void receiveAttack(Projectile projectile)
+	{
 		if (strikeImmunity > 0)
 			return;
 
@@ -440,80 +465,103 @@ public abstract class GameCharacter implements IAttackable
 			return;
 		inflictEffects(projectile.getEffects());
 		receiveDamage(projectile.getPower());
-		if(!name.equals("Player")){
-			world.getReputationSystem().addNewEvent("Attacked", "test group", this);
+		if (!name.equals("Player"))
+		{
+			world.getReputationSystem().addNewEvent("Attacked", "test group",
+					this, bottomLeftCorner);
 		}
 	}
-	
+
 	@Override
-	public void receiveDamage(int damage) {
+	public void receiveDamage(int damage)
+	{
 		damage = Math.max(damage, 0);
 		int health = getHealth();
 		damage = Math.min(damage, health);
 		health -= damage;
-		System.err.printf("%s takes %d damage. %d left.\n", getName(), damage, health);
+		System.err.printf("%s takes %d damage. %d left.\n", getName(), damage,
+				health);
 		setHealth(health);
 	}
-	
-	private void inflictEffects(StatusEffect[] effects) {
-		for(StatusEffect effect: effects) {
-			if(!isImmune(effect)) {
+
+	private void inflictEffects(StatusEffect[] effects)
+	{
+		for (StatusEffect effect : effects)
+		{
+			if (!isImmune(effect))
+			{
 				inflictEffect(effect);
 			}
 		}
 	}
-	
-	private void inflictEffect(StatusEffect effect) {
-		immunityHash.put(effect.getParentRef(), stateTime + effect.getImmunePeriod());
+
+	private void inflictEffect(StatusEffect effect)
+	{
+		immunityHash.put(effect.getParentRef(),
+				stateTime + effect.getImmunePeriod());
 		inflictedEffects.add(effect);
 	}
-	
-	private boolean isImmune(StatusEffect effect) {
+
+	private boolean isImmune(StatusEffect effect)
+	{
 		Float immunityEnd = immunityHash.get(effect.getParentRef());
 		return immunityEnd != null && stateTime < immunityEnd;
 	}
-	
-	public int getHealth() {
+
+	public int getHealth()
+	{
 		return health;
 	}
-	
-	public int getMaxHealth() {
+
+	public int getMaxHealth()
+	{
 		return MAX_HEALTH;
 	}
-	
-	protected void setHealth(int health) {
+
+	protected void setHealth(int health)
+	{
 		health = Math.max(health, 0);
 		health = Math.min(getMaxHealth(), health);
 		this.health = health;
 	}
-	
-	public boolean isDead() {
+
+	public boolean isDead()
+	{
 		boolean result = getHealth() == 0;
 		if (result)
 			deathCleanup();
 		return result;
 	}
-	
-	private void deathCleanup() {
+
+	private void deathCleanup()
+	{
 		if (weaponSlot != null)
 			weaponSlot.quickFinishAttack();
 	}
-	
-	public boolean isGameOver() {
+
+	public boolean isGameOver()
+	{
 		return false;
 	}
-	
-	private boolean attemptShieldBlock(Weapon weapon) {
-		if (shieldSlot != null && weapon.getLastDirection().equals(faceDirection.opposite())) {
+
+	private boolean attemptShieldBlock(Weapon weapon)
+	{
+		if (shieldSlot != null
+				&& weapon.getLastDirection().equals(faceDirection.opposite()))
+		{
 			// only allow shield to block if you are facing the attack
 			shieldSlot.receiveAttack(weapon);
 			return true;
 		}
 		return false;
 	}
-	
-	private boolean attemptShieldBlock(Projectile projectile) {
-		if (shieldSlot != null && projectile.getFiredDirection().equals(faceDirection.opposite())) {
+
+	private boolean attemptShieldBlock(Projectile projectile)
+	{
+		if (shieldSlot != null
+				&& projectile.getFiredDirection().equals(
+						faceDirection.opposite()))
+		{
 			shieldSlot.receiveAttack(projectile);
 			return true;
 		}
@@ -536,6 +584,7 @@ public abstract class GameCharacter implements IAttackable
 
 	/**
 	 * Likely insufficient implementation of equip
+	 * 
 	 * @param sword
 	 */
 	public boolean equip(Map m, Weapon weapon)
@@ -546,7 +595,7 @@ public abstract class GameCharacter implements IAttackable
 			weaponSlot.unequip();
 			weaponSlot = null;
 		}
-		
+
 		boolean result = weapon.tryEquip(this);
 		if (!result)
 		{
@@ -557,11 +606,12 @@ public abstract class GameCharacter implements IAttackable
 		m.addEquippedWeapon(weapon);
 		return result;
 	}
-	
-	public void swapWeapon(Map m) {
+
+	public void swapWeapon(Map m)
+	{
 		m.removeEquippedWeapon(weaponSlot);
 		weaponSlot.unequip();
-		
+
 		Weapon temp = weaponSlot;
 		weaponSlot = weaponSlotExtra;
 		weaponSlotExtra = temp;
@@ -570,39 +620,108 @@ public abstract class GameCharacter implements IAttackable
 		weaponSlot.tryEquip(this);
 		m.addEquippedWeapon(weaponSlot);
 	}
-	
-	public Rectangle getHitBox() {
+
+	public Rectangle getHitBox()
+	{
 		Rectangle r = sprite.getBoundingRectangle();
 		Vector2 center = new Vector2();
 		r.getCenter(center);
-		r.setWidth(r.getWidth()-8); // why -8?
-		r.setHeight(r.getHeight()-8); // why -8?
+		r.setWidth(r.getWidth() - 8); // why -8?
+		r.setHeight(r.getHeight() - 8); // why -8?
 		r.setCenter(center);
 		return r;
 	}
-	
-	public boolean equipShield(Shield s) {
-		if (shieldSlot != null) {
+
+	public boolean equipShield(Shield s)
+	{
+		if (shieldSlot != null)
+		{
 			shieldSlot.unequip();
 			shieldSlot = null;
 		}
-		
+
 		boolean result = s.tryEquip(this);
 		if (!result)
 		{
 			return result;
 		}
-		
+
 		shieldSlot = s;
 		return result;
 	}
-	
-	public void unequipShield() {
+
+	public void unequipShield()
+	{
 		shieldSlot.unequip();
 	}
 
-	public NPCMemory getNPCMemory() {
+	public NPCMemory getNPCMemory()
+	{
 		return npcMemory;
+	}
+
+	public float getSightDistance()
+	{
+		return sightDistance;
+	}
+	
+	public boolean checkCoordinateInVision(float x, float y)
+	{
+		float tempX = getCenterX();
+		float tempY = getCenterY();
+		float visionFieldPoints[] = new float[8];
+		
+		if(faceDirection.name().equalsIgnoreCase("up"))
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX - 0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY + 0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX;
+			visionFieldPoints[5] = tempY + sightDistance;
+			visionFieldPoints[6] = tempX +  0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY +  0.8f*(sightDistance); 
+		}
+		else if(faceDirection.name().equalsIgnoreCase("down"))
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX -  0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY -  0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX;
+			visionFieldPoints[5] = tempY - sightDistance;
+			visionFieldPoints[6] = tempX +  0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY -  0.8f*(sightDistance); 
+		}
+		else if(faceDirection.name().equalsIgnoreCase("left"))
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX -  0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY - 0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX - sightDistance;
+			visionFieldPoints[5] = tempY;
+			visionFieldPoints[6] = tempX - 0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f*(sightDistance); 
+		}
+		else //facing right
+		{
+			visionFieldPoints[0] = tempX; //x value of point centered on NPC
+			visionFieldPoints[1] = tempY; //y value of point centered on NPC
+			visionFieldPoints[2] = tempX + 0.8f*(sightDistance); 
+			visionFieldPoints[3] = tempY - 0.8f*(sightDistance);
+			visionFieldPoints[4] = tempX + sightDistance;
+			visionFieldPoints[5] = tempY;
+			visionFieldPoints[6] = tempX + 0.8f*(sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f*(sightDistance); 
+		}
+		
+		Polygon visionCone = new Polygon(visionFieldPoints);
+		if(visionCone.contains(x,y))
+		{
+			return true;
+		}
+		return false;
 	}
 
 }
