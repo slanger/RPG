@@ -83,8 +83,7 @@ public class NonplayableCharacter extends GameCharacter
 		// attack
 		if (weaponSlot != null && enableAttack)
 		{
-			weaponSlot.attack(currentMap, getFaceDirection(), getSprite()
-					.getBoundingRectangle());
+			weaponSlot.attack(currentMap, getFaceDirection(), getBoundingRectangle());
 			enableAttack = false;
 		}
 		else

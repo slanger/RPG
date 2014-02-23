@@ -28,9 +28,9 @@ import com.me.rpg.utils.Direction;
 
 public abstract class GameCharacter implements IAttackable
 {
-
+	
 	private static final int MAX_HEALTH = 100;
-
+	
 	private String name;
 	private Sprite sprite;
 	private Coordinate bottomLeftCorner;
@@ -48,11 +48,13 @@ public abstract class GameCharacter implements IAttackable
 
 	// Combat stuff
 	protected Weapon weaponSlot;
-	protected Weapon weaponSlotExtra;
+	protected Weapon swapWeaponSlot;
 	protected Shield shieldSlot;
+	protected boolean shielding;
 	protected LinkedList<StatusEffect> inflictedEffects;
 	protected HashMap<StatusEffect, Float> immunityHash;
 	protected int health;
+	protected int maxHealth;
 	protected float strikeImmunity;
 	protected boolean strafing;
 
@@ -97,6 +99,7 @@ public abstract class GameCharacter implements IAttackable
 
 		inflictedEffects = new LinkedList<StatusEffect>();
 		immunityHash = new HashMap<StatusEffect, Float>();
+		maxHealth = 100;
 		health = getMaxHealth();
 
 		world = World.getInstance();
@@ -173,14 +176,27 @@ public abstract class GameCharacter implements IAttackable
 	{
 		return strafing;
 	}
-
-	public void setStrafing(boolean strafing)
-	{
+	
+	private void setStrafing(boolean strafing) {
 		this.strafing = strafing;
 	}
-
-	public Direction getFaceDirection()
-	{
+	
+	public boolean isUsingShield() {
+		return shielding;
+	}
+	
+	public void usingShield(boolean shielding) {
+		if (shieldSlot == null)
+			throw new RuntimeException("There's no shield equipped!");
+		this.shielding = shielding;
+		setStrafing(shielding);
+	}
+	
+	public boolean isShielded() {
+		return shieldSlot != null && shielding && !isAttacking();
+	}
+	
+	public Direction getFaceDirection() {
 		return faceDirection;
 	}
 
@@ -262,7 +278,7 @@ public abstract class GameCharacter implements IAttackable
 
 	public float getSpeed()
 	{
-		if (!strafing || moveDirection == faceDirection)
+		if (!strafing)
 			return speed;
 		return speed * 0.6f;
 	}
@@ -311,6 +327,10 @@ public abstract class GameCharacter implements IAttackable
 		return weaponSlot;
 	}
 	
+	public boolean isAttacking() {
+		return weaponSlot == null ? false : weaponSlot.isAttacking();
+	}
+	
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);
@@ -327,9 +347,19 @@ public abstract class GameCharacter implements IAttackable
 																		// blinking
 																		// rate
 		}
-
+		
+		// if we are facing up and using shield, draw shield before character sprite
+		if (isShielded() && faceDirection.equals(Direction.UP)) {
+			shieldSlot.render(getBoundingRectangle(), faceDirection, batch);
+		}
+		
 		// draw sprite
 		sprite.draw(batch);
+		
+		// if we are shielding and not facing up, then draw shield after character sprite
+		if (isShielded() && !faceDirection.equals(Direction.UP)){
+			shieldSlot.render(getBoundingRectangle(), faceDirection, batch);
+		}
 
 		// draw weapon
 		if (weaponSlot != null)
@@ -449,7 +479,6 @@ public abstract class GameCharacter implements IAttackable
 		float diffh = (float)Math.sqrt(diffx*diffx + diffy*diffy);
 		float xDist = (float)(deltaTime*getSpeed()*diffx/diffh);
 		float yDist = (float)(deltaTime*getSpeed()*diffy/diffh);
-		System.out.printf("xDist=%f, yDist=%f\n", xDist, yDist);
 		center.setX(center.getX() + xDist);
 		center.setY(center.getY() + yDist);
 		Direction movement;// = Direction.getDirectionByDiff((int)Math.signum(diffx), (int)Math.signum(diffy));
@@ -539,13 +568,27 @@ public abstract class GameCharacter implements IAttackable
 				health);
 		setHealth(health);
 	}
-
-	private void inflictEffects(StatusEffect[] effects)
-	{
-		for (StatusEffect effect : effects)
-		{
-			if (!isImmune(effect))
-			{
+	
+	private boolean attemptShieldBlock(Weapon weapon) {
+		if (isShielded() && weapon.getLastDirection().equals(faceDirection.opposite())) {
+			// only allow shield to block if you are facing the attack
+			shieldSlot.receiveAttack(weapon);
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean attemptShieldBlock(Projectile projectile) {
+		if (isShielded() && projectile.getFiredDirection().equals(faceDirection.opposite())) {
+			shieldSlot.receiveAttack(projectile);
+			return true;
+		}
+		return false;
+	}
+	
+	private void inflictEffects(StatusEffect[] effects) {
+		for(StatusEffect effect: effects) {
+			if(!isImmune(effect)) {
 				inflictEffect(effect);
 			}
 		}
@@ -600,30 +643,6 @@ public abstract class GameCharacter implements IAttackable
 		return false;
 	}
 
-	private boolean attemptShieldBlock(Weapon weapon)
-	{
-		if (shieldSlot != null
-				&& weapon.getLastDirection().equals(faceDirection.opposite()))
-		{
-			// only allow shield to block if you are facing the attack
-			shieldSlot.receiveAttack(weapon);
-			return true;
-		}
-		return false;
-	}
-
-	private boolean attemptShieldBlock(Projectile projectile)
-	{
-		if (shieldSlot != null
-				&& projectile.getFiredDirection().equals(
-						faceDirection.opposite()))
-		{
-			shieldSlot.receiveAttack(projectile);
-			return true;
-		}
-		return false;
-	}
-
 	public abstract void doneFollowingPath();
 
 	/**
@@ -643,7 +662,7 @@ public abstract class GameCharacter implements IAttackable
 	 * 
 	 * @param sword
 	 */
-	public boolean equip(Map m, Weapon weapon)
+	public boolean equipWeapon(Map m, Weapon weapon)
 	{
 		if (weaponSlot != null)
 		{
@@ -669,8 +688,8 @@ public abstract class GameCharacter implements IAttackable
 		weaponSlot.unequip();
 
 		Weapon temp = weaponSlot;
-		weaponSlot = weaponSlotExtra;
-		weaponSlotExtra = temp;
+		weaponSlot = swapWeaponSlot;
+		swapWeaponSlot = temp;
 		if (weaponSlot == null)
 			return;
 		weaponSlot.tryEquip(this);
@@ -682,17 +701,19 @@ public abstract class GameCharacter implements IAttackable
 		Rectangle r = sprite.getBoundingRectangle();
 		Vector2 center = new Vector2();
 		r.getCenter(center);
-		r.setWidth(r.getWidth() - 8); // why -8?
-		r.setHeight(r.getHeight() - 8); // why -8?
+		// TODO: Looks unnatural/bad when arrow disappears "before" it hits (because character has clear pixels)
+		// This is just a hack to make it look better, needs a better fix
+		int widthReduction = 8;
+		int heightReduction = 8;
+		r.setWidth(r.getWidth()-widthReduction);
+		r.setHeight(r.getHeight()-heightReduction);
 		r.setCenter(center);
 		return r;
 	}
-
-	public boolean equipShield(Shield s)
-	{
-		if (shieldSlot != null)
-		{
-			shieldSlot.unequip();
+	
+	public boolean equipShield(Shield s) {
+		if (shieldSlot != null) {
+			unequipShield();
 			shieldSlot = null;
 		}
 

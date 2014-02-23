@@ -59,7 +59,7 @@ public class PlayerControlledWalkAI implements WalkAI
 		if (Gdx.input.isKeyPressed(Keys.U)){
 			if (strafeEnabler) {
 				strafeEnabler = false;
-				character.setStrafing(!character.isStrafing());
+				character.usingShield(!character.isUsingShield());
 			}
 		} else {
 			strafeEnabler = true;

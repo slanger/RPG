@@ -23,15 +23,17 @@ public class Shield extends Equippable implements IAttackable {
 	
 	public void render(Rectangle charRectangle, Direction direction,
 			SpriteBatch batch) {
-/*
-		Sprite sprite = getShield(direction);
+		Sprite sprite = getItemSprite(direction);
 		
 		float centerX = charRectangle.getX() + charRectangle.getWidth()/2;
 		float centerY = charRectangle.getY() + charRectangle.getHeight()/2;
 		float bottomLeftX = centerX - sprite.getWidth() / 2;
 		float bottomLeftY = centerY - sprite.getHeight() / 2;
 		
-		switch (currentStyle) {
+		// TODO: come up with a better value for protrusion --> the amount that the shield sticks out from character
+		float protrusion = sprite.getWidth()/6;
+		
+		/*switch (currentStyle) {
 			// straight poking
 			case POKING:
 				sprite.setPosition(leftX + (getRenderOffset() + charRectangle.getWidth() - 8)*direction.getDx(), leftY + (getRenderOffset() + charRectangle.getHeight() - 8)*direction.getDy());
@@ -44,16 +46,9 @@ public class Shield extends Equippable implements IAttackable {
 				sprite.setPosition(leftX + (charRectangle.getWidth() - 4)*direction.getDx(), leftY + (charRectangle.getHeight() - 4)*direction.getDy());
 				sprite.setOrigin(sprite.getWidth()/2 * (-direction.getDx() + 1), sprite.getHeight()/2 * (-direction.getDy() + 1));
 				break;
-		}
-		sprite.draw(batch);*/
-	}
-	
-	/**
-	 * Returns whether the shield should be rendered 
-	 * @return
-	 */
-	public boolean renderForeground() {
-		return false;
+		}*/
+		sprite.setPosition(bottomLeftX, bottomLeftY);
+		sprite.draw(batch);
 	}
 	
 	@Override

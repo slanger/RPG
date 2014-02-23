@@ -49,6 +49,7 @@ public final class World implements Disposable
 	public static final String NPC_TEXTURE_PATH = "villain.png";
 	public static final String SWORD_PATH = "sword.png";
 	public static final String ARROW_PATH = "arrow.png";
+	public static final String SHIELD_PATH = "shield.png";
 
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
@@ -379,31 +380,37 @@ public final class World implements Disposable
 		int height = 32;
 
 		// melee attack test stuff
-		Texture swordSprite = RPG.manager.get(SWORD_PATH);
+		Texture swordSprite = RPG.manager.get(World.SWORD_PATH);
+		Texture shieldSprite = RPG.manager.get(World.SHIELD_PATH);
+		Shield shield = new Shield("lameShield");
 		Weapon sword = new MeleeWeapon("LameSword");
 		Weapon sword2 = new MeleeWeapon("Sword2");
 		sword2.initSprite(swordSprite, width, height, 32, 32);
 		sword.initSprite(swordSprite, width, height, 32, 32);
+		shield.initSprite(shieldSprite, width, height, 32, 32);
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		sword2.addEffect(poison);
 
-		character.equip(map, sword);
-		character.swapWeapon(map);
-		npc.equip(map, sword2);
+		player.equipWeapon(map, sword);
+		player.swapWeapon(map);
+		player.equipShield(shield);
+		npc.equipWeapon(map, sword2);
 
 		// ranged attack test stuff
-		Texture bowSprite = RPG.manager.get(ARROW_PATH);
+		Texture bowSprite = RPG.manager.get(World.ARROW_PATH);
 		RangedWeapon bow = new RangedWeapon("LameBow");
 		bow.initSprite(bowSprite, width, height, 32, 32);
 
-		character.equip(map, bow);
+		player.equipWeapon(map, bow);
 		Projectile arrow = new Projectile("arrow", bowSprite, width, height,
 				32, 32);
 		bow.equipProjectile(arrow, 1000);
 
-		Shield shield = new Shield("plain shield");
-		npc.equipShield(shield);
+		Shield plainShield = new Shield("plain shield");
+		plainShield.initSprite(shieldSprite, width, height, 32, 32);
+		npc.equipShield(plainShield);
+		//npc.usingShield(true);
 	}
 
 	public void temporaryVisionConeTest()

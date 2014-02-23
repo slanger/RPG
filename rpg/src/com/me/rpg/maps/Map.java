@@ -353,9 +353,7 @@ public abstract class Map implements Disposable
 			Coordinate selectedLocation = selected.getBottomLeftCorner();
 			selected.setPosition(selectedLocation.getX(),
 					selectedLocation.getY());
-			// TODO this calculation is not quite right for characters on the
-			// edge of what is being drawn on the map
-			if (selected.getHitBox().overlaps(cameraBounds))
+			if (selected.getBoundingRectangle().overlaps(cameraBounds))
 			{
 				selected.render(batch);
 			}

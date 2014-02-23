@@ -204,8 +204,7 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if (weaponSlot != null && enableAttack)
 			{
-				weaponSlot.attack(currentMap, getFaceDirection(), getSprite()
-						.getBoundingRectangle());
+				weaponSlot.attack(currentMap, getFaceDirection(), getBoundingRectangle());
 				enableAttack = false;
 			}
 		}
