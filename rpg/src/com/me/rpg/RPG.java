@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.maps.ExampleMap;
@@ -33,6 +34,7 @@ public class RPG implements Screen
 
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
+	private ShapeRenderer shapeRenderer;
 
 	private World world;
 
@@ -48,7 +50,8 @@ public class RPG implements Screen
 		// camera.zoom -= 0.1f;
 
 		batch = new SpriteBatch();
-		world = new World(batch, camera);
+		shapeRenderer = new ShapeRenderer();
+		world = new World(batch, shapeRenderer, camera);
 
 		Texture graves = RPG.manager.get(GRAVESTONE_PATH);
 		gravestone1 = new TextureRegion(graves, 0, 0, 34, 41);
@@ -58,6 +61,7 @@ public class RPG implements Screen
 	public void dispose()
 	{
 		batch.dispose();
+		shapeRenderer.dispose();
 		manager.dispose();
 		world.dispose();
 	}

@@ -29,6 +29,7 @@ public class World implements Disposable
 	public static String FADED_RED_DOT_PATH = "faded_red_dot.png";
 
 	private SpriteBatch batch;
+	private ShapeRenderer shapeRenderer;
 	private OrthographicCamera camera;
 	private BitmapFont debugFont;
 	private Map map;
@@ -132,9 +133,11 @@ public class World implements Disposable
 		return reputationSystem;
 	}
 
-	public World(SpriteBatch batch, OrthographicCamera camera)
+	public World(SpriteBatch batch, ShapeRenderer shapeRenderer,
+			OrthographicCamera camera)
 	{
 		this.batch = batch;
+		this.shapeRenderer = shapeRenderer;
 		this.camera = camera;
 
 		// create map
@@ -167,8 +170,8 @@ public class World implements Disposable
 		{
 			dialogue.render();
 		}
-		//end dialogue stuff
-		
+		// end dialogue stuff
+
 		if (warping)
 		{
 			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
@@ -211,8 +214,6 @@ public class World implements Disposable
 		float tempSightDistance = 0.0f;
 		Direction tempDirection = null;
 		float visionFieldPoints[] = new float[8];
-
-		ShapeRenderer shapeRenderer = new ShapeRenderer();
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
