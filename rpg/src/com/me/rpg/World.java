@@ -160,7 +160,6 @@ public class World implements Disposable
 		map.render();
 
 		temporaryVisionConeTest();
-		reputationSystem.CheckForWitnesses(null, null);
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
