@@ -1,0 +1,152 @@
+
+west_town_pack.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+map
+  rotate: false
+  xy: 0, 0
+  size: 256, 16704
+  orig: 256, 16704
+  offset: 0, 0
+  index: 1
+map
+  rotate: false
+  xy: 0, 16706
+  size: 256, 1504
+  orig: 256, 1504
+  offset: 0, 0
+  index: 34
+map
+  rotate: false
+  xy: 0, 18212
+  size: 256, 832
+  orig: 256, 832
+  offset: 0, 0
+  index: 64
+map
+  rotate: false
+  xy: 258, 0
+  size: 160, 256
+  orig: 160, 256
+  offset: 0, 0
+  index: 2
+map
+  rotate: false
+  xy: 258, 0
+  size: 160, 256
+  orig: 160, 256
+  offset: 0, 0
+  index: 2
+map
+  rotate: false
+  xy: 258, 258
+  size: 128, 256
+  orig: 128, 256
+  offset: 0, 0
+  index: 5
+map
+  rotate: false
+  xy: 0, 19046
+  size: 384, 224
+  orig: 384, 224
+  offset: 0, 0
+  index: 253
+map
+  rotate: false
+  xy: 0, 19272
+  size: 384, 128
+  orig: 384, 128
+  offset: 0, 0
+  index: 445
+map
+  rotate: false
+  xy: 0, 19402
+  size: 384, 128
+  orig: 384, 128
+  offset: 0, 0
+  index: 448
+map
+  rotate: false
+  xy: 0, 19532
+  size: 384, 128
+  orig: 384, 128
+  offset: 0, 0
+  index: 451
+map
+  rotate: false
+  xy: 0, 19662
+  size: 384, 128
+  orig: 384, 128
+  offset: 0, 0
+  index: 454
+map
+  rotate: false
+  xy: 0, 19792
+  size: 256, 128
+  orig: 256, 128
+  offset: 0, 0
+  index: 457
+map
+  rotate: false
+  xy: 388, 258
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 7
+map
+  rotate: false
+  xy: 258, 516
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 12
+map
+  rotate: false
+  xy: 356, 516
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 13
+map
+  rotate: false
+  xy: 258, 646
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 15
+map
+  rotate: false
+  xy: 356, 646
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 16
+map
+  rotate: false
+  xy: 258, 776
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 18
+map
+  rotate: false
+  xy: 356, 776
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 19
+map
+  rotate: false
+  xy: 388, 388
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: 13
+map
+  rotate: false
+  xy: 0, 19922
+  size: 256, 64
+  orig: 256, 64
+  offset: 0, 0
+  index: 904

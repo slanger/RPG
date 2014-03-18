@@ -16,6 +16,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.PrototypeMap;
+import com.me.rpg.maps.WestTownMap;
 
 public class RPG implements Screen
 {
@@ -132,6 +133,7 @@ public class RPG implements Screen
 				new InternalFileHandleResolver()));
 		manager.load(ExampleMap.MAP_TMX_PATH, TiledMap.class);
 		manager.load(PrototypeMap.MAP_TMX_PATH, TiledMap.class);
+		manager.load(WestTownMap.MAP_TMX_PATH, TiledMap.class);
 
 		// load textures
 		manager.load(PLAYER_TEXTURE_PATH, Texture.class);

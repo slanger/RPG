@@ -700,6 +700,8 @@ public abstract class Map implements Disposable
 			return new ExampleMap(world, batch, camera);
 		case PROTOTYPE:
 			return new PrototypeMap(world, batch, camera);
+		case WEST_TOWN:
+			return new WestTownMap(world, batch, camera);
 		}
 		throw new RuntimeException("Cannot get Map from the given MapType");
 	}
