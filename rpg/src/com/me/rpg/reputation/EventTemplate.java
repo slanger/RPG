@@ -1,32 +1,24 @@
 package com.me.rpg.reputation;
 
+import java.util.HashMap;
+
 public class EventTemplate {
 	
 	private String eventName; 
-	private int magnitude;
-	//individual group effects
+	private HashMap<String, Integer> eventEffectsByGroup;
 	
-	EventTemplate(String eventName, int magnitude)
+	EventTemplate(String eventName, int magnitude, HashMap<String, Integer> eventEffectsByGroup)
 	{
-		this.setEventName(eventName);
-		this.setMagnitude(magnitude);
+		this.eventName=eventName;
+		this.eventEffectsByGroup=eventEffectsByGroup;
 	}
 
 	public String getEventName() {
 		return eventName;
 	}
 
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
-
-	public int getMagnitude() {
-		return magnitude;
-	}
-
-	public void setMagnitude(int magnitude) {
-		this.magnitude = magnitude;
+	public int getEffectOnGroup(String group) {
+		return eventEffectsByGroup.get(group);
 	}
 	
-
 }
