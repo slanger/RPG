@@ -1,0 +1,54 @@
+
+inside_house_pack.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+map
+  rotate: false
+  xy: 0, 0
+  size: 256, 8704
+  orig: 256, 8704
+  offset: 0, 0
+  index: 1
+map
+  rotate: false
+  xy: 0, 8706
+  size: 384, 128
+  orig: 384, 128
+  offset: 0, 0
+  index: 199
+map
+  rotate: false
+  xy: 0, 8836
+  size: 384, 128
+  orig: 384, 128
+  offset: 0, 0
+  index: 202
+map
+  rotate: false
+  xy: 258, 0
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 3
+map
+  rotate: false
+  xy: 356, 0
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 4
+map
+  rotate: false
+  xy: 258, 130
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 6
+map
+  rotate: false
+  xy: 356, 130
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: 7
