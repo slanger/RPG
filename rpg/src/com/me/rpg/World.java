@@ -21,12 +21,11 @@ import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Timer;
 
-public class World implements Disposable
+public final class World implements Disposable
 {
 
-	public static String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
-	public static String WHITE_DOT_PATH = "white_dot.png";
-	public static String FADED_RED_DOT_PATH = "faded_red_dot.png";
+	public static final String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
+	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
 
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
@@ -152,7 +151,7 @@ public class World implements Disposable
 
 		// warp resources
 		warpSound = RPG.manager.get(WARP_SOUND_PATH, Sound.class);
-		whiteScreen = new Sprite(RPG.manager.get(WHITE_DOT_PATH, Texture.class));
+		whiteScreen = new Sprite(RPG.manager.get(RPG.WHITE_DOT_PATH, Texture.class));
 	}
 
 	public void render()

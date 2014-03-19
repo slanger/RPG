@@ -10,25 +10,23 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.maps.ExampleMap;
+import com.me.rpg.maps.Map;
 import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownMap;
+import com.me.rpg.utils.LoadBar;
 
 public class RPG implements Screen
 {
 
+	public static final String WHITE_DOT_PATH = "white_dot.png";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
 	public static final String SWORD_PATH = "sword.png";
 	public static final String ARROW_PATH = "arrow.png";
-	public static final String GRAVESTONE_PATH = "gravestones.png";
-
-	public static TextureRegion gravestone1;
-	public static TextureRegion gravestone2;
 
 	public static AssetManager manager = new AssetManager();
 	public ScreenHandler screenHandler;
@@ -37,10 +35,13 @@ public class RPG implements Screen
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
 
-	private World world;
+	private World world = null;
+
+	private LoadBar loadBar;
 
 	public RPG(ScreenHandler screenHandler)
 	{
+		loadLoadBarAssets();
 		loadAssets();
 
 		this.screenHandler = screenHandler;
@@ -52,10 +53,13 @@ public class RPG implements Screen
 
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
-		world = new World(batch, shapeRenderer, camera);
 
-		Texture graves = RPG.manager.get(GRAVESTONE_PATH);
-		gravestone1 = new TextureRegion(graves, 0, 0, 34, 41);
+		float offset = 10;
+		float width = camera.viewportWidth - 2 * offset;
+		float height = camera.viewportHeight / 8;
+		float x = offset;
+		float y = camera.viewportHeight / 2 - height / 2;
+		loadBar = new LoadBar(x, y, width, height, manager.get(WHITE_DOT_PATH, Texture.class));
 	}
 
 	@Override
@@ -72,6 +76,22 @@ public class RPG implements Screen
 	{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		// if AssetManager is still loading assets, draw load bar
+		if (!manager.update())
+		{
+			loadBar.update(manager.getProgress());
+			batch.begin();
+			loadBar.render(batch);
+			batch.end();
+			return;
+		}
+
+		// lazy loading
+		if (world == null)
+		{
+			world = new World(batch, shapeRenderer, camera);
+		}
 
 		// update before render
 		update();
@@ -126,6 +146,13 @@ public class RPG implements Screen
 
 	}
 
+	private void loadLoadBarAssets()
+	{
+		manager.load(WHITE_DOT_PATH, Texture.class);
+		manager.update();
+		manager.finishLoading();
+	}
+
 	private void loadAssets()
 	{
 		// load Tiled maps
@@ -140,17 +167,13 @@ public class RPG implements Screen
 		manager.load(NPC_TEXTURE_PATH, Texture.class);
 		manager.load(SWORD_PATH, Texture.class);
 		manager.load(ARROW_PATH, Texture.class);
-		manager.load(GRAVESTONE_PATH, Texture.class);
-		manager.load(World.WHITE_DOT_PATH, Texture.class);
+		manager.load(Map.GRAVESTONE_PATH, Texture.class);
 		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
 
 		// load sounds and music
 		manager.load(World.WARP_SOUND_PATH, Sound.class);
 		manager.load(PrototypeMap.BACKGROUND_MUSIC_START, Music.class);
 		manager.load(PrototypeMap.BACKGROUND_MUSIC_LOOP, Music.class);
-
-		manager.update();
-		manager.finishLoading();
 	}
 
 	@Override

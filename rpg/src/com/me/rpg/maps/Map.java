@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
@@ -34,6 +35,8 @@ import com.me.rpg.utils.Timer;
 
 public abstract class Map implements Disposable
 {
+
+	public static final String GRAVESTONE_PATH = "gravestones.png";
 
 	protected World world;
 	protected SpriteBatch batch;
@@ -69,6 +72,8 @@ public abstract class Map implements Disposable
 	protected Timer timer;
 
 	protected MapType mapType;
+
+	protected TextureRegion gravestone;
 
 	public MapType getMapType()
 	{
@@ -132,6 +137,9 @@ public abstract class Map implements Disposable
 		flyingProjectiles = new ArrayList<Projectile>();
 		equippedWeapons = new ArrayList<Weapon>();
 		corpses = new ArrayList<DeadCharacter>();
+
+		Texture graves = RPG.manager.get(GRAVESTONE_PATH);
+		gravestone = new TextureRegion(graves, 0, 0, 34, 41);
 	}
 
 	protected void setup()
@@ -484,8 +492,7 @@ public abstract class Map implements Disposable
 			if (character.isDead())
 			{
 				charIter.remove();
-				corpses.add(new DeadCharacter(character, new Sprite(
-						RPG.gravestone1), 3.0f));
+				corpses.add(new DeadCharacter(character, new Sprite(gravestone), 3.0f));
 			}
 		}
 
