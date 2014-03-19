@@ -11,8 +11,8 @@ public class Main
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "The Legend of the Diforce";
 		cfg.useGL20 = true;
-		cfg.width = 400;
-		cfg.height = 400;
+		cfg.width = 448;
+		cfg.height = 448;
 		new LwjglApplication(new ScreenHandler(), cfg);
 	}
 
