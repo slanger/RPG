@@ -11,16 +11,16 @@ import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.characters.PlayableCharacter;
 
-public class WestTownMap extends Map
+public class WestTownInsideHouse extends Map
 {
 
-	public static final String MAP_TMX_PATH = "maps/west_town/west_town.tmx";
+	public static final String MAP_TMX_PATH = "maps/west_town/inside_house/inside_house.tmx";
 
-	public WestTownMap(World world, SpriteBatch batch, OrthographicCamera camera)
+	public WestTownInsideHouse(World world, SpriteBatch batch, OrthographicCamera camera)
 	{
 		super(world, batch, camera);
 
-		mapType = MapType.WEST_TOWN;
+		mapType = MapType.WEST_TOWN_INSIDE_HOUSE;
 
 		// get Tiled map
 		tiledMap = RPG.manager.get(MAP_TMX_PATH, TiledMap.class);

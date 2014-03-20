@@ -42,8 +42,8 @@ public class ExampleMap extends Map
 		final String PLAYER_NAME = "Player";
 		final String NPC1_NAME = "NPC1";
 		final String NPC2_NAME = "NPC2";
-		final int width = 32;
-		final int height = 32;
+		final int width = 28;
+		final int height = 28;
 
 		// get spawn points and walking boundaries from .tmx
 		MapObjects spawnPoints = getSpawnPoints();
