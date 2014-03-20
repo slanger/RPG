@@ -9,6 +9,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -24,6 +25,7 @@ public class RPG implements Screen
 {
 
 	public static final String WHITE_DOT_PATH = "white_dot.png";
+	public static final String FONT_PATH = "font/Microsoft_Uighur_white.fnt";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
 	public static final String SWORD_PATH = "sword.png";
@@ -39,6 +41,7 @@ public class RPG implements Screen
 	private World world = null;
 
 	private LoadBar loadBar;
+	private BitmapFont font;
 
 	public RPG(ScreenHandler screenHandler)
 	{
@@ -61,6 +64,8 @@ public class RPG implements Screen
 		float x = offset;
 		float y = camera.viewportHeight / 2 - height / 2;
 		loadBar = new LoadBar(x, y, width, height, manager.get(WHITE_DOT_PATH, Texture.class));
+
+		font = manager.get(FONT_PATH, BitmapFont.class);
 	}
 
 	@Override
@@ -84,6 +89,7 @@ public class RPG implements Screen
 			loadBar.update(manager.getProgress());
 			batch.begin();
 			loadBar.render(batch);
+			font.draw(batch, "Loading", loadBar.x, loadBar.y);
 			batch.end();
 			return;
 		}
@@ -150,6 +156,7 @@ public class RPG implements Screen
 	private void loadLoadBarAssets()
 	{
 		manager.load(WHITE_DOT_PATH, Texture.class);
+		manager.load(FONT_PATH, BitmapFont.class);
 		manager.update();
 		manager.finishLoading();
 	}

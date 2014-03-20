@@ -6,9 +6,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class LoadBar
 {
 
-	private final float x, y, width, height;
-	private final Texture loadTexture;
+	public final float x, y, width, height;
+	public final Texture loadTexture;
 	private float progress = 0;
+
+	public float getProgress()
+	{
+		return progress;
+	}
 
 	public LoadBar(float x, float y, float width, float height, Texture loadTexture)
 	{
