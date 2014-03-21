@@ -190,7 +190,7 @@ public class DialogueSystem {
 //		Label response3 = new Label("Response2 ---------------", style);
 		
 		
-		Label objectName = new Label("John" , style);
+		Label objectName = new Label(conversingNPC.getName() , style);
 		Label npcStatement1 = new Label(npcStatement, style);
 		Label separator = new Label("------------------------------------------------------------------"
 				+ "------------------------------------------------", separatorStyle);
@@ -445,72 +445,4 @@ public class DialogueSystem {
 		}
 		
 	}
-	
-	
-////public void advanceDialogue(String key)
-//{
-//	int temp2;
-//	if (currentIndex < 0)
-//		currentIndex = 0;
-//	if (currentIndex < lastIndex)
-//	{
-//		currentText = dialogueArray[currentIndex];
-//		int temp = playerResponsePosition[currentIndex];
-//		if (temp != 0)
-//			requireResponse = true;
-//		if (requireResponse == true)
-//		{
-//			if (key == "NUM_1" && temp > 0)
-//			{
-//				requireResponse = false;
-//				currentIndex += 1;
-//			}
-//			else if (key == "NUM_2" && temp > 1)
-//			{
-//				requireResponse = false;
-//				currentIndex += 2;
-//			}
-//			else if (key == "NUM_3" && temp > 2)
-//			{
-//				requireResponse = false;
-//				currentIndex += 3;
-//			}
-//			else
-//			{
-//				// index stays same until response
-//			}
-//		}
-//		else
-//		{
-//			if (key == "E")
-//				currentIndex++;
-//			else
-//			{
-//				// index stays same until E hit.
-//			}
-//		}
-//		if (currentIndex + 1 > lastIndex)
-//		{
-//			temp2 = 0;
-//		}
-//		else
-//		{
-//			temp2 = playerResponsePosition[currentIndex + 1];
-//		}
-//		if (temp2 != 0)
-//		{ // request player response
-//			requireResponse = true;
-//		}
-//
-//	}
-//	else
-//	{
-//		System.out.println(lastIndex);
-//		requireResponse = false;
-//		currentText = "";
-//		inDialogue = false;
-//	}
-//}
-	
-	
 }
