@@ -56,6 +56,9 @@ public abstract class GameCharacter implements IAttackable
 	protected float strikeImmunity;
 	protected boolean strafing;
 
+	//
+	protected boolean isInDialogue;
+	
 	// Reputation Stuff
 	protected NPCMemory npcMemory;
 	protected World world;
@@ -102,6 +105,7 @@ public abstract class GameCharacter implements IAttackable
 		npcMemory = new NPCMemory(world.getReputationSystem()
 				.getMasterEventList());
 		sightDistance = 450.0f;
+		isInDialogue = false;
 	}
 
 	public String getName()
@@ -722,6 +726,14 @@ public abstract class GameCharacter implements IAttackable
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isInDialogue() {
+		return isInDialogue;
+	}
+
+	public void setInDialogue(boolean isInDialogue) {
+		this.isInDialogue = isInDialogue;
 	}
 
 }

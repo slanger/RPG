@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.utils.Disposable;
-import com.me.rpg.ai.Dialogue;
+import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.NonplayableCharacter;
 import com.me.rpg.characters.PlayableCharacter;
@@ -59,7 +59,7 @@ public final class World implements Disposable
 
 	private Timer timer = new Timer();
 
-	private Dialogue dialogue;
+	private DialogueSystem dialogueSystem;
 	private ReputationSystem reputationSystem;
 
 	private boolean warping = false;
@@ -71,9 +71,9 @@ public final class World implements Disposable
 	private boolean movingToAnotherMap = false;
 	private boolean updateEnable = true;
 
-	public Dialogue getDialogue()
+	public DialogueSystem getDialogueSystem()
 	{
-		return dialogue;
+		return dialogueSystem;
 	}
 
 	public ReputationSystem getReputationSystem()
@@ -109,7 +109,7 @@ public final class World implements Disposable
 		this.camera = camera;
 
 		// create map
-		dialogue = new Dialogue();
+		dialogueSystem = new DialogueSystem(batch, camera);
 		reputationSystem = new ReputationSystem(this);
 
 		// create debug font
@@ -186,9 +186,9 @@ public final class World implements Disposable
 		batch.begin();
 
 		// temporary dialogue stuff
-		if (dialogue.getInDialogue())
+		if (dialogueSystem.getInDialogue())
 		{
-			dialogue.render(batch, camera, shapeRenderer);
+			dialogueSystem.render(batch, camera);
 		}
 		// end dialogue stuff
 
