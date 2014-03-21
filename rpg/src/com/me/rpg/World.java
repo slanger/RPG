@@ -122,7 +122,7 @@ public final class World implements Disposable
 
 	}
 
-	public DialogueSystem getDialogue()
+	public DialogueSystem getDialogueSystem()
 	{
 		return dialogueSystem;
 	}

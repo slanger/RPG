@@ -9,6 +9,7 @@ import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
+import com.me.rpg.utils.Direction;
 
 public class PlayableCharacter extends GameCharacter
 {
@@ -24,11 +25,12 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableControls = true;
 	private boolean enablePushing = true;
 
-	private boolean enableInputE = true;
-	private boolean enableInput1 = true;
-	private boolean enableInput2 = true;
-	private boolean enableInput3 = true;
-
+	//dialogue keys
+	private boolean enableInputE = true;  //for initiating dialogue with character, selecting response option
+	private boolean enableInputUp = true;
+	private boolean enableInputDown = true;
+	//end dialogue keys
+	
 	public boolean getEnableControls()
 	{
 		return enableControls;
@@ -78,6 +80,66 @@ public class PlayableCharacter extends GameCharacter
 		}
 
 		/*
+		 * DIALOGUE
+		 */
+		if (Gdx.input.isKeyPressed(Keys.E))
+		{
+			if (enableInputE)
+			{
+				enableInputE = false;
+				if (!isInDialogue)
+				{
+					initiateDialogue();
+					if(isInDialogue)
+					{
+						advanceDialogue("E");
+					}
+				}
+				else
+				{ // currently in dialogue
+					advanceDialogue("E");
+				}
+			}
+		}
+		else
+		{
+			enableInputE = true;
+		}
+		if(Gdx.input.isKeyPressed(Keys.UP))
+		{
+			if(enableInputUp && isInDialogue)
+			{
+				enableInputUp = false;
+				advanceDialogue("UP");
+			}
+			else
+			{
+				enableInputUp = true;
+			}
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			if (enableInputDown && isInDialogue)
+			{
+				enableInputDown = false;
+				advanceDialogue("DOWN");
+			}
+		}
+		else
+		{
+			enableInputDown = true;
+		}
+		/*
+		 * END DIALOGUE
+		 */
+		
+		if(this.isInDialogue() == true)
+		{
+			return;
+		}
+		
+		/*
 		 * MOVEMENT
 		 */
 
@@ -123,73 +185,6 @@ public class PlayableCharacter extends GameCharacter
 		 * END ACTIONS
 		 */
 
-		/*
-		 * DIALOGUE
-		 */
-
-		if (Gdx.input.isKeyPressed(Keys.E))
-		{
-			if (enableInputE)
-			{
-				enableInputE = false;
-				if (!currentMap.getWorld().getDialogue().getInDialogue())
-				{
-					initiateDialogue();
-					advanceDialogue("E");
-				}
-				else
-				{ // currently in dialogue
-					advanceDialogue("E");
-				}
-			}
-		}
-		else
-		{
-			enableInputE = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Keys.NUM_1))
-		{
-			if (enableInput1)
-			{
-				enableInput1 = false;
-				advanceDialogue("NUM_1");
-			}
-		}
-		else
-		{
-			enableInput1 = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Keys.NUM_2))
-		{
-			if (enableInput2)
-			{
-				enableInput2 = false;
-				advanceDialogue("NUM_2");
-			}
-		}
-		else
-		{
-			enableInput2 = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Keys.NUM_3))
-		{
-			if (enableInput3)
-			{
-				enableInput3 = false;
-				advanceDialogue("NUM_3");
-			}
-		}
-		else
-		{
-			enableInput3 = true;
-		}
-
-		/*
-		 * END DIALOGUE
-		 */
 
 		/*
 		 * COMBAT
@@ -272,10 +267,13 @@ public class PlayableCharacter extends GameCharacter
 		GameCharacter c = currentMap.checkCollisionWithCharacters(hitbox, this);
 		if (c != null)
 		{
-			c.setMoving(false);
-			DialogueSystem dialogueSystem = currentMap.getWorld().getDialogue();
-			dialogueSystem.setInDialogue(true);
-			//dialogue.update(c);
+			DialogueSystem dialogueSystem = currentMap.getWorld().getDialogueSystem();
+			boolean foundDialogue = dialogueSystem.startConversation(this, c);
+			if(foundDialogue){
+				this.setInDialogue(true);
+				c.setInDialogue(true);
+				c.setFaceDirection(this.getFaceDirection().opposite());
+			}
 		}
 	}
 

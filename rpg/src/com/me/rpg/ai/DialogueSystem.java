@@ -32,10 +32,15 @@ public class DialogueSystem {
 	private BitmapFont dialogueFont;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
-	private boolean inDialogue;
 	private Stage debugStage;
 	private Table table;
 	
+	//per conversation stuff
+	private boolean inDialogue = false;
+	private Node currentDialogueNode = null;
+	private GameCharacter player = null;
+	private GameCharacter conversingNPC = null;
+
 	public DialogueSystem(SpriteBatch batch, OrthographicCamera camera)
 	{
 		//initialize renderer stuff
@@ -64,6 +69,33 @@ public class DialogueSystem {
 		}
 	}
 	
+	public boolean startConversation(GameCharacter player, GameCharacter conversingNPC)
+	{
+		this.player = player;
+		this.conversingNPC = conversingNPC;
+		
+		for(Node rootNode : rootNodes)
+		{
+			if(rootNode.getObjectID().equalsIgnoreCase(conversingNPC.getName()))
+			{
+				//npc has dialogue tree
+				inDialogue = true;
+				currentDialogueNode = rootNode.getChild(0);
+				System.out.println(currentDialogueNode.getDialogue());
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean advanceDialogue(String key) //returns true if dialogue ended
+	{
+		
+		return false;
+	}
+	
+	
+	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
 		this.batch = batch;
@@ -78,10 +110,6 @@ public class DialogueSystem {
 		
 		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2 + desiredX;
 		float dialoguePositionY = camera.position.y + camera.viewportHeight / 2 - desiredY;
-		
-		System.out.println(dialoguePositionX);
-		System.out.println(dialoguePositionY);
-		
 		
 		float dialogueWidth = (camera.viewportWidth - 2*desiredX);
 		//float dialogueHeight = (camera.viewportHeight - 8*desiredX);;
@@ -123,7 +151,7 @@ public class DialogueSystem {
 	    table.add(response3).width(dialogueWidth*0.9f);
 	    table.row();
 	    
-	    table.debug();
+	    //table.debug();
 		//stage.addActor(table);
 		
 	 	batch.draw(texture, dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
@@ -132,7 +160,6 @@ public class DialogueSystem {
 		table.clear();
 		//Table.drawDebug(stage);
 	}
-	
 	
 	public void setInDialogue(boolean inDialogue)
 	{
