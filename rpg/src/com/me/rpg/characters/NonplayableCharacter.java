@@ -9,6 +9,8 @@ import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
 import com.me.rpg.state.State;
+import com.me.rpg.state.UpdateResult;
+import com.me.rpg.state.action.Action;
 import com.me.rpg.utils.Timer;
 
 public class NonplayableCharacter extends GameCharacter
@@ -74,8 +76,13 @@ public class NonplayableCharacter extends GameCharacter
 	public void doUpdate(float deltaTime, Map currentMap)
 	{
 		// update movement
-		if (stateMachine != null)
-			stateMachine.update(deltaTime);
+		if (stateMachine != null) {
+			UpdateResult result = stateMachine.update(deltaTime);
+			for (int i = 0; i < result.actions.size(); ++i) {
+				Action a  = result.actions.get(i);
+				a.doAction(deltaTime);
+			}
+		}
 		else
 			walkAI.update(deltaTime, currentMap);
 

@@ -3,13 +3,13 @@ package com.me.rpg.state.transition;
 import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableInt;
 
-public class IntTransition extends Transition {
+public class IntCondition implements Condition {
 	
 	private MutableInt mutable;
 	private int target;
 	private Comparison type;
 	
-	public IntTransition(MutableInt mutable, int target, Comparison type) {
+	public IntCondition(MutableInt mutable, int target, Comparison type) {
 		this.mutable = mutable;
 		this.target = target;
 		this.type = type;
@@ -17,7 +17,7 @@ public class IntTransition extends Transition {
 	
 	
 	@Override
-	public boolean doTransition() {
+	public boolean test() {
 		int value = mutable.getValue();
 		switch (type) {
 		case EQUALS:

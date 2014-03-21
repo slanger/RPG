@@ -3,21 +3,21 @@ package com.me.rpg.state.transition;
 import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableFloat;
 
-public class FloatTransition extends Transition {
+public class FloatCondition implements Condition {
 	
 	private MutableFloat mutable;
 	private float target;
 	private Comparison type;
 	private static final float EPS = 0.0000001f;
 	
-	public FloatTransition(MutableFloat mutable, float target, Comparison type) {
+	public FloatCondition(MutableFloat mutable, float target, Comparison type) {
 		this.mutable = mutable;
 		this.target = target;
 		this.type = type;
 	}
 	
 	@Override
-	public boolean doTransition() {
+	public boolean test() {
 		float value = mutable.getValue();
 		switch (type) {
 		case EQUALS:

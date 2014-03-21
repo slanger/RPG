@@ -6,6 +6,7 @@ public class Coordinate
 {
 
 	public static final Coordinate ZERO = new Coordinate(0f, 0f);
+	public static final float EPS = 0.00000001f;
 
 	private float x;
 	private float y;
@@ -63,6 +64,15 @@ public class Coordinate
 	public static Coordinate copy(Coordinate c)
 	{
 		return new Coordinate(c.getX(), c.getY());
+	}
+
+	public boolean isNear(Coordinate target) {
+		double diff = Math.abs(target.x - x) + Math.abs(target.y - y);
+		return diff < EPS;
+	}
+	
+	public float distance2(Coordinate target) {
+		return (x-target.x)*(x-target.x) + (y-target.y)*(y-target.y);
 	}
 
 }

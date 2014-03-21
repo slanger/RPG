@@ -159,6 +159,15 @@ public abstract class GameCharacter implements IAttackable
 		this.bottomLeftCorner = new Coordinate(center.getX() - getSpriteWidth()
 				/ 2, center.getY() - getSpriteHeight() / 2);
 	}
+	
+	public boolean isCenterNear(Coordinate target) {
+		Coordinate c = getCenter();
+		return c.isNear(target);
+	}
+	
+	public boolean isNear(Coordinate bottomLeftTarget) {
+		return bottomLeftCorner.isNear(bottomLeftTarget);
+	}
 
 	public Direction getMoveDirection()
 	{

@@ -1,133 +1,132 @@
 package com.me.rpg.state;
 
+import java.util.ArrayList;
+
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.state.transition.BooleanTransition;
-import com.me.rpg.state.transition.FloatTransition;
-import com.me.rpg.state.transition.IntTransition;
+import com.me.rpg.state.action.Action;
+import com.me.rpg.state.transition.BooleanCondition;
+import com.me.rpg.state.transition.FloatCondition;
+import com.me.rpg.state.transition.IntCondition;
+import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableFloat;
 
-
-/**
- * Main driver of this class is through the update(float) method.
- * @author Alex
- *
- */
 public abstract class State {
 	
-	private String goal;
-	private State currentState;
-	private GameCharacter mainCharacter;
+	protected HierarchicalState parent;
+	protected Transition[] transitions;
+	protected GameCharacter character;
 	
+	private ArrayList<Action> emptyActions;
 	private MutableFloat timeInState;
-	private boolean calledTransition;
-	private boolean transitionResult;
+	private String stateName;
+	private ArrayList<State> parentStates;
 	
-	public State() {
-		this("");
-	}
-	
-	public State(String goal) {
-		this(goal, null);
-	}
-	
-	public State(String goal, GameCharacter mainCharacter) {
-		this.goal = goal;
-		this.mainCharacter = mainCharacter;
-		timeInState = new MutableFloat();
-		currentState = this;
-	}
-	
-	/**
-	 * Sets the mainCharacter if it is not already set.
-	 * @param mainCharacter The main character for this state - the one who is in this state
-	 */
-	public final void setMainCharacter(GameCharacter mainCharacter) {
-		if (this.mainCharacter != null)
-			throw new RuntimeException("MainCharacter already exists for this state.");
-		if (mainCharacter == null)
-			throw new NullPointerException("You are not allowed to set the mainCharacter to be null.");
-		this.mainCharacter = mainCharacter;
-	}
-	
-	protected final GameCharacter getMainCharacter() {
-		return mainCharacter;
-	}
-	
-	/**
-	 * Called when we enter the state.  Will only be called again after leaveState is called
-	 */
-	public void enterState() {}
-	
-	/**
-	 * Called when we leave a state.
-	 */
-	public void leaveState() {}
-	
-	
-	/**
-	 * This is what will be called every frame update
-	 * It will call the child's update(float) method first.
-	 * Then call the doUpdateBeforeTransition(float) method
-	 * Then the transition() method
-	 * 		within the transition() method, the doTransition() method is called
-	 * 		The impl. of transition() guarantees doTransition will be called once per update()
-	 * Lastly, the doUpdateAfterTransition(float) method
-	 * 
-	 * update() and transition() are final.
-	 * Hooks provided are doUpdateBeforeTransition(), doTransition(), doUpdateAfterTransition()
-	 * @param deltaTime Time in seconds which have passed since last update
-	 */
-	public final void update(float deltaTime) {
-		//System.err.printf("goal:%s\n", getGoal());
-		calledTransition = false;
-		if (currentState != this)
-			currentState.update(deltaTime);
+	public State(HierarchicalState parent, GameCharacter character) {
+		this.parent = parent;
+		this.character = character;
+		transitions = null;
+		emptyActions = new ArrayList<Action>();
+		timeInState = new MutableFloat(0f);
 		
-		timeInState.incrementValue(deltaTime);
-		doUpdateBeforeTransition(deltaTime);
-		transition();
-		if (transitionResult) {
-			timeInState.setValue(0f);
+		stateName = this.getClass().getCanonicalName();
+		parentStates = null;
+		if (parent != null) {
+			parent.addChild(this);
 		}
-		doUpdateAfterTransition(deltaTime);
 	}
 	
-	public final boolean transition() {
-		if (calledTransition)
-			return transitionResult;
-		
-		calledTransition = true;
-		transitionResult = doTransition();
-		return transitionResult;
+	public void setName(String newName) {
+		stateName = newName;
 	}
 	
-	public abstract void doUpdateBeforeTransition(float deltaTime);
+	public ArrayList<State> getParentStates() {
+		if (parentStates != null)
+			return parentStates;
+		ArrayList<State> ret = new ArrayList<State>();
+		if (parent != null) {
+			ret = parent.getParentStates();
+		}
+		ret.add(this);
+		parentStates = ret;
+		return parentStates;
+	}
 	
-	public void doUpdateAfterTransition(float deltaTime) {}
+	/**
+	 * Gets the current state stack
+	 * @return This state has no children - it is a leaf.
+	 */
+	public ArrayList<State> getStates() {
+		ArrayList<State> list = new ArrayList<State>();
+		list.add(this);
+		return list;
+	}
 	
-	public boolean doTransition() {
-		// default implementation does nothing.
-		return false;
+	public final ArrayList<Action> getActions(float delta) {
+		timeInState.incrementValue(delta);
+		return doGetActions();
 	}
-	public BooleanTransition getBooleanTransition(String key, boolean target) {
-		throw new UnsupportedOperationException("getBooleanTransition function not supported.");
+	
+	public final ArrayList<Action> getEntryActions() {
+		return doGetEntryActions();
 	}
-	public IntTransition getIntTransition(String key, int target, Comparison type) {
-		throw new UnsupportedOperationException("getIntTransition function not supported.");
+	
+	public final ArrayList<Action> getExitActions() {
+		timeInState.setValue(0f);
+		return doGetExitActions();
 	}
-	public FloatTransition getFloatTransition(String key, float target, Comparison type) {
+	
+	protected ArrayList<Action> doGetEntryActions() {
+		return emptyActions;
+	}
+	
+	protected ArrayList<Action> doGetActions() {
+		return emptyActions;
+	}
+	
+	protected ArrayList<Action> doGetExitActions() {
+		return emptyActions;
+	}
+	
+	public void setTransitions(Transition ... transitions) {
+		if (this.transitions != null)
+			throw new RuntimeException("Cannot set the transitions more than once.");
+		if (transitions == null)
+			throw new NullPointerException("Cannot set the transition array to null.");
+		for (int i = 0; i < transitions.length; ++i) {
+			if (transitions[i] == null)
+				throw new NullPointerException("Cannot have a null transition: " + i + " " + transitions);
+		}
+		this.transitions = new Transition[transitions.length];
+		System.arraycopy(transitions, 0, this.transitions, 0, transitions.length);
+	}
+	
+	public Transition[] getTransitions() {
+		return transitions;
+	}
+	
+	public UpdateResult update(float delta) {
+		UpdateResult result = new UpdateResult();
+		result.actions = getActions(delta);
+		return result;
+	}
+	
+	public BooleanCondition getBooleanCondition(String key, boolean target) {
+		throw new UnsupportedOperationException("getBooleanCondition function not supported.");
+	}
+	
+	public IntCondition getIntCondition(String key, int target, Comparison type) {
+		throw new UnsupportedOperationException("getIntCondition function not supported.");
+	}
+	
+	public FloatCondition getFloatCondition(String key, float target, Comparison type) {
 		if (key.equals("timeInState")) {
-			return new FloatTransition(timeInState, target, type);
+			return new FloatCondition(timeInState, target, type);
 		}
-		throw new RuntimeException("Attempt to get FloatTransition from improper key: " + key);
+		throw new RuntimeException("Attempt to get FloatCondition from improper key: " + key);
 	}
 	
-	public final void setCurrentState(State nextState) {
-		currentState = nextState;
-	}
-	
-	public String getGoal() {
-		return goal;
+	public String toString() {
+		return stateName;
 	}
 }

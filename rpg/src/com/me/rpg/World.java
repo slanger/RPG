@@ -34,6 +34,12 @@ import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationSystem;
+import com.me.rpg.state.HierarchicalState;
+import com.me.rpg.state.MeleeFightState;
+import com.me.rpg.state.PatrolState;
+import com.me.rpg.state.transition.SeePeopleCondition;
+import com.me.rpg.state.transition.Transition;
+import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Timer;
@@ -204,7 +210,26 @@ public final class World implements Disposable
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
 		exampleMap.addCharacterToMap(npc1, 544, 544);
 		exampleMap.addCharacterToMap(npc2, 480, 128);
-
+		
+		// setup State
+		HierarchicalState parent = new HierarchicalState(null, npc1);
+		
+		Coordinate[] patrol = new Coordinate[] {new Coordinate(50,50), new Coordinate(400,50), new Coordinate(400,400), new Coordinate(50,400)};
+		PatrolState patrol0 = new PatrolState(parent, npc1, patrol);
+		
+		MeleeFightState fight0 = new MeleeFightState(parent, npc1);
+		
+		SeePeopleCondition canSee = new SeePeopleCondition(npc1, 0, Comparison.NOTEQUALS);
+		SeePeopleCondition cannotSee = new SeePeopleCondition(npc1, 0, Comparison.EQUALS);
+		
+		Transition patrolToFight = new Transition(fight0, canSee);
+		Transition fightToPatrol = new Transition(patrol0, cannotSee);
+		
+		patrol0.setTransitions(patrolToFight);
+		fight0.setTransitions(fightToPatrol);
+		parent.setInitialState(patrol0);
+		npc1.setStateMachine(parent);
+		
 		// setup weapons
 		genericWeaponSetup(player, npc1, exampleMap);
 	}
