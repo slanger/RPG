@@ -23,12 +23,7 @@ import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.characters.DeadCharacter;
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.combat.MeleeWeapon;
-import com.me.rpg.combat.Poison;
 import com.me.rpg.combat.Projectile;
-import com.me.rpg.combat.RangedWeapon;
-import com.me.rpg.combat.Shield;
-import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Timer;
@@ -197,39 +192,6 @@ public abstract class Map implements Disposable
 	{
 		MapLayer waypointsLayer = tiledMap.getLayers().get("Waypoints");
 		return waypointsLayer.getObjects();
-	}
-
-	protected void genericWeaponSetup(GameCharacter character, GameCharacter npc)
-	{
-		int width = 32;
-		int height = 32;
-
-		// melee attack test stuff
-		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
-		Weapon sword = new MeleeWeapon("LameSword");
-		Weapon sword2 = new MeleeWeapon("Sword2");
-		sword2.initSprite(swordSprite, width, height, 32, 32);
-		sword.initSprite(swordSprite, width, height, 32, 32);
-		StatusEffect poison = new Poison(50, 3, 2f);
-		sword.addEffect(poison);
-		sword2.addEffect(poison);
-
-		character.equip(this, sword);
-		character.swapWeapon(this);
-		npc.equip(this, sword2);
-
-		// ranged attack test stuff
-		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
-		RangedWeapon bow = new RangedWeapon("LameBow");
-		bow.initSprite(bowSprite, width, height, 32, 32);
-
-		character.equip(this, bow);
-		Projectile arrow = new Projectile("arrow", bowSprite, width, height,
-				32, 32);
-		bow.equipProjectile(arrow, 1000);
-
-		Shield shield = new Shield("plain shield");
-		npc.equipShield(shield);
 	}
 
 	private void cameraPanMovement()
