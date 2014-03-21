@@ -195,9 +195,6 @@ public class PlayableCharacter extends GameCharacter
 		 */
 	}
 
-<<<<<<< HEAD
-=======
-	
 	public void handleDialogueInput()
 	{
 		if (!enableControls)
@@ -271,18 +268,7 @@ public class PlayableCharacter extends GameCharacter
 		
 	}
 	
-	private void doGoodAction()
-	{
-		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox,
-				this);
-		if (c != null)
-		{
-			c.acceptGoodAction(this);
-		}
-	}
 
->>>>>>> origin/dialogue
 	private void doPush()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
