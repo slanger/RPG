@@ -516,8 +516,8 @@ public abstract class Map implements Disposable
 		boolean canMove = checkCollisionWithObjects(boundingBox);
 		if (!canMove)
 		{
-			canMoveInXDirection = checkCollisionWithObjects(boundingBoxWithNewX);
-			canMoveInYDirection = checkCollisionWithObjects(boundingBoxWithNewY);
+			canMoveInXDirection &= checkCollisionWithObjects(boundingBoxWithNewX);
+			canMoveInYDirection &= checkCollisionWithObjects(boundingBoxWithNewY);
 		}
 
 		// collision detection with characters
@@ -526,9 +526,9 @@ public abstract class Map implements Disposable
 		if (c != null)
 		{
 			c = checkCollisionWithCharacters(boundingBoxWithNewX, thisCharacter);
-			canMoveInXDirection = (c == null);
+			canMoveInXDirection &= (c == null);
 			c = checkCollisionWithCharacters(boundingBoxWithNewY, thisCharacter);
-			canMoveInYDirection = (c == null);
+			canMoveInYDirection &= (c == null);
 		}
 
 		if (!canMoveInXDirection)

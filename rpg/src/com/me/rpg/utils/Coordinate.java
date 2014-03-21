@@ -1,5 +1,6 @@
 package com.me.rpg.utils;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Coordinate
@@ -73,6 +74,10 @@ public class Coordinate
 	
 	public float distance2(Coordinate target) {
 		return (x-target.x)*(x-target.x) + (y-target.y)*(y-target.y);
+	}
+	
+	public Rectangle getCenteredRectangle(float width, float height) {
+		return new Rectangle(x - width/2.0f, y - width/2.0f, width, height);
 	}
 
 }

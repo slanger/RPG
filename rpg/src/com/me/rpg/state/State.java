@@ -15,6 +15,7 @@ public abstract class State {
 	
 	protected HierarchicalState parent;
 	protected Transition[] transitions;
+	protected boolean setTransitions;
 	protected GameCharacter character;
 	
 	private ArrayList<Action> emptyActions;
@@ -28,6 +29,8 @@ public abstract class State {
 		transitions = null;
 		emptyActions = new ArrayList<Action>();
 		timeInState = new MutableFloat(0f);
+		transitions = new Transition[0];
+		setTransitions = false;
 		
 		stateName = this.getClass().getCanonicalName();
 		parentStates = null;
@@ -45,7 +48,7 @@ public abstract class State {
 			return parentStates;
 		ArrayList<State> ret = new ArrayList<State>();
 		if (parent != null) {
-			ret = parent.getParentStates();
+			ret.addAll(parent.getParentStates());
 		}
 		ret.add(this);
 		parentStates = ret;
@@ -89,7 +92,7 @@ public abstract class State {
 	}
 	
 	public void setTransitions(Transition ... transitions) {
-		if (this.transitions != null)
+		if (setTransitions)
 			throw new RuntimeException("Cannot set the transitions more than once.");
 		if (transitions == null)
 			throw new NullPointerException("Cannot set the transition array to null.");
@@ -98,6 +101,7 @@ public abstract class State {
 				throw new NullPointerException("Cannot have a null transition: " + i + " " + transitions);
 		}
 		this.transitions = new Transition[transitions.length];
+		setTransitions = true;
 		System.arraycopy(transitions, 0, this.transitions, 0, transitions.length);
 	}
 	
@@ -108,8 +112,12 @@ public abstract class State {
 	public UpdateResult update(float delta) {
 		UpdateResult result = new UpdateResult();
 		result.actions = getActions(delta);
+		doUpdate(delta);
 		return result;
 	}
+	
+	// Can override in subclasses for delta details
+	protected void doUpdate(float delta) {}
 	
 	public BooleanCondition getBooleanCondition(String key, boolean target) {
 		throw new UnsupportedOperationException("getBooleanCondition function not supported.");

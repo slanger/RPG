@@ -34,9 +34,16 @@ import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationSystem;
+import com.me.rpg.state.CustomState;
 import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
+import com.me.rpg.state.RandomWalkState;
+import com.me.rpg.state.RunAwayState;
+import com.me.rpg.state.action.RandomWalkAction;
+import com.me.rpg.state.action.WalkAction;
+import com.me.rpg.state.transition.AndCondition;
+import com.me.rpg.state.transition.Condition;
 import com.me.rpg.state.transition.SeePeopleCondition;
 import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
@@ -199,12 +206,12 @@ public final class World implements Disposable
 		RectangleMapObject boundary1 = (RectangleMapObject) exampleWalkingBoundaries
 				.get(NPC1_NAME);
 		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height,
-				16, 16, 0.15f, boundary1.getRectangle());
+				16, 16, 0.15f);
 
 		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries
 				.get(NPC2_NAME);
 		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height,
-				16, 16, 0.15f, boundary2.getRectangle());
+				16, 16, 0.15f);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
@@ -230,6 +237,41 @@ public final class World implements Disposable
 		parent.setInitialState(patrol0);
 		npc1.setStateMachine(parent);
 		
+		// StateMachine for npc2
+		parent = new HierarchicalState(null, npc2);
+		HierarchicalState subparent = new HierarchicalState(parent, npc2);
+		subparent.setName("subParent");
+		CustomState notAtCen = new CustomState(subparent, npc2);
+		notAtCen.setName("notAtCen");
+		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2, boundary2.getRectangle());
+		randomWalkState.setName("randomWalk");
+		RunAwayState runaway = new RunAwayState(parent, npc2);
+		runaway.setName("runaway");
+		
+		subparent.setInitialState(notAtCen);
+		parent.setInitialState(subparent);
+		
+		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500,100));
+		notAtCen.setActions(walkAction0);
+		//RandomWalkAction randomWalkAction0= new RandomWalkAction(npc2, boundary2.getRectangle());
+		//randomWalkState.setActions(randomWalkAction0);
+		
+		Condition timed = notAtCen.getFloatCondition("timeInState", 5f, Comparison.GREATER);
+		Transition notCenToRandom = new Transition(randomWalkState, timed);
+		
+		canSee = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
+		cannotSee = new SeePeopleCondition(npc2, 0, Comparison.EQUALS);
+		
+		Condition timer = runaway.getFloatCondition("timeInState", 5f, Comparison.GREATER);
+		Condition and = new AndCondition(cannotSee, timer);
+		Transition subStateToRun = new Transition(runaway, canSee);
+		Transition runToNotAtCen = new Transition(notAtCen, and);
+		
+		randomWalkState.setTransitions(subStateToRun);
+		notAtCen.setTransitions(notCenToRandom, subStateToRun);
+		runaway.setTransitions(runToNotAtCen);
+		
+		npc2.setStateMachine(parent);
 		// setup weapons
 		genericWeaponSetup(player, npc1, exampleMap);
 	}

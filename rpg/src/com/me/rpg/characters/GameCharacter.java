@@ -14,8 +14,6 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
-import com.me.rpg.ai.StandStillAI;
-import com.me.rpg.ai.WalkAI;
 import com.me.rpg.combat.IAttackable;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.Shield;
@@ -43,7 +41,6 @@ public abstract class GameCharacter implements IAttackable
 	private float stateTime = 0f;
 	private float speed = 100f;
 
-	protected WalkAI walkAI;
 	protected Map currentMap = null;
 
 	// Combat stuff
@@ -94,8 +91,6 @@ public abstract class GameCharacter implements IAttackable
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
 		sprite.setRegion(downIdle);
-		// default walk AI
-		walkAI = new StandStillAI();
 
 		inflictedEffects = new LinkedList<StatusEffect>();
 		immunityHash = new HashMap<StatusEffect, Float>();
@@ -312,16 +307,6 @@ public abstract class GameCharacter implements IAttackable
 		sprite.setPosition(x, y);
 	}
 
-	public WalkAI getWalkAI()
-	{
-		return walkAI;
-	}
-
-	public void setWalkAI(WalkAI walkAI)
-	{
-		this.walkAI = walkAI;
-	}
-
 	public Map getCurrentMap()
 	{
 		return currentMap;
@@ -440,16 +425,12 @@ public abstract class GameCharacter implements IAttackable
 	public void addedToMap(Map map)
 	{
 		currentMap = map;
-		walkAI.start();
 	}
 
 	public void removedFromMap(Map map)
 	{
-		walkAI.stop();
 		currentMap = null;
 	}
-
-	public abstract void acceptGoodAction(GameCharacter characterDoingAction);
 
 	public void acceptPush(GameCharacter pushingCharacter)
 	{
@@ -469,56 +450,6 @@ public abstract class GameCharacter implements IAttackable
 		}
 	}
 	
-	/**
-	 * Will update the location and direction based on moving directly toward the goal
-	 * Won't avoid obstacles
-	 * @param target Target location
-	 * @param deltaTime Time in seconds of movement
-	 */
-	public void basicMoveToward(Coordinate target, float deltaTime) {
-		Coordinate center = getCenter();
-		float diffx = target.getX() - center.getX();
-		float diffy = target.getY() - center.getY();
-		float dist = diffx*diffx + diffy*diffy;
-		float travelDist = deltaTime*getSpeed() * deltaTime*getSpeed();
-		if (travelDist > dist) {
-			setCenter(target);
-			return;
-		}
-		float diffh = (float)Math.sqrt(diffx*diffx + diffy*diffy);
-		float xDist = (float)(deltaTime*getSpeed()*diffx/diffh);
-		float yDist = (float)(deltaTime*getSpeed()*diffy/diffh);
-		center.setX(center.getX() + xDist);
-		center.setY(center.getY() + yDist);
-		Direction movement;// = Direction.getDirectionByDiff((int)Math.signum(diffx), (int)Math.signum(diffy));
-		if (Math.abs(yDist) >= Math.abs(xDist))
-		{
-			if (yDist > 0)
-			{
-				movement = Direction.UP;
-			}
-			else
-			{
-				movement = Direction.DOWN;
-			}
-		}
-		else
-		{
-			if (xDist >= 0)
-			{
-				movement = Direction.RIGHT;
-			}
-			else
-			{
-				movement = Direction.LEFT;
-			}
-		}
-		setMoving(true);
-		setMoveDirection(movement);
-		getCurrentMap().checkCollision(center.getX()-16, center.getY()-16, getCenter().getX()-16, getCenter().getY()-16, this, center);
-		setBottomLeftCorner(center);
-	}
-
 	protected Rectangle getHitboxInFrontOfCharacter()
 	{
 		float width = getSpriteWidth();
@@ -651,8 +582,6 @@ public abstract class GameCharacter implements IAttackable
 	{
 		return false;
 	}
-
-	public abstract void doneFollowingPath();
 
 	/**
 	 * May be useful with debugging. Likely will be out of date if Character

@@ -33,7 +33,6 @@ public class PatrolState extends State {
 		// find closest patrol location.
 		float min = Float.MAX_VALUE;
 		Coordinate center = character.getCenter();
-		int oldIdx = idx;
 		for (int i = 0; i < patrol.length; ++i) {
 			float dist2 = center.distance2(patrol[i]);
 			if (dist2 < min) {

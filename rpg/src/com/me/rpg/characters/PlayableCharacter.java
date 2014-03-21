@@ -19,7 +19,6 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableAttack = true;
 	private boolean enableWeaponSwitch = true;
 	private boolean enableStyleSwitch = true;
-	private boolean enableGoodAction = true;
 	private boolean enableControls = true;
 	private boolean enablePushing = true;
 
@@ -28,6 +27,8 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableInputUp = true;
 	private boolean enableInputDown = true;
 	//end dialogue keys
+	
+	private PlayerControlledWalkAI walkAI;
 	
 	public boolean getEnableControls()
 	{
@@ -45,7 +46,7 @@ public class PlayableCharacter extends GameCharacter
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
 				animationDuration);
 		npcMemory = null;
-		setWalkAI(new PlayerControlledWalkAI(this));
+		walkAI = new PlayerControlledWalkAI(this);
 		// redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH,
 		// Texture.class);
 	}
@@ -157,25 +158,6 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * END MOVEMENT
 		 */
-
-		/*
-		 * ACTIONS
-		 */
-
-		// do good action
-		if (Gdx.input.isKeyPressed(Keys.A))
-		{
-			if (enableGoodAction)
-			{
-				enableGoodAction = false;
-				doGoodAction();
-			}
-		}
-		else
-		{
-			enableGoodAction = true;
-		}
-
 		// push a character
 		if (Gdx.input.isKeyPressed(Keys.S))
 		{
@@ -246,17 +228,6 @@ public class PlayableCharacter extends GameCharacter
 		 */
 	}
 
-	private void doGoodAction()
-	{
-		Rectangle hitbox = getHitboxInFrontOfCharacter();
-		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox,
-				this);
-		if (c != null)
-		{
-			c.acceptGoodAction(this);
-		}
-	}
-
 	private void doPush()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
@@ -283,11 +254,6 @@ public class PlayableCharacter extends GameCharacter
 			}
 		}
 	}
-	
-	private void finishDialogue()
-	{
-		
-	}
 
 	@Override
 	public boolean isGameOver()
@@ -298,18 +264,6 @@ public class PlayableCharacter extends GameCharacter
 	private void advanceDialogue(String key)
 	{
 		//getCurrentMap().getWorld().getDialogue().advanceDialogue(key);
-	}
-
-	@Override
-	public void acceptGoodAction(GameCharacter characterDoingAction)
-	{
-		return; // do nothing
-	}
-
-	@Override
-	public void doneFollowingPath()
-	{
-		return; // do nothing
 	}
 
 }
