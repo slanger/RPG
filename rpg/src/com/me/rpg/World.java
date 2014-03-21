@@ -140,7 +140,7 @@ public final class World implements Disposable
 		this.camera = camera;
 
 		// create map
-		dialogue = new Dialogue(batch, camera);
+		dialogue = new Dialogue();
 		reputationSystem = new ReputationSystem(this);
 
 		map = new ExampleMap(this, batch, camera);
@@ -166,7 +166,7 @@ public final class World implements Disposable
 		// temporary dialogue stuff
 		if (dialogue.getInDialogue())
 		{
-			dialogue.render();
+			dialogue.render(batch, camera, shapeRenderer);
 		}
 		// end dialogue stuff
 

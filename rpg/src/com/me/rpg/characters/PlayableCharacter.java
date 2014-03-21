@@ -275,7 +275,7 @@ public class PlayableCharacter extends GameCharacter
 			c.setMoving(false);
 			Dialogue dialogue = currentMap.getWorld().getDialogue();
 			dialogue.setInDialogue(true);
-			dialogue.update(c);
+			//dialogue.update(c);
 		}
 	}
 
@@ -287,7 +287,7 @@ public class PlayableCharacter extends GameCharacter
 
 	private void advanceDialogue(String key)
 	{
-		getCurrentMap().getWorld().getDialogue().advanceDialogue(key);
+		//getCurrentMap().getWorld().getDialogue().advanceDialogue(key);
 	}
 
 	@Override

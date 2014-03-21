@@ -1,9 +1,35 @@
 package com.me.rpg.ai;
 
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.me.rpg.ScreenHandler;
 import com.me.rpg.characters.GameCharacter;
+import com.me.rpg.utils.Direction;
 
 public class Dialogue
 {
@@ -12,30 +38,22 @@ public class Dialogue
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 
-	// Planning on converting this array system to a tree implementation soon
-	private int playerResponsePosition[]; // index locations that require
-											// response will have int > 0. The
-											// int is how many choices
-	private String dialogueArray[]; // this array will store
-	private int currentIndex;
-	private int lastIndex;
-	private String currentText; // the dialogue at the position in the arrays
-	//private int numOptions; // the number of options for response.
-	private boolean requireResponse = false; // does the player have to select an
-												// option
 	private boolean inDialogue;
+	
+	
+	//new stuff
+	private Stage stage;
+	private Table table;
+	private SpriteBatch spriteBatch;
+	private BitmapFont white;
+	private Label heading;
+	private ShapeRenderer shapeRenderer;
+	
+	//end new stuff
 
-	public Dialogue(SpriteBatch batch, OrthographicCamera camera)
+	public Dialogue()
 	{
-		this.batch = batch;
-		this.camera = camera;
 
-		currentText = "";
-		playerResponsePosition = new int[100];
-		dialogueArray = new String[100];
-
-		dialogueFont = new BitmapFont();
-		dialogueFont.setColor(1.0f, 1.0f, 1.0f, 1f); // white
 	}
 
 	public void setInDialogue(boolean inDialogue)
@@ -48,131 +66,141 @@ public class Dialogue
 		return inDialogue;
 	}
 
-	public int getNumResponseOptions()
+////	public void advanceDialogue(String key)
+//	{
+//		int temp2;
+//		if (currentIndex < 0)
+//			currentIndex = 0;
+//		if (currentIndex < lastIndex)
+//		{
+//			currentText = dialogueArray[currentIndex];
+//			int temp = playerResponsePosition[currentIndex];
+//			if (temp != 0)
+//				requireResponse = true;
+//			if (requireResponse == true)
+//			{
+//				if (key == "NUM_1" && temp > 0)
+//				{
+//					requireResponse = false;
+//					currentIndex += 1;
+//				}
+//				else if (key == "NUM_2" && temp > 1)
+//				{
+//					requireResponse = false;
+//					currentIndex += 2;
+//				}
+//				else if (key == "NUM_3" && temp > 2)
+//				{
+//					requireResponse = false;
+//					currentIndex += 3;
+//				}
+//				else
+//				{
+//					// index stays same until response
+//				}
+//			}
+//			else
+//			{
+//				if (key == "E")
+//					currentIndex++;
+//				else
+//				{
+//					// index stays same until E hit.
+//				}
+//			}
+//			if (currentIndex + 1 > lastIndex)
+//			{
+//				temp2 = 0;
+//			}
+//			else
+//			{
+//				temp2 = playerResponsePosition[currentIndex + 1];
+//			}
+//			if (temp2 != 0)
+//			{ // request player response
+//				requireResponse = true;
+//			}
+//
+//		}
+//		else
+//		{
+//			System.out.println(lastIndex);
+//			requireResponse = false;
+//			currentText = "";
+//			inDialogue = false;
+//		}
+//	}
+
+	public void render(SpriteBatch batch, OrthographicCamera camera, ShapeRenderer shapeRenderer)
 	{
-		return playerResponsePosition[currentIndex];
+		this.batch = batch;
+		this.camera = camera;
+		this.shapeRenderer = shapeRenderer;
+		
+		//stage = new Stage();
+		
+		float desiredX = (camera.viewportWidth * 0.1f);
+		float desiredY = (camera.viewportHeight * 0.9f);
+		
+		
+		
+		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2 + desiredX;
+		float dialoguePositionY = camera.position.y + camera.viewportHeight / 2 - desiredY;
+		
+		System.out.println(dialoguePositionX);
+		System.out.println(dialoguePositionY);
+		
+		
+		float dialogueWidth = (camera.viewportWidth - 2*desiredX);
+		//float dialogueHeight = (camera.viewportHeight - 8*desiredX);;
+		float dialogueHeight = 250.0f;
+		
+		Texture texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
+
+		table = new Table();
+
+		dialogueFont = new BitmapFont();
+		
+		LabelStyle style = new LabelStyle(dialogueFont, Color.WHITE);
+		LabelStyle selectedStyle = new LabelStyle(dialogueFont, Color.BLUE);
+		LabelStyle separatorStyle = new LabelStyle(dialogueFont, Color.GRAY );
+		
+//---------------------------------------------------------------------------------	
+		Label objectName = new Label("John" , style);
+		Label npcStatement1 = new Label("NPC statement ------ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd---", style);
+		Label npcStatement2 = new Label("NPC statement---------", selectedStyle);
+		Label separator = new Label("------------------------------------------------------------------"
+				+ "------------------------------------------------", separatorStyle);
+//---------------------------------------------------------------------------------
+		Label response1 = new Label("Response1 -------------- ", style);
+		Label response2 = new Label("Response2 ----------------", style);
+		Label response3 = new Label("Response2 ---------------", style);
+		
+		npcStatement1.setWrap(true);
+		
+	    Table table = new Table();
+	    table.setBounds(dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
+	    
+	    table.add(objectName).width(dialogueWidth*0.9f);
+	    table.row();
+	    table.add(npcStatement1).width(dialogueWidth*0.9f);
+	    table.row();
+	    table.add(separator).width(dialogueWidth);;
+	    table.row();
+	    table.add(response1).width(dialogueWidth*0.9f);;
+	    table.row();
+	    table.add(response2).width(dialogueWidth*0.9f);;
+	    table.row();
+	    table.add(response3).width(dialogueWidth*0.9f);;
+	    table.row();
+	    
+	    table.debug();
+		//stage.addActor(table);
+		
+	 	batch.draw(texture, dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
+	
+		table.draw(batch, 1.0f);
+		//Table.drawDebug(stage);
 	}
-
-	public boolean getRequireResponse()
-	{
-		return requireResponse;
-	}
-
-	public void update(GameCharacter character)
-	{
-		currentIndex = -1;
-		System.out.println(character.getName());
-
-		switch (character.getName())
-		{
-		case "NPC1":
-			dialogueArray[0] = "Hi, im npc1!";
-			playerResponsePosition[0] = 0;
-			dialogueArray[1] = "Anyway, nice to meet you!";
-			playerResponsePosition[1] = 0;
-			dialogueArray[2] = "";
-			playerResponsePosition[2] = 0;
-			lastIndex = 2;
-			break;
-		case "NPC2":
-			dialogueArray[0] = "What weapon do you like to use?";
-			playerResponsePosition[0] = 0;
-			dialogueArray[1] = "1. Sword    2. Bow    3. Axe";
-			playerResponsePosition[1] = 3;
-			dialogueArray[2] = "I like swords too";
-			playerResponsePosition[2] = 0;
-			dialogueArray[3] = "You must be a nice archer then";
-			playerResponsePosition[3] = 0;
-			dialogueArray[4] = "Never liked axes much";
-			playerResponsePosition[4] = 0;
-			dialogueArray[5] = "";
-			playerResponsePosition[5] = 0;
-			lastIndex = 5;
-			break;
-		case "NPC3":
-			dialogueArray[0] = "Go away";
-			playerResponsePosition[0] = 0;
-			dialogueArray[1] = "";
-			playerResponsePosition[1] = 0;
-			lastIndex = 1;
-			break;
-		default:
-			break;
-		}
-
-	}
-
-	public void advanceDialogue(String key)
-	{
-		int temp2;
-		if (currentIndex < 0)
-			currentIndex = 0;
-		if (currentIndex < lastIndex)
-		{
-			currentText = dialogueArray[currentIndex];
-			int temp = playerResponsePosition[currentIndex];
-			if (temp != 0)
-				requireResponse = true;
-			if (requireResponse == true)
-			{
-				if (key == "NUM_1" && temp > 0)
-				{
-					requireResponse = false;
-					currentIndex += 1;
-				}
-				else if (key == "NUM_2" && temp > 1)
-				{
-					requireResponse = false;
-					currentIndex += 2;
-				}
-				else if (key == "NUM_3" && temp > 2)
-				{
-					requireResponse = false;
-					currentIndex += 3;
-				}
-				else
-				{
-					// index stays same until response
-				}
-			}
-			else
-			{
-				if (key == "E")
-					currentIndex++;
-				else
-				{
-					// index stays same until E hit.
-				}
-			}
-			if (currentIndex + 1 > lastIndex)
-			{
-				temp2 = 0;
-			}
-			else
-			{
-				temp2 = playerResponsePosition[currentIndex + 1];
-			}
-			if (temp2 != 0)
-			{ // request player response
-				requireResponse = true;
-			}
-
-		}
-		else
-		{
-			System.out.println(lastIndex);
-			requireResponse = false;
-			currentText = "";
-			inDialogue = false;
-		}
-	}
-
-	public void render()
-	{
-		float dialogueTextX = camera.position.x - camera.viewportWidth / 2 + 30;
-		float dialogueTextY = camera.position.y + camera.viewportHeight / 2
-				- 350;
-		dialogueFont.draw(batch, currentText, dialogueTextX, dialogueTextY);
-	}
-
+	
 }
