@@ -1,31 +1,34 @@
 package com.me.rpg;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ScreenHandler extends Game
 {
 
-	private SpriteBatch spriteBatch;
-	public RPG rpgScreen;
 	public StartScreen startScreen;
+	public RPG rpgScreen;
 	public GameOverScreen endScreen;
 
 	@Override
 	public void create()
 	{
 		Texture.setEnforcePotImages(false);
-		spriteBatch = new SpriteBatch();
-		startScreen = new StartScreen(this, spriteBatch);
+		startScreen = new StartScreen(this);
 		rpgScreen = new RPG(this);
-		endScreen = new GameOverScreen(this, spriteBatch);
+		endScreen = new GameOverScreen(this);
 		setScreen(startScreen);
 	}
 
 	public ScreenHandler()
 	{
 
+	}
+
+	public void moveToOtherScreen(Screen otherScreen)
+	{
+		setScreen(otherScreen);
 	}
 
 	@Override

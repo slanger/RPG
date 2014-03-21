@@ -27,7 +27,7 @@ public class StartScreen implements Screen, InputProcessor
 	private TextureAtlas atlas;
 	private Table table;
 	private ScreenHandler screenHandler;
-	private SpriteBatch spriteBatch;
+	private SpriteBatch spriteBatch = new SpriteBatch();
 	private Texture mainScreenTexture;
 	private int width, height;
 	private TextButton buttonPlay, buttonSettings;
@@ -35,10 +35,9 @@ public class StartScreen implements Screen, InputProcessor
 	private Label heading;
 
 	// CONSTRUCTOR
-	public StartScreen(ScreenHandler screenHandler, SpriteBatch spriteBatch)
+	public StartScreen(ScreenHandler screenHandler)
 	{
 		this.screenHandler = screenHandler;
-		this.spriteBatch = spriteBatch;
 	}
 
 	@Override
@@ -92,7 +91,7 @@ public class StartScreen implements Screen, InputProcessor
 			public void touchUp(InputEvent event, float x, float y,
 					int pointer, int button)
 			{
-				screenHandler.setScreen(screenHandler.rpgScreen);
+				screenHandler.moveToOtherScreen(screenHandler.rpgScreen);
 			}
 		});
 
@@ -110,7 +109,7 @@ public class StartScreen implements Screen, InputProcessor
 			public void touchUp(InputEvent event, float x, float y,
 					int pointer, int button)
 			{
-				screenHandler.setScreen(screenHandler.rpgScreen);
+				screenHandler.moveToOtherScreen(screenHandler.rpgScreen);
 			}
 		});
 
@@ -126,7 +125,7 @@ public class StartScreen implements Screen, InputProcessor
 				if (keycode == Keys.ENTER)
 				{
 					stage.removeListener(this);
-					screenHandler.setScreen(screenHandler.rpgScreen);
+					screenHandler.moveToOtherScreen(screenHandler.rpgScreen);
 				}
 				return true;
 			}
@@ -172,7 +171,7 @@ public class StartScreen implements Screen, InputProcessor
 	@Override
 	public void hide()
 	{
-		dispose();
+		// TODO Auto-generated method stub
 
 	}
 
@@ -193,8 +192,12 @@ public class StartScreen implements Screen, InputProcessor
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
-
+		stage.dispose();
+		skin.dispose();
+		atlas.dispose();
+		spriteBatch.dispose();
+		mainScreenTexture.dispose();
+		white.dispose();
 	}
 
 	@Override

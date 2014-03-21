@@ -32,8 +32,6 @@ public class RPG implements Screen
 
 	public final ScreenHandler screenHandler;
 
-	private World world;
-
 	private LoadBar loadBar;
 	private BitmapFont font;
 
@@ -82,26 +80,22 @@ public class RPG implements Screen
 			return;
 		}
 
-		if (world == null)
-		{
-			world = World.getInstance();
-		}
-
 		// update before render
 		update();
 
 		// render World
-		world.render();
+		World.getInstance().render();
 	}
 
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		camera.update();
+		World world = World.getInstance();
 		world.update(deltaTime);
 		if (world.isGameOver())
 		{
-			screenHandler.setScreen(screenHandler.endScreen);
+			screenHandler.moveToOtherScreen(screenHandler.endScreen);
 		}
 	}
 
@@ -182,8 +176,7 @@ public class RPG implements Screen
 	@Override
 	public void hide()
 	{
-		// TODO Auto-generated method stub
-
+		World.clearInstance();
 	}
 
 }

@@ -201,8 +201,8 @@ public final class World implements Disposable
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
-		exampleMap.addCharacterToMap(npc1, 480, 128);
-		exampleMap.addCharacterToMap(npc2, 544, 544);
+		exampleMap.addCharacterToMap(npc1, 544, 544);
+		exampleMap.addCharacterToMap(npc2, 480, 128);
 
 		// setup weapons
 		genericWeaponSetup(player, npc1, exampleMap);
