@@ -38,7 +38,7 @@ public class GameOverScreen implements Screen
 		spriteBatch.begin();
 
 		// render HUD and overlays
-		debugFont.draw(spriteBatch, "THE END", 150, 250);
+		debugFont.draw(spriteBatch, "GAME OVER", 150, 250);
 
 		spriteBatch.end();
 	}

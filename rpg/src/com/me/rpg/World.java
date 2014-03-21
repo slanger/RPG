@@ -101,6 +101,11 @@ public final class World implements Disposable
 		this.isGameOver = isGameOver;
 	}
 
+	public void setUpdateEnable(boolean updateEnable)
+	{
+		this.updateEnable = updateEnable;
+	}
+
 	public World(SpriteBatch batch, ShapeRenderer shapeRenderer,
 			OrthographicCamera camera)
 	{
