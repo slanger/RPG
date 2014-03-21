@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.MapType;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
@@ -98,16 +99,19 @@ public class PlayerControlledWalkAI implements WalkAI
 				// check warp point collision
 				x = newCoordinate.getX();
 				y = newCoordinate.getY();
-				Map newMap = currentMap.checkCollisionWithWarpPoints(new Rectangle(
-						x, y, spriteWidth, spriteHeight));
-				if (newMap != null)
+				Coordinate warpCoordinate = new Coordinate();
+				MapType newMapType = currentMap.checkCollisionWithWarpPoints(new Rectangle(
+						x, y, spriteWidth, spriteHeight), warpCoordinate);
+				if (newMapType != null)
 				{
-					currentMap.getWorld().warpToAnotherMap(newMap);
+					// currentMap.getWorld().warpPlayerToAnotherMap(newMapType, warpCoordinate);
+					currentMap.getWorld().movePlayerToAnotherMap(newMapType, warpCoordinate);
 				}
 			}
 		}
 		character.setMoving(moving);
-		if (ret != null) {
+		if (ret != null)
+		{
 			character.setMoveDirection(ret);
 		}
 		character.setBottomLeftCorner(newCoordinate);

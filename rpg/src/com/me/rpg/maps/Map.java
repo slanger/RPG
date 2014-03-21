@@ -62,7 +62,6 @@ public abstract class Map implements Disposable
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
-	private boolean gameOver = false;
 
 	protected Timer timer;
 
@@ -108,16 +107,6 @@ public abstract class Map implements Disposable
 	public Timer getTimer()
 	{
 		return timer;
-	}
-
-	public boolean isGameOver()
-	{
-		return gameOver;
-	}
-
-	public void setGameOver()
-	{
-		gameOver = true;
 	}
 
 	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
@@ -175,7 +164,7 @@ public abstract class Map implements Disposable
 		return spawnLayer.getObjects();
 	}
 
-	protected MapObjects getWalkingBoundaries()
+	public MapObjects getWalkingBoundaries()
 	{
 		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get(
 				"WalkingBoundaries");
@@ -440,8 +429,7 @@ public abstract class Map implements Disposable
 			deadChar.update(deltaTime);
 			if (deadChar.isGameOver())
 			{
-				// TODO: fix this awful code
-				setGameOver();
+				world.setGameOver(true);
 			}
 		}
 
@@ -644,10 +632,10 @@ public abstract class Map implements Disposable
 
 	/**
 	 * A collision check that only checks warp points. Returns a reference to a
-	 * Map object if the input hitbox collides with a warp point. Returns null
+	 * MapType object if the input hitbox collides with a warp point. Returns null
 	 * otherwise.
 	 */
-	public Map checkCollisionWithWarpPoints(Rectangle hitbox)
+	public MapType checkCollisionWithWarpPoints(Rectangle hitbox, Coordinate warpCoordinate)
 	{
 		Vector2 centerPoint = hitbox.getCenter(new Vector2());
 		for (RectangleMapObject warpPoint : warpPoints)
@@ -655,26 +643,20 @@ public abstract class Map implements Disposable
 			if (warpPoint.getRectangle().contains(centerPoint))
 			{
 				String newMapString = warpPoint.getName();
-				return getMap(MapType.getMapType(newMapString));
+				Coordinate c = getWarpCoordinate(warpPoint);
+				warpCoordinate.setX(c.getX());
+				warpCoordinate.setY(c.getY());
+				return MapType.getMapType(newMapString);
 			}
 		}
 		return null;
 	}
 
-	public Map getMap(MapType mapType)
+	private Coordinate getWarpCoordinate(RectangleMapObject warpPoint)
 	{
-		switch (mapType)
-		{
-		case EXAMPLE:
-			return new ExampleMap(world, batch, camera);
-		case PROTOTYPE:
-			return new PrototypeMap(world, batch, camera);
-		case WEST_TOWN:
-			return new WestTownMap(world, batch, camera);
-		case WEST_TOWN_INSIDE_HOUSE:
-			return new WestTownInsideHouse(world, batch, camera);
-		}
-		throw new RuntimeException("Cannot get Map from the given MapType");
+		float warpX = Float.parseFloat(warpPoint.getProperties().get("x", String.class));
+		float warpY = Float.parseFloat(warpPoint.getProperties().get("y", String.class));
+		return new Coordinate(warpX, warpY);
 	}
 
 	/*

@@ -34,6 +34,7 @@ import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationSystem;
+import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Timer;
 
@@ -42,6 +43,10 @@ public final class World implements Disposable
 
 	public static final String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
 	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
+	public static final String PLAYER_TEXTURE_PATH = "hero.png";
+	public static final String NPC_TEXTURE_PATH = "villain.png";
+	public static final String SWORD_PATH = "sword.png";
+	public static final String ARROW_PATH = "arrow.png";
 
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
@@ -50,8 +55,9 @@ public final class World implements Disposable
 	private List<Map> maps;
 	private Map currentMap;
 
-	private List<GameCharacter> characters;
 	private PlayableCharacter player;
+
+	private Timer timer = new Timer();
 
 	private Dialogue dialogue;
 	private ReputationSystem reputationSystem;
@@ -61,9 +67,8 @@ public final class World implements Disposable
 	private Sound warpSound;
 	private Sprite whiteScreen;
 
-	private Timer timer = new Timer();
-
-	public boolean isGameOver = false;
+	private boolean isGameOver = false;
+	private boolean movingToAnotherMap = false;
 
 	public Dialogue getDialogue()
 	{
@@ -83,6 +88,16 @@ public final class World implements Disposable
 	private void setCurrentMap(Map currentMap)
 	{
 		this.currentMap = currentMap;
+	}
+
+	public boolean isGameOver()
+	{
+		return isGameOver;
+	}
+
+	public void setGameOver(boolean isGameOver)
+	{
+		this.isGameOver = isGameOver;
 	}
 
 	public World(SpriteBatch batch, ShapeRenderer shapeRenderer,
@@ -118,8 +133,6 @@ public final class World implements Disposable
 
 		// CHARACTER SETUP
 
-		characters = new ArrayList<GameCharacter>();
-
 		NonplayableCharacter npc1;
 		NonplayableCharacter npc2;
 		final String PLAYER_NAME = "Player";
@@ -128,47 +141,41 @@ public final class World implements Disposable
 		final int width = 28;
 		final int height = 28;
 
-		// get spawn points and walking boundaries from .tmx
-		MapObjects spawnPoints = getSpawnPoints();
-		MapObjects walkingBoundaries = getWalkingBoundaries();
-
 		// create characters
-		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
+		Texture spritesheet1 = RPG.manager.get(PLAYER_TEXTURE_PATH);
 		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width,
-				height, 16, 16, 0.15f, world);
+				height, 16, 16, 0.15f, this);
 		player.setSpeed(200f);
 
-		Texture spritesheet2 = RPG.manager.get(RPG.NPC_TEXTURE_PATH);
-		RectangleMapObject boundary1 = (RectangleMapObject) walkingBoundaries
+		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
+
+		Texture spritesheet2 = RPG.manager.get(NPC_TEXTURE_PATH);
+		RectangleMapObject boundary1 = (RectangleMapObject) exampleWalkingBoundaries
 				.get(NPC1_NAME);
 		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height,
-				16, 16, 0.15f, world, boundary1.getRectangle());
+				16, 16, 0.15f, this, boundary1.getRectangle());
 
-		RectangleMapObject boundary2 = (RectangleMapObject) walkingBoundaries
+		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries
 				.get(NPC2_NAME);
 		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height,
-				16, 16, 0.15f, world, boundary2.getRectangle());
+				16, 16, 0.15f, this, boundary2.getRectangle());
 
 		// add characters to map
-		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints
-				.get(PLAYER_NAME);
-		addFocusedCharacterToMap(player, playerSpawn.getRectangle().x,
-				playerSpawn.getRectangle().y);
-		RectangleMapObject npc1Spawn = (RectangleMapObject) spawnPoints
-				.get(NPC1_NAME);
-		addCharacterToMap(npc1, npc1Spawn.getRectangle().x,
-				npc1Spawn.getRectangle().y);
-		RectangleMapObject npc2Spawn = (RectangleMapObject) spawnPoints
-				.get(NPC2_NAME);
-		addCharacterToMap(npc2, npc2Spawn.getRectangle().x,
-				npc2Spawn.getRectangle().y);
+		exampleMap.addFocusedCharacterToMap(player, 192, 544);
+		exampleMap.addCharacterToMap(npc1, 480, 128);
+		exampleMap.addCharacterToMap(npc2, 544, 544);
 
 		// setup weapons
-		genericWeaponSetup(player, npc1);
+		genericWeaponSetup(player, npc1, exampleMap);
 	}
 
 	public void render()
 	{
+		if (movingToAnotherMap)
+		{
+			return;
+		}
+
 		currentMap.render();
 
 		temporaryVisionConeTest();
@@ -211,14 +218,31 @@ public final class World implements Disposable
 		}
 	}
 
-	public void moveToAnotherMap(MapType mapType)
+	public void movePlayerToAnotherMap(final MapType mapType, final Coordinate newLocation)
 	{
 		currentMap.close();
-		currentMap = maps.get(mapType.getMapIndex());
+		movingToAnotherMap = true;
+
+		// cannot remove player from Map until the Map has stopped updating
+		// Exception in thread "LWJGL Application" java.util.ConcurrentModificationException
+		timer.scheduleTask(new Timer.Task()
+		{
+
+			@Override
+			public void run()
+			{
+				currentMap.removeCharacterFromMap(player);
+				currentMap = maps.get(mapType.getMapIndex());
+				currentMap.addFocusedCharacterToMap(player, newLocation);
+				movingToAnotherMap = false;
+			}
+
+		}, 1);
 	}
 
-	public void warpToAnotherMap(MapType mapType)
+	public void warpPlayerToAnotherMap(MapType mapType, Coordinate newLocation)
 	{
+		
 		currentMap.close();
 		warping = true;
 		warpingAlpha = 0f;
@@ -239,23 +263,27 @@ public final class World implements Disposable
 
 		}, 0f, 0.1f);
 		Map newMap = maps.get(mapType.getMapIndex());
-		timer.scheduleTask(new WarpToAnotherMapTask(newMap), 3.0f);
+		timer.scheduleTask(new WarpToAnotherMapTask(newMap, newLocation), 3.0f);
 	}
 
 	private class WarpToAnotherMapTask extends Timer.Task
 	{
 
 		private Map newMap;
+		private Coordinate newLocation;
 
-		WarpToAnotherMapTask(Map newMap)
+		WarpToAnotherMapTask(Map newMap, Coordinate newLocation)
 		{
 			this.newMap = newMap;
+			this.newLocation = newLocation;
 		}
 
 		@Override
 		public void run()
 		{
+			currentMap.removeCharacterFromMap(player);
 			setCurrentMap(newMap);
+			newMap.addFocusedCharacterToMap(player, newLocation);
 
 			timer.scheduleTask(new Timer.Task()
 			{
@@ -295,13 +323,13 @@ public final class World implements Disposable
 		}
 	}
 
-	private void genericWeaponSetup(GameCharacter character, GameCharacter npc)
+	private void genericWeaponSetup(GameCharacter character, GameCharacter npc, Map map)
 	{
 		int width = 32;
 		int height = 32;
 
 		// melee attack test stuff
-		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
+		Texture swordSprite = RPG.manager.get(SWORD_PATH);
 		Weapon sword = new MeleeWeapon("LameSword");
 		Weapon sword2 = new MeleeWeapon("Sword2");
 		sword2.initSprite(swordSprite, width, height, 32, 32);
@@ -310,16 +338,16 @@ public final class World implements Disposable
 		sword.addEffect(poison);
 		sword2.addEffect(poison);
 
-		character.equip(this, sword);
-		character.swapWeapon(this);
-		npc.equip(this, sword2);
+		character.equip(map, sword);
+		character.swapWeapon(map);
+		npc.equip(map, sword2);
 
 		// ranged attack test stuff
-		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
+		Texture bowSprite = RPG.manager.get(ARROW_PATH);
 		RangedWeapon bow = new RangedWeapon("LameBow");
 		bow.initSprite(bowSprite, width, height, 32, 32);
 
-		character.equip(this, bow);
+		character.equip(map, bow);
 		Projectile arrow = new Projectile("arrow", bowSprite, width, height,
 				32, 32);
 		bow.equipProjectile(arrow, 1000);
