@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.World;
 import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.ai.RandomWalkAI;
 import com.me.rpg.maps.Map;
@@ -21,10 +20,10 @@ public class NonplayableCharacter extends GameCharacter
 
 	public NonplayableCharacter(String name, Texture spritesheet, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
-			World world, Rectangle walkingBounds)
+			Rectangle walkingBounds)
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
-				animationDuration, world);
+				animationDuration);
 
 		setWalkAI(new RandomWalkAI(this, 1, 1, walkingBounds));
 

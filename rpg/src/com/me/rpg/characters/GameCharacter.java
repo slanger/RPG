@@ -65,8 +65,7 @@ public abstract class GameCharacter implements IAttackable
 	protected float sightDistance;
 
 	protected GameCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration,
-			World world)
+			int height, int tileWidth, int tileHeight, float animationDuration)
 	{
 		this.name = name;
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
@@ -101,7 +100,7 @@ public abstract class GameCharacter implements IAttackable
 		immunityHash = new HashMap<StatusEffect, Float>();
 		health = getMaxHealth();
 
-		this.world = world;
+		world = World.getInstance();
 		npcMemory = new NPCMemory(world.getReputationSystem()
 				.getMasterEventList());
 		sightDistance = 450.0f;

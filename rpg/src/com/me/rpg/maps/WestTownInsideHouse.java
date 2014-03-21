@@ -1,20 +1,17 @@
 package com.me.rpg.maps;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.me.rpg.RPG;
-import com.me.rpg.World;
 
 public class WestTownInsideHouse extends Map
 {
 
 	public static final String MAP_TMX_PATH = "maps/west_town/inside_house/inside_house.tmx";
 
-	public WestTownInsideHouse(World world, SpriteBatch batch, OrthographicCamera camera)
+	public WestTownInsideHouse()
 	{
-		super(world, batch, camera);
+		super();
 
 		mapType = MapType.WEST_TOWN_INSIDE_HOUSE;
 

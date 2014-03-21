@@ -41,6 +41,8 @@ import com.me.rpg.utils.Timer;
 public final class World implements Disposable
 {
 
+	private static World instance = null;
+
 	public static final String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
 	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
@@ -70,6 +72,27 @@ public final class World implements Disposable
 	private boolean isGameOver = false;
 	private boolean movingToAnotherMap = false;
 	private boolean updateEnable = true;
+
+	public static World getInstance()
+	{
+		if (instance == null)
+		{
+			System.out.println("*** initialize world ***");
+			instance = new World();
+			instance.initializeWorld();
+		}
+		return instance;
+	}
+
+	public static void clearInstance()
+	{
+		if (instance == null)
+		{
+			return;
+		}
+		instance.dispose();
+		instance = null;
+	}
 
 	public DialogueSystem getDialogueSystem()
 	{
@@ -106,16 +129,19 @@ public final class World implements Disposable
 		this.updateEnable = updateEnable;
 	}
 
-	public World(SpriteBatch batch, ShapeRenderer shapeRenderer,
-			OrthographicCamera camera)
+	/*
+	 *  You CANNOT call World.getInstance() in this constructor--it will cause an
+	 *  infinite loop. Things that call World.getInstance() need to be placed in
+	 *  initializeWorld()
+	 */
+	private World()
 	{
-		this.batch = batch;
-		this.shapeRenderer = shapeRenderer;
-		this.camera = camera;
+		batch = RPG.batch;
+		camera = RPG.camera;
 
-		// create map
-		dialogueSystem = new DialogueSystem(batch, camera);
-		reputationSystem = new ReputationSystem(this);
+		shapeRenderer = new ShapeRenderer();
+
+		dialogueSystem = new DialogueSystem();
 
 		// create debug font
 		debugFont = new BitmapFont();
@@ -124,16 +150,22 @@ public final class World implements Disposable
 		// warp resources
 		warpSound = RPG.manager.get(WARP_SOUND_PATH, Sound.class);
 		whiteScreen = new Sprite(RPG.manager.get(RPG.WHITE_DOT_PATH, Texture.class));
+	}
+
+	private void initializeWorld()
+	{
+		// create reputation system
+		reputationSystem = new ReputationSystem();
 
 		// create maps
 		maps = new ArrayList<Map>();
-		Map exampleMap = new ExampleMap(this, batch, camera);
+		Map exampleMap = new ExampleMap();
 		maps.add(exampleMap);
-		Map prototypeMap = new PrototypeMap(this, batch, camera);
+		Map prototypeMap = new PrototypeMap();
 		maps.add(prototypeMap);
-		Map westTown = new WestTownMap(this, batch, camera);
+		Map westTown = new WestTownMap();
 		maps.add(westTown);
-		Map westTownInsideHouse = new WestTownInsideHouse(this, batch, camera);
+		Map westTownInsideHouse = new WestTownInsideHouse();
 		maps.add(westTownInsideHouse);
 
 		currentMap = maps.get(MapType.EXAMPLE.getMapIndex());
@@ -151,7 +183,7 @@ public final class World implements Disposable
 		// create characters
 		Texture spritesheet1 = RPG.manager.get(PLAYER_TEXTURE_PATH);
 		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width,
-				height, 16, 16, 0.15f, this);
+				height, 16, 16, 0.15f);
 		player.setSpeed(200f);
 
 		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
@@ -160,12 +192,12 @@ public final class World implements Disposable
 		RectangleMapObject boundary1 = (RectangleMapObject) exampleWalkingBoundaries
 				.get(NPC1_NAME);
 		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height,
-				16, 16, 0.15f, this, boundary1.getRectangle());
+				16, 16, 0.15f, boundary1.getRectangle());
 
 		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries
 				.get(NPC2_NAME);
 		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height,
-				16, 16, 0.15f, this, boundary2.getRectangle());
+				16, 16, 0.15f, boundary2.getRectangle());
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);

@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.me.rpg.RPG;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Direction;
 
@@ -42,12 +43,12 @@ public class DialogueSystem {
 	private GameCharacter conversingNPC = null;
 	private boolean finishedDialogue = false;
 	
-	public DialogueSystem(SpriteBatch batch, OrthographicCamera camera)
+	public DialogueSystem()
 	{
 		//initialize renderer stuff
 		dialogueFont = new BitmapFont();
-		this.batch=batch;
-		this.camera=camera;
+		batch = RPG.batch;
+		camera = RPG.camera;
 		inDialogue = false;
 		Table table = new Table();
 		

@@ -1,12 +1,9 @@
 package com.me.rpg.maps;
 
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.me.rpg.RPG;
-import com.me.rpg.World;
 import com.me.rpg.utils.Timer;
 
 public class PrototypeMap extends Map
@@ -19,9 +16,9 @@ public class PrototypeMap extends Map
 	private Music startMusic, loopMusic;
 	private StartLoopMusicTask startLoopMusicTask = new StartLoopMusicTask();
 
-	public PrototypeMap(World world, SpriteBatch batch, OrthographicCamera camera)
+	public PrototypeMap()
 	{
-		super(world, batch, camera);
+		super();
 
 		mapType = MapType.PROTOTYPE;
 

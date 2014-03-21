@@ -108,11 +108,11 @@ public abstract class Map implements Disposable
 		return timer;
 	}
 
-	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
+	public Map()
 	{
-		this.world = world;
-		this.batch = batch;
-		this.camera = camera;
+		world = World.getInstance();
+		batch = RPG.batch;
+		camera = RPG.camera;
 
 		timer = new Timer();
 

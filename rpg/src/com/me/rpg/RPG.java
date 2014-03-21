@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.maps.ExampleMap;
@@ -27,14 +26,13 @@ public class RPG implements Screen
 	public static final String WHITE_DOT_PATH = "white_dot.png";
 	public static final String FONT_PATH = "font/Microsoft_Uighur_white.fnt";
 
-	public static AssetManager manager = new AssetManager();
-	public ScreenHandler screenHandler;
+	public static final AssetManager manager = new AssetManager();
+	public static final OrthographicCamera camera = new OrthographicCamera();
+	public static final SpriteBatch batch = new SpriteBatch();
 
-	private OrthographicCamera camera;
-	private SpriteBatch batch;
-	private ShapeRenderer shapeRenderer;
+	public final ScreenHandler screenHandler;
 
-	private World world = null;
+	private World world;
 
 	private LoadBar loadBar;
 	private BitmapFont font;
@@ -46,13 +44,8 @@ public class RPG implements Screen
 
 		this.screenHandler = screenHandler;
 
-		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
-		// camera.zoom -= 0.1f;
-
-		batch = new SpriteBatch();
-		shapeRenderer = new ShapeRenderer();
 
 		float offset = 10;
 		float width = camera.viewportWidth - 2 * offset;
@@ -68,9 +61,8 @@ public class RPG implements Screen
 	public void dispose()
 	{
 		batch.dispose();
-		shapeRenderer.dispose();
 		manager.dispose();
-		world.dispose();
+		World.clearInstance();
 	}
 
 	@Override
@@ -90,10 +82,9 @@ public class RPG implements Screen
 			return;
 		}
 
-		// lazy loading
 		if (world == null)
 		{
-			world = new World(batch, shapeRenderer, camera);
+			world = World.getInstance();
 		}
 
 		// update before render

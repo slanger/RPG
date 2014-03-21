@@ -1,20 +1,17 @@
 package com.me.rpg.maps;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.me.rpg.RPG;
-import com.me.rpg.World;
 
 public class ExampleMap extends Map
 {
 
 	public static final String MAP_TMX_PATH = "maps/example/example.tmx";
 
-	public ExampleMap(World world, SpriteBatch batch, OrthographicCamera camera)
+	public ExampleMap()
 	{
-		super(world, batch, camera);
+		super();
 
 		mapType = MapType.EXAMPLE;
 

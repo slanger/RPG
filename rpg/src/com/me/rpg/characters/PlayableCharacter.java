@@ -5,11 +5,9 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
-import com.me.rpg.utils.Direction;
 
 public class PlayableCharacter extends GameCharacter
 {
@@ -42,11 +40,10 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	public PlayableCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration,
-			World world)
+			int height, int tileWidth, int tileHeight, float animationDuration)
 	{
 		super(name, spritesheet, width, height, tileWidth, tileHeight,
-				animationDuration, world);
+				animationDuration);
 		npcMemory = null;
 		setWalkAI(new PlayerControlledWalkAI(this));
 		// redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH,

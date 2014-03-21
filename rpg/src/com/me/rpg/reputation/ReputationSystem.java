@@ -20,8 +20,8 @@ public class ReputationSystem {
 	private ArrayList<ReputationEvent> MasterEventList;
 	private EventTemplate[] EventTemplateList = new EventTemplate[10];
 
-	public ReputationSystem(World world) {
-		this.world = world;
+	public ReputationSystem() {
+		world = World.getInstance();
 		initializeTemplates();
 		MasterEventList = new ArrayList<ReputationEvent>();
 	}
