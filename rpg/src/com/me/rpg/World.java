@@ -69,6 +69,7 @@ public final class World implements Disposable
 
 	private boolean isGameOver = false;
 	private boolean movingToAnotherMap = false;
+	private boolean updateEnable = true;
 
 	public Dialogue getDialogue()
 	{
@@ -210,6 +211,12 @@ public final class World implements Disposable
 	public void update(float deltaTime)
 	{
 		timer.update(deltaTime);
+
+		if (!updateEnable)
+		{
+			return;
+		}
+
 		Iterator<Map> iter = maps.iterator();
 		while (iter.hasNext())
 		{
@@ -221,6 +228,7 @@ public final class World implements Disposable
 	public void movePlayerToAnotherMap(final MapType mapType, final Coordinate newLocation)
 	{
 		currentMap.close();
+		updateEnable = false;
 		movingToAnotherMap = true;
 
 		// cannot remove player from Map until the Map has stopped updating
@@ -234,7 +242,9 @@ public final class World implements Disposable
 				currentMap.removeCharacterFromMap(player);
 				currentMap = maps.get(mapType.getMapIndex());
 				currentMap.addFocusedCharacterToMap(player, newLocation);
+				updateEnable = true;
 				movingToAnotherMap = false;
+				currentMap.open();
 			}
 
 		}, 1);
@@ -242,8 +252,8 @@ public final class World implements Disposable
 
 	public void warpPlayerToAnotherMap(MapType mapType, Coordinate newLocation)
 	{
-		
 		currentMap.close();
+		updateEnable = false;
 		warping = true;
 		warpingAlpha = 0f;
 		warpSound.play();
@@ -302,6 +312,7 @@ public final class World implements Disposable
 				@Override
 				public void run()
 				{
+					updateEnable = true;
 					warping = false;
 					newMap.open();
 				}

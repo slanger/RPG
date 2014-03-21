@@ -58,7 +58,6 @@ public abstract class Map implements Disposable
 	// Tiled layers drawn in front of characters, labeled by index
 	protected int[] foregroundLayers;
 
-	protected boolean updateEnable = true;
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
@@ -223,7 +222,6 @@ public abstract class Map implements Disposable
 	public void open()
 	{
 		// default implementation
-		updateEnable = true;
 	}
 
 	/**
@@ -233,7 +231,6 @@ public abstract class Map implements Disposable
 	public void close()
 	{
 		// default implementation
-		updateEnable = false;
 	}
 
 	/**
@@ -411,11 +408,6 @@ public abstract class Map implements Disposable
 		if (cameraPan)
 		{
 			cameraPanMovement();
-			return;
-		}
-
-		if (!updateEnable)
-		{
 			return;
 		}
 

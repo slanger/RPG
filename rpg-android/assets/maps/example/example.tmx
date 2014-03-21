@@ -51,8 +51,8 @@
   </object>
   <object name="prototype_map" x="320" y="-32" width="64" height="32">
    <properties>
-    <property name="x" value="2496"/>
-    <property name="y" value="2560"/>
+    <property name="x" value="1248"/>
+    <property name="y" value="1248"/>
    </properties>
   </object>
  </objectgroup>
