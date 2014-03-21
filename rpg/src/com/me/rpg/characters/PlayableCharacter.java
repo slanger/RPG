@@ -92,12 +92,12 @@ public class PlayableCharacter extends GameCharacter
 					initiateDialogue();
 					if(isInDialogue)
 					{
-						advanceDialogue("E");
+						advanceDialogue("ENTER");
 					}
 				}
 				else
 				{ // currently in dialogue
-					advanceDialogue("E");
+					advanceDialogue("ENTER");
 				}
 			}
 		}
@@ -275,6 +275,11 @@ public class PlayableCharacter extends GameCharacter
 				c.setFaceDirection(this.getFaceDirection().opposite());
 			}
 		}
+	}
+	
+	private void finishDialogue()
+	{
+		
 	}
 
 	@Override

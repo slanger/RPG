@@ -40,7 +40,8 @@ public class DialogueSystem {
 	private Node currentDialogueNode = null;
 	private GameCharacter player = null;
 	private GameCharacter conversingNPC = null;
-
+	private boolean finishedDialogue = false;
+	
 	public DialogueSystem(SpriteBatch batch, OrthographicCamera camera)
 	{
 		//initialize renderer stuff
@@ -90,11 +91,30 @@ public class DialogueSystem {
 	
 	public boolean advanceDialogue(String key) //returns true if dialogue ended
 	{
-		
+		if(key.equals("ENTER"))
+		{
+			
+			
+		}
+		else if(key.equals("UP"))
+		{
+			
+		}
+		else if(key.equals("DOWN"))
+		{
+			
+		}
+		else
+		{
+			
+		}
 		return false;
 	}
 	
-	
+	public void finishConversation()
+	{
+		
+	}
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
