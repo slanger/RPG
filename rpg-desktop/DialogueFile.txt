@@ -2,10 +2,16 @@ NPC NPC1 dislike
 	responses 0 trigger null dialogue "You killed my father... prepare to die!"
 
 NPC NPC2 like
-	responses 3 trigger null dialogue "What would you like to buy"	
+	responses 5 trigger null dialogue "What would you like to buy"	
 		responses 1 trigger null dialogue "Sword  	50 	gold"
 			responses 0 trigger trigger_add_sword dialogue "Thank you, that will be 50 gold"
 		responses 0 trigger null dialogue "Hammer 	60 	gold"
 		responses 0 trigger null dialogue "Shield 	100 	gold"
+		responses 0 trigger null dialogue "Health Potion	10 	gold"
+		responses 1 trigger null dialogue "Arrows	1 	gold each"
+			responses 3 trigger null dialogue "How Many?"
+				responses 0 trigger null dialogue "1 arrow"
+				responses 0 trigger null dialogue "5 arrows"
+				responses 0 trigger null dialogue "20 arrows"
 
 

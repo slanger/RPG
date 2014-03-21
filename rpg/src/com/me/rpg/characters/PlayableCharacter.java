@@ -79,26 +79,26 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * DIALOGUE
 		 */
-		boolean isInDialogue = world.getDialogueSystem().getInDialogue();
 		if (Gdx.input.isKeyPressed(Keys.E))
 		{
+			boolean dialogueEnded = false;
 			if (enableInputE)
 			{
-				System.out.println("E");
-
+				System.out.println("passed enable E");
 				enableInputE = false;
-				if (!isInDialogue)
+				if (!world.getDialogueSystem().getInDialogue())
 				{
 					initiateDialogue();
 					if(world.getDialogueSystem().getInDialogue())
 					{						
-						advanceDialogue("ENTER");
+						dialogueEnded = advanceDialogue("ENTER");
 					}
 				}
 				else
 				{ // currently in dialogue
-					advanceDialogue("ENTER");
+					dialogueEnded = advanceDialogue("ENTER");
 				}
+				if(dialogueEnded == true) world.setUpdateEnable(true);
 			}
 		}
 		else
@@ -109,9 +109,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if(enableInputUp)
 			{
-				System.out.println("up");
 				enableInputUp = false;
-				if(isInDialogue)
+				if(world.getDialogueSystem().getInDialogue())
 				{
 					advanceDialogue("UP");
 				}
@@ -126,9 +125,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if(enableInputDown == true)
 			{
-				System.out.println("down");
 				enableInputDown = false;
-				if (isInDialogue)
+				if (world.getDialogueSystem().getInDialogue())
 				{
 					advanceDialogue("DOWN");
 				}
@@ -143,7 +141,7 @@ public class PlayableCharacter extends GameCharacter
 		 * END DIALOGUE
 		 */
 		
-		if(isInDialogue == true)
+		if(world.getDialogueSystem().getInDialogue() == true)
 		{
 			return;
 		}
@@ -296,9 +294,9 @@ public class PlayableCharacter extends GameCharacter
 		return isDead();
 	}
 
-	private void advanceDialogue(String key)
-	{
-		//getCurrentMap().getWorld().getDialogue().advanceDialogue(key);
+	private boolean advanceDialogue(String key)
+	{	
+		return world.getDialogueSystem().advanceDialogue(key);
 	}
 
 	@Override
