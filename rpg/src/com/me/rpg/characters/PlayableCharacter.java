@@ -77,74 +77,41 @@ public class PlayableCharacter extends GameCharacter
 			return;
 		}
 
-		/*
-		 * DIALOGUE
-		 */
-		boolean isInDialogue = world.getDialogueSystem().getInDialogue();
+		if(world.getDialogueSystem().getInDialogue()) 
+		{
+			return;
+		}
+		
 		if (Gdx.input.isKeyPressed(Keys.E))
 		{
+			boolean dialogueEnded = false;
 			if (enableInputE)
 			{
-				System.out.println("E");
-
 				enableInputE = false;
-				if (!isInDialogue)
+				if (!world.getDialogueSystem().getInDialogue())
 				{
 					initiateDialogue();
 					if(world.getDialogueSystem().getInDialogue())
 					{						
-						advanceDialogue("ENTER");
+						dialogueEnded = advanceDialogue("ENTER");
 					}
 				}
 				else
 				{ // currently in dialogue
-					advanceDialogue("ENTER");
+					dialogueEnded = advanceDialogue("ENTER");
 				}
+				if(dialogueEnded == true) world.setUpdateEnable(true);
 			}
 		}
 		else
 		{
 			enableInputE = true;
 		}
-		if(Gdx.input.isKeyPressed(Keys.UP))
-		{
-			if(enableInputUp)
-			{
-				System.out.println("up");
-				enableInputUp = false;
-				if(isInDialogue)
-				{
-					advanceDialogue("UP");
-				}
-			}
-		}
-		else
-		{
-			enableInputUp = true;
-		}
-		
-		if (Gdx.input.isKeyPressed(Keys.DOWN))
-		{
-			if(enableInputDown == true)
-			{
-				System.out.println("down");
-				enableInputDown = false;
-				if (isInDialogue)
-				{
-					advanceDialogue("DOWN");
-				}
-			}
-		}
-		else
-		{
-			enableInputDown = true;
-		}
-		
 		/*
 		 * END DIALOGUE
 		 */
 		
-		if(isInDialogue == true)
+		if(world.getDialogueSystem().getInDialogue() == true)
 		{
 			return;
 		}
@@ -228,6 +195,94 @@ public class PlayableCharacter extends GameCharacter
 		 */
 	}
 
+<<<<<<< HEAD
+=======
+	
+	public void handleDialogueInput()
+	{
+		if (!enableControls)
+		{
+			return;
+		}
+
+		/*
+		 * DIALOGUE
+		 */
+		if (Gdx.input.isKeyPressed(Keys.E))
+		{
+			boolean dialogueEnded = false;
+			if (enableInputE)
+			{
+				enableInputE = false;
+				if (!world.getDialogueSystem().getInDialogue())
+				{
+					initiateDialogue();
+					if(world.getDialogueSystem().getInDialogue())
+					{						
+						dialogueEnded = advanceDialogue("ENTER");
+					}
+				}
+				else
+				{ // currently in dialogue
+					dialogueEnded = advanceDialogue("ENTER");
+				}
+				if(dialogueEnded == true) world.setUpdateEnable(true);
+			}
+		}
+		else
+		{
+			enableInputE = true;
+		}
+		if(Gdx.input.isKeyPressed(Keys.UP))
+		{
+			if(enableInputUp)
+			{
+				enableInputUp = false;
+				if(world.getDialogueSystem().getInDialogue())
+				{
+					advanceDialogue("UP");
+				}
+			}
+		}
+		else
+		{
+			enableInputUp = true;
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			if(enableInputDown == true)
+			{
+				enableInputDown = false;
+				if (world.getDialogueSystem().getInDialogue())
+				{
+					advanceDialogue("DOWN");
+				}
+			}
+		}
+		else
+		{
+			enableInputDown = true;
+		}
+		
+		/*
+		 * END DIALOGUE
+		 */
+		
+	}
+	
+	private void doGoodAction()
+	{
+		Rectangle hitbox = getHitboxInFrontOfCharacter();
+		GameCharacter c = getCurrentMap().checkCollisionWithCharacters(hitbox,
+				this);
+		if (c != null)
+		{
+			c.acceptGoodAction(this);
+		}
+	}
+
+>>>>>>> origin/dialogue
 	private void doPush()
 	{
 		Rectangle hitbox = getHitboxInFrontOfCharacter();
@@ -261,9 +316,9 @@ public class PlayableCharacter extends GameCharacter
 		return isDead();
 	}
 
-	private void advanceDialogue(String key)
-	{
-		//getCurrentMap().getWorld().getDialogue().advanceDialogue(key);
+	private boolean advanceDialogue(String key)
+	{	
+		return world.getDialogueSystem().advanceDialogue(key);
 	}
 
 }

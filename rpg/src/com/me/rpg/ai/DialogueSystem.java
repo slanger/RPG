@@ -87,9 +87,10 @@ public class DialogueSystem {
 			if(rootNode.getObjectID().equalsIgnoreCase(conversingNPC.getName()))
 			{
 				//npc has dialogue tree
+				inDialogue = true;
+				currentDialogueNode = rootNode;
 				choiceIndex = 0;
 				showIndex = 0;
-				inDialogue = true;
 				return true;
 			}
 		}
@@ -98,9 +99,23 @@ public class DialogueSystem {
 	
 	public boolean advanceDialogue(String key) //returns true if dialogue ended
 	{
+		
+		System.out.println(key);
+		
 		if(key.equals("ENTER"))
 		{
-			currentDialogueNode = currentDialogueNode.getChild(choiceIndex);
+			System.out.println("advancing on enter");
+		
+			if(currentDialogueNode.getNumChildren() > 0 )
+			{
+				currentDialogueNode = currentDialogueNode.getChild(choiceIndex);
+			}
+			else
+			{
+				inDialogue = false;
+				return true;
+			}
+			
 			//activate trigger for this child
 			
 			responses.clear();
@@ -109,32 +124,40 @@ public class DialogueSystem {
 			{
 				responses.add(currentDialogueNode.getChild(i).getDialogue());
 			}
+			choiceIndex = 0;
+			showIndex = 0;
 		}
 		else if(key.equals("UP"))
 		{
+			System.out.println("advancing on up");
+
 			if(choiceIndex > 0)
 			{
 				choiceIndex--;
-				if(choiceIndex > 2) showIndex--;
+				if(choiceIndex > 1 && (showIndex > 0)) showIndex--;
 			}
 			
 		}
 		else if(key.equals("DOWN"))
 		{
-			if(choiceIndex < currentDialogueNode.getNumChildren()) 
+			System.out.println("advancing on down");
+
+			if(choiceIndex < currentDialogueNode.getNumChildren()-1) 
 			{
 				choiceIndex++;
-				if(choiceIndex > 2) showIndex++;
+				if((choiceIndex > 2) && (showIndex < currentDialogueNode.getNumChildren()-3))
+				{
+					showIndex++;
+				}
+					
 			}
 		}
 		else{}
+		System.out.println("choiceIndex: " +choiceIndex);
+		System.out.println("showIndex: "+showIndex);
 		return false;
 	}
 	
-	public void finishConversation()
-	{
-		
-	}
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
@@ -167,33 +190,45 @@ public class DialogueSystem {
 //		Label response3 = new Label("Response2 ---------------", style);
 		
 		
-		Label objectName = new Label("John" , style);
+		Label objectName = new Label(conversingNPC.getName() , style);
 		Label npcStatement1 = new Label(npcStatement, style);
 		Label separator = new Label("------------------------------------------------------------------"
 				+ "------------------------------------------------", separatorStyle);
 		
-		int selectedIndex = choiceIndex - showIndex;
-		Label response1 = new Label("test1", style);
-		Label response2 = new Label("test1", style);
-		Label response3 = new Label("test1", style);
 		
+		
+		int selectedIndex = choiceIndex - showIndex;
+		
+		Label response1 = new Label("", style);
+		Label response2 = new Label("", style);
+		Label response3 = new Label("", style);
+		
+		if((currentDialogueNode.getNumChildren()-1) >= showIndex)
+		{
+			response1.setText(responses.get(showIndex));
+		}
+		if((currentDialogueNode.getNumChildren()-1) >= showIndex+1)
+		{
+			response2.setText(responses.get(showIndex+1));
+
+		}
+		if((currentDialogueNode.getNumChildren()-1) >= showIndex+2)
+		{
+			response3.setText(responses.get(showIndex+2));
+		}
+		
+		//response1.setStyle(separatorStyle);
 		if(selectedIndex == 0)
 		{
-			//response1 = new Label(responses.get(showIndex), selectedStyle);
-			//response2 = new Label(responses.get(showIndex + 1), style);
-			//response3 = new Label(responses.get(showIndex + 2), style);	
+			response1.setStyle(selectedStyle);
 		}
 		else if(selectedIndex == 1)
 		{
-			//response1 = new Label(responses.get(showIndex), style);
-			//response2 = new Label(responses.get(showIndex + 1), selectedStyle);
-			//response3 = new Label(responses.get(showIndex + 2), style);	
+			response2.setStyle(selectedStyle);
 		}
 		else
 		{
-			//response1 = new Label(responses.get(showIndex), style);
-			//response2 = new Label(responses.get(showIndex + 1), style);
-			//response3 = new Label(responses.get(showIndex + 2), selectedStyle);	
+			response3.setStyle(selectedStyle);
 		}
 		
 		npcStatement1.setWrap(true);
@@ -410,72 +445,4 @@ public class DialogueSystem {
 		}
 		
 	}
-	
-	
-////public void advanceDialogue(String key)
-//{
-//	int temp2;
-//	if (currentIndex < 0)
-//		currentIndex = 0;
-//	if (currentIndex < lastIndex)
-//	{
-//		currentText = dialogueArray[currentIndex];
-//		int temp = playerResponsePosition[currentIndex];
-//		if (temp != 0)
-//			requireResponse = true;
-//		if (requireResponse == true)
-//		{
-//			if (key == "NUM_1" && temp > 0)
-//			{
-//				requireResponse = false;
-//				currentIndex += 1;
-//			}
-//			else if (key == "NUM_2" && temp > 1)
-//			{
-//				requireResponse = false;
-//				currentIndex += 2;
-//			}
-//			else if (key == "NUM_3" && temp > 2)
-//			{
-//				requireResponse = false;
-//				currentIndex += 3;
-//			}
-//			else
-//			{
-//				// index stays same until response
-//			}
-//		}
-//		else
-//		{
-//			if (key == "E")
-//				currentIndex++;
-//			else
-//			{
-//				// index stays same until E hit.
-//			}
-//		}
-//		if (currentIndex + 1 > lastIndex)
-//		{
-//			temp2 = 0;
-//		}
-//		else
-//		{
-//			temp2 = playerResponsePosition[currentIndex + 1];
-//		}
-//		if (temp2 != 0)
-//		{ // request player response
-//			requireResponse = true;
-//		}
-//
-//	}
-//	else
-//	{
-//		System.out.println(lastIndex);
-//		requireResponse = false;
-//		currentText = "";
-//		inDialogue = false;
-//	}
-//}
-	
-	
 }
