@@ -23,12 +23,7 @@ import com.me.rpg.RPG;
 import com.me.rpg.World;
 import com.me.rpg.characters.DeadCharacter;
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.combat.MeleeWeapon;
-import com.me.rpg.combat.Poison;
 import com.me.rpg.combat.Projectile;
-import com.me.rpg.combat.RangedWeapon;
-import com.me.rpg.combat.Shield;
-import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Timer;
@@ -63,11 +58,9 @@ public abstract class Map implements Disposable
 	// Tiled layers drawn in front of characters, labeled by index
 	protected int[] foregroundLayers;
 
-	protected boolean updateEnable = true;
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
-	private boolean gameOver = false;
 
 	protected Timer timer;
 
@@ -113,16 +106,6 @@ public abstract class Map implements Disposable
 	public Timer getTimer()
 	{
 		return timer;
-	}
-
-	public boolean isGameOver()
-	{
-		return gameOver;
-	}
-
-	public void setGameOver()
-	{
-		gameOver = true;
 	}
 
 	public Map(World world, SpriteBatch batch, OrthographicCamera camera)
@@ -180,7 +163,7 @@ public abstract class Map implements Disposable
 		return spawnLayer.getObjects();
 	}
 
-	protected MapObjects getWalkingBoundaries()
+	public MapObjects getWalkingBoundaries()
 	{
 		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get(
 				"WalkingBoundaries");
@@ -197,39 +180,6 @@ public abstract class Map implements Disposable
 	{
 		MapLayer waypointsLayer = tiledMap.getLayers().get("Waypoints");
 		return waypointsLayer.getObjects();
-	}
-
-	protected void genericWeaponSetup(GameCharacter character, GameCharacter npc)
-	{
-		int width = 32;
-		int height = 32;
-
-		// melee attack test stuff
-		Texture swordSprite = RPG.manager.get(RPG.SWORD_PATH);
-		Weapon sword = new MeleeWeapon("LameSword");
-		Weapon sword2 = new MeleeWeapon("Sword2");
-		sword2.initSprite(swordSprite, width, height, 32, 32);
-		sword.initSprite(swordSprite, width, height, 32, 32);
-		StatusEffect poison = new Poison(50, 3, 2f);
-		sword.addEffect(poison);
-		sword2.addEffect(poison);
-
-		character.equip(this, sword);
-		character.swapWeapon(this);
-		npc.equip(this, sword2);
-
-		// ranged attack test stuff
-		Texture bowSprite = RPG.manager.get(RPG.ARROW_PATH);
-		RangedWeapon bow = new RangedWeapon("LameBow");
-		bow.initSprite(bowSprite, width, height, 32, 32);
-
-		character.equip(this, bow);
-		Projectile arrow = new Projectile("arrow", bowSprite, width, height,
-				32, 32);
-		bow.equipProjectile(arrow, 1000);
-
-		Shield shield = new Shield("plain shield");
-		npc.equipShield(shield);
 	}
 
 	private void cameraPanMovement()
@@ -272,7 +222,6 @@ public abstract class Map implements Disposable
 	public void open()
 	{
 		// default implementation
-		updateEnable = true;
 	}
 
 	/**
@@ -282,7 +231,6 @@ public abstract class Map implements Disposable
 	public void close()
 	{
 		// default implementation
-		updateEnable = false;
 	}
 
 	/**
@@ -463,11 +411,6 @@ public abstract class Map implements Disposable
 			return;
 		}
 
-		if (!updateEnable)
-		{
-			return;
-		}
-
 		timer.update(deltaTime);
 
 		// update dead character fade
@@ -478,8 +421,7 @@ public abstract class Map implements Disposable
 			deadChar.update(deltaTime);
 			if (deadChar.isGameOver())
 			{
-				// TODO: fix this awful code
-				setGameOver();
+				world.setGameOver(true);
 			}
 		}
 
@@ -682,10 +624,10 @@ public abstract class Map implements Disposable
 
 	/**
 	 * A collision check that only checks warp points. Returns a reference to a
-	 * Map object if the input hitbox collides with a warp point. Returns null
+	 * MapType object if the input hitbox collides with a warp point. Returns null
 	 * otherwise.
 	 */
-	public Map checkCollisionWithWarpPoints(Rectangle hitbox)
+	public MapType checkCollisionWithWarpPoints(Rectangle hitbox, Coordinate warpCoordinate)
 	{
 		Vector2 centerPoint = hitbox.getCenter(new Vector2());
 		for (RectangleMapObject warpPoint : warpPoints)
@@ -693,26 +635,20 @@ public abstract class Map implements Disposable
 			if (warpPoint.getRectangle().contains(centerPoint))
 			{
 				String newMapString = warpPoint.getName();
-				return getMap(MapType.getMapType(newMapString));
+				Coordinate c = getWarpCoordinate(warpPoint);
+				warpCoordinate.setX(c.getX());
+				warpCoordinate.setY(c.getY());
+				return MapType.getMapType(newMapString);
 			}
 		}
 		return null;
 	}
 
-	public Map getMap(MapType mapType)
+	private Coordinate getWarpCoordinate(RectangleMapObject warpPoint)
 	{
-		switch (mapType)
-		{
-		case EXAMPLE:
-			return new ExampleMap(world, batch, camera);
-		case PROTOTYPE:
-			return new PrototypeMap(world, batch, camera);
-		case WEST_TOWN:
-			return new WestTownMap(world, batch, camera);
-		case WEST_TOWN_INSIDE_HOUSE:
-			return new WestTownInsideHouse(world, batch, camera);
-		}
-		throw new RuntimeException("Cannot get Map from the given MapType");
+		float warpX = Float.parseFloat(warpPoint.getProperties().get("x", String.class));
+		float warpY = Float.parseFloat(warpPoint.getProperties().get("y", String.class));
+		return new Coordinate(warpX, warpY);
 	}
 
 	/*

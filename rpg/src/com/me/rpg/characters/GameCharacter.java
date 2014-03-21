@@ -29,7 +29,7 @@ import com.me.rpg.utils.Direction;
 public abstract class GameCharacter implements IAttackable
 {
 
-	private static final int MAX_HEALTH = 1000;
+	private static final int MAX_HEALTH = 100;
 
 	private String name;
 	private Sprite sprite;

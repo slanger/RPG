@@ -43,7 +43,17 @@
   <object name="NPC2" x="32" y="384" width="576" height="224"/>
  </objectgroup>
  <objectgroup name="Warp" width="20" height="20">
-  <object name="west_town" x="640" y="320" width="32" height="64"/>
-  <object name="prototype_map" x="320" y="-32" width="64" height="32"/>
+  <object name="west_town" x="640" y="320" width="32" height="64">
+   <properties>
+    <property name="x" value="0"/>
+    <property name="y" value="800"/>
+   </properties>
+  </object>
+  <object name="prototype_map" x="320" y="-32" width="64" height="32">
+   <properties>
+    <property name="x" value="1248"/>
+    <property name="y" value="1248"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

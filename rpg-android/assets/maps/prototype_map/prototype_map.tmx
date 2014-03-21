@@ -64,6 +64,11 @@
   <object name="NPC3" x="832" y="448" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="Warp" width="160" height="160">
-  <object name="example" x="1248" y="1248" width="32" height="32"/>
+  <object name="example" x="1248" y="1248" width="32" height="32">
+   <properties>
+    <property name="x" value="320"/>
+    <property name="y" value="608"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

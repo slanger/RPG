@@ -109,7 +109,7 @@ public class ReputationSystem {
 		// For each character within radius,
 		// character.getNPCMemory.addNewMemoryElement();
 
-		ArrayList<GameCharacter> charactersOnMap = world.getMap()
+		ArrayList<GameCharacter> charactersOnMap = world.getCurrentMap()
 				.getCharactersOnMap();
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
 		while (iterator1.hasNext()) {

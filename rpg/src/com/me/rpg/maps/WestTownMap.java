@@ -1,15 +1,11 @@
 package com.me.rpg.maps;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.me.rpg.RPG;
 import com.me.rpg.World;
-import com.me.rpg.characters.PlayableCharacter;
 
 public class WestTownMap extends Map
 {
@@ -32,28 +28,6 @@ public class WestTownMap extends Map
 
 		// map setup
 		setup();
-
-		// CHARACTER SETUP
-
-		PlayableCharacter player;
-		final String PLAYER_NAME = "Player";
-		final int width = 28;
-		final int height = 28;
-
-		// get spawn points and walking boundaries from .tmx
-		MapObjects spawnPoints = getSpawnPoints();
-
-		// create characters
-		Texture spritesheet1 = RPG.manager.get(RPG.PLAYER_TEXTURE_PATH);
-		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width,
-				height, 16, 16, 0.15f, world);
-		player.setSpeed(200f);
-
-		// add characters to map
-		RectangleMapObject playerSpawn = (RectangleMapObject) spawnPoints
-				.get(PLAYER_NAME);
-		addFocusedCharacterToMap(player, playerSpawn.getRectangle().x,
-				playerSpawn.getRectangle().y);
 	}
 
 }

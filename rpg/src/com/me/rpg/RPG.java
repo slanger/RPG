@@ -26,10 +26,6 @@ public class RPG implements Screen
 
 	public static final String WHITE_DOT_PATH = "white_dot.png";
 	public static final String FONT_PATH = "font/Microsoft_Uighur_white.fnt";
-	public static final String PLAYER_TEXTURE_PATH = "hero.png";
-	public static final String NPC_TEXTURE_PATH = "villain.png";
-	public static final String SWORD_PATH = "sword.png";
-	public static final String ARROW_PATH = "arrow.png";
 
 	public static AssetManager manager = new AssetManager();
 	public ScreenHandler screenHandler;
@@ -172,10 +168,10 @@ public class RPG implements Screen
 		manager.load(WestTownInsideHouse.MAP_TMX_PATH, TiledMap.class);
 
 		// load textures
-		manager.load(PLAYER_TEXTURE_PATH, Texture.class);
-		manager.load(NPC_TEXTURE_PATH, Texture.class);
-		manager.load(SWORD_PATH, Texture.class);
-		manager.load(ARROW_PATH, Texture.class);
+		manager.load(World.PLAYER_TEXTURE_PATH, Texture.class);
+		manager.load(World.NPC_TEXTURE_PATH, Texture.class);
+		manager.load(World.SWORD_PATH, Texture.class);
+		manager.load(World.ARROW_PATH, Texture.class);
 		manager.load(Map.GRAVESTONE_PATH, Texture.class);
 		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
 
