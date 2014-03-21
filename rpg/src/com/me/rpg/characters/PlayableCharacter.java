@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.World;
-import com.me.rpg.ai.Dialogue;
+import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
 
@@ -273,8 +273,8 @@ public class PlayableCharacter extends GameCharacter
 		if (c != null)
 		{
 			c.setMoving(false);
-			Dialogue dialogue = currentMap.getWorld().getDialogue();
-			dialogue.setInDialogue(true);
+			DialogueSystem dialogueSystem = currentMap.getWorld().getDialogue();
+			dialogueSystem.setInDialogue(true);
 			//dialogue.update(c);
 		}
 	}

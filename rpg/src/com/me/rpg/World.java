@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Disposable;
-import com.me.rpg.ai.Dialogue;
+import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
@@ -33,7 +33,7 @@ public final class World implements Disposable
 	private BitmapFont debugFont;
 	private Map map;
 
-	private Dialogue dialogue;
+	private DialogueSystem dialogueSystem;
 	private ReputationSystem reputationSystem;
 
 	private boolean warping = false;
@@ -122,9 +122,9 @@ public final class World implements Disposable
 
 	}
 
-	public Dialogue getDialogue()
+	public DialogueSystem getDialogue()
 	{
-		return dialogue;
+		return dialogueSystem;
 	}
 
 	public ReputationSystem getReputationSystem()
@@ -140,7 +140,7 @@ public final class World implements Disposable
 		this.camera = camera;
 
 		// create map
-		dialogue = new Dialogue();
+		dialogueSystem = new DialogueSystem(batch, camera);
 		reputationSystem = new ReputationSystem(this);
 
 		map = new ExampleMap(this, batch, camera);
@@ -164,9 +164,9 @@ public final class World implements Disposable
 		batch.begin();
 
 		// temporary dialogue stuff
-		if (dialogue.getInDialogue())
+		if (dialogueSystem.getInDialogue())
 		{
-			dialogue.render(batch, camera, shapeRenderer);
+			dialogueSystem.render(batch, camera);
 		}
 		// end dialogue stuff
 
