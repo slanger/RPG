@@ -69,7 +69,7 @@ public class PlayableCharacter extends GameCharacter
 		// redHitbox.width, redHitbox.height);
 	}
 
-	private void handleInput(float deltaTime)
+	public void handleInput(float deltaTime)
 	{
 		if (!enableControls)
 		{
@@ -79,16 +79,19 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * DIALOGUE
 		 */
+		boolean isInDialogue = world.getDialogueSystem().getInDialogue();
 		if (Gdx.input.isKeyPressed(Keys.E))
 		{
 			if (enableInputE)
 			{
+				System.out.println("E");
+
 				enableInputE = false;
 				if (!isInDialogue)
 				{
 					initiateDialogue();
-					if(isInDialogue)
-					{
+					if(world.getDialogueSystem().getInDialogue())
+					{						
 						advanceDialogue("ENTER");
 					}
 				}
@@ -104,34 +107,43 @@ public class PlayableCharacter extends GameCharacter
 		}
 		if(Gdx.input.isKeyPressed(Keys.UP))
 		{
-			if(enableInputUp && isInDialogue)
+			if(enableInputUp)
 			{
+				System.out.println("up");
 				enableInputUp = false;
-				advanceDialogue("UP");
+				if(isInDialogue)
+				{
+					advanceDialogue("UP");
+				}
 			}
-			else
-			{
-				enableInputUp = true;
-			}
+		}
+		else
+		{
+			enableInputUp = true;
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			if (enableInputDown && isInDialogue)
+			if(enableInputDown == true)
 			{
+				System.out.println("down");
 				enableInputDown = false;
-				advanceDialogue("DOWN");
+				if (isInDialogue)
+				{
+					advanceDialogue("DOWN");
+				}
 			}
 		}
 		else
 		{
 			enableInputDown = true;
 		}
+		
 		/*
 		 * END DIALOGUE
 		 */
 		
-		if(this.isInDialogue() == true)
+		if(isInDialogue == true)
 		{
 			return;
 		}
@@ -267,9 +279,8 @@ public class PlayableCharacter extends GameCharacter
 			DialogueSystem dialogueSystem = currentMap.getWorld().getDialogueSystem();
 			boolean foundDialogue = dialogueSystem.startConversation(this, c);
 			if(foundDialogue){
-				this.setInDialogue(true);
-				c.setInDialogue(true);
 				c.setFaceDirection(this.getFaceDirection().opposite());
+				world.setUpdateEnable(false);
 			}
 		}
 	}

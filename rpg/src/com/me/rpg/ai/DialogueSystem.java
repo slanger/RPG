@@ -35,6 +35,7 @@ public class DialogueSystem {
 	private OrthographicCamera camera;
 	private Stage debugStage;
 	private Table table;
+	private Texture texture;
 	
 	//per conversation stuff
 	private boolean inDialogue = false;
@@ -42,6 +43,10 @@ public class DialogueSystem {
 	private GameCharacter player = null;
 	private GameCharacter conversingNPC = null;
 	private boolean finishedDialogue = false;
+	private int choiceIndex;
+	private int showIndex;
+	private String npcStatement = null;
+	private ArrayList<String> responses;
 	
 	public DialogueSystem()
 	{
@@ -50,8 +55,8 @@ public class DialogueSystem {
 		batch = RPG.batch;
 		camera = RPG.camera;
 		inDialogue = false;
-		Table table = new Table();
-		
+		table = new Table();
+		texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
 		
 		initializeDialogueSystem();
 	}
@@ -60,6 +65,7 @@ public class DialogueSystem {
 	{
 		nodeStorage = new LinkedList<Node>();
 		rootNodes = new ArrayList<Node>();
+		responses = new ArrayList<String>();
 		readDialogueFile();
 		
 		while(nodeStorage.isEmpty() == false)
@@ -81,9 +87,9 @@ public class DialogueSystem {
 			if(rootNode.getObjectID().equalsIgnoreCase(conversingNPC.getName()))
 			{
 				//npc has dialogue tree
+				choiceIndex = 0;
+				showIndex = 0;
 				inDialogue = true;
-				currentDialogueNode = rootNode.getChild(0);
-				System.out.println(currentDialogueNode.getDialogue());
 				return true;
 			}
 		}
@@ -94,21 +100,34 @@ public class DialogueSystem {
 	{
 		if(key.equals("ENTER"))
 		{
+			currentDialogueNode = currentDialogueNode.getChild(choiceIndex);
+			//activate trigger for this child
 			
-			
+			responses.clear();
+			npcStatement = currentDialogueNode.getDialogue();
+			for(int i = 0; i < currentDialogueNode.getNumChildren(); i++)
+			{
+				responses.add(currentDialogueNode.getChild(i).getDialogue());
+			}
 		}
 		else if(key.equals("UP"))
 		{
+			if(choiceIndex > 0)
+			{
+				choiceIndex--;
+				if(choiceIndex > 2) showIndex--;
+			}
 			
 		}
 		else if(key.equals("DOWN"))
 		{
-			
+			if(choiceIndex < currentDialogueNode.getNumChildren()) 
+			{
+				choiceIndex++;
+				if(choiceIndex > 2) showIndex++;
+			}
 		}
-		else
-		{
-			
-		}
+		else{}
 		return false;
 	}
 	
@@ -124,39 +143,68 @@ public class DialogueSystem {
 		
 		//stage = new Stage();
 		
-		float desiredX = (camera.viewportWidth * 0.1f);
-		float desiredY = (camera.viewportHeight * 0.9f);
+		float desiredY = (camera.viewportHeight);
 		
+		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2;
+		float dialoguePositionY = camera.position.y - camera.viewportHeight / 2;
 		
-		
-		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2 + desiredX;
-		float dialoguePositionY = camera.position.y + camera.viewportHeight / 2 - desiredY;
-		
-		float dialogueWidth = (camera.viewportWidth - 2*desiredX);
+		float dialogueWidth = camera.viewportWidth;
 		//float dialogueHeight = (camera.viewportHeight - 8*desiredX);;
 		float dialogueHeight = 250.0f;
-		
-		Texture texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
-
-		table = new Table();
-
+	
 		LabelStyle style = new LabelStyle(dialogueFont, Color.WHITE);
 		LabelStyle selectedStyle = new LabelStyle(dialogueFont, Color.BLUE);
 		LabelStyle separatorStyle = new LabelStyle(dialogueFont, Color.GRAY );
 		
-//---------------------------------------------------------------------------------	
+////---------------------------------------------------------------------------------	
+//		Label objectName = new Label("John" , style);
+//		Label npcStatement1 = new Label("NPC statement ------ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd---", style);
+//		Label separator = new Label("------------------------------------------------------------------"
+//				+ "------------------------------------------------", separatorStyle);
+////---------------------------------------------------------------------------------
+//		Label response1 = new Label("Response1 -------------- ", style);
+//		Label response2 = new Label("Response2 ----------------", style);
+//		Label response3 = new Label("Response2 ---------------", style);
+		
+		
 		Label objectName = new Label("John" , style);
-		Label npcStatement1 = new Label("NPC statement ------ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd---", style);
+		Label npcStatement1 = new Label(npcStatement, style);
 		Label separator = new Label("------------------------------------------------------------------"
 				+ "------------------------------------------------", separatorStyle);
-//---------------------------------------------------------------------------------
-		Label response1 = new Label("Response1 -------------- ", style);
-		Label response2 = new Label("Response2 ----------------", style);
-		Label response3 = new Label("Response2 ---------------", style);
+		
+		int selectedIndex = choiceIndex - showIndex;
+		Label response1 = new Label("test1", style);
+		Label response2 = new Label("test1", style);
+		Label response3 = new Label("test1", style);
+		
+		if(selectedIndex == 0)
+		{
+			//response1 = new Label(responses.get(showIndex), selectedStyle);
+			//response2 = new Label(responses.get(showIndex + 1), style);
+			//response3 = new Label(responses.get(showIndex + 2), style);	
+		}
+		else if(selectedIndex == 1)
+		{
+			//response1 = new Label(responses.get(showIndex), style);
+			//response2 = new Label(responses.get(showIndex + 1), selectedStyle);
+			//response3 = new Label(responses.get(showIndex + 2), style);	
+		}
+		else
+		{
+			//response1 = new Label(responses.get(showIndex), style);
+			//response2 = new Label(responses.get(showIndex + 1), style);
+			//response3 = new Label(responses.get(showIndex + 2), selectedStyle);	
+		}
 		
 		npcStatement1.setWrap(true);
 		
+//		System.out.println("camera position x "+camera.position.x);
+//		System.out.println("camera position y "+camera.position.y);
+//		
+//		System.out.println("dialogue position x: "+dialoguePositionX);
+//		System.out.println("dialogue position y: "+dialoguePositionY);
 	    
+		
 	    table.setBounds(dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
 	    
 	    table.add(objectName).width(dialogueWidth*0.9f);
@@ -172,6 +220,7 @@ public class DialogueSystem {
 	    table.add(response3).width(dialogueWidth*0.9f);
 	    table.row();
 	    
+	    //table.setScale(0.5f);
 	    //table.debug();
 		//stage.addActor(table);
 		

@@ -252,6 +252,7 @@ public final class World implements Disposable
 
 		if (!updateEnable)
 		{
+			player.handleInput(deltaTime);
 			return;
 		}
 
