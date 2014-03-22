@@ -8,6 +8,7 @@ import static com.me.rpg.utils.Direction.UP;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
@@ -104,8 +105,8 @@ public class PlayerControlledWalkAI implements WalkAI
 						x, y, spriteWidth, spriteHeight), warpCoordinate);
 				if (newMapType != null)
 				{
-					// currentMap.getWorld().warpPlayerToAnotherMap(newMapType, warpCoordinate);
-					currentMap.getWorld().movePlayerToAnotherMap(newMapType, warpCoordinate);
+					// World.getInstance().warpPlayerToAnotherMap(newMapType, warpCoordinate);
+					World.getInstance().movePlayerToAnotherMap(newMapType, warpCoordinate);
 				}
 			}
 		}

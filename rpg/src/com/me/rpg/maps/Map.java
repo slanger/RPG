@@ -98,11 +98,6 @@ public abstract class Map implements Disposable
 		return collidables;
 	}
 
-	public World getWorld()
-	{
-		return world;
-	}
-
 	public Timer getTimer()
 	{
 		return timer;

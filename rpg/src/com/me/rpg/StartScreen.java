@@ -77,45 +77,7 @@ public class StartScreen implements Screen, InputProcessor
 		buttonPlay = new TextButton("", textPlayButtonStyle);
 		buttonSettings = new TextButton("", textScoreButtonStyle);
 
-		// PLAY BUTTON FUNCTIONALITY
-		buttonPlay.addListener(new InputListener()
-		{
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y,
-					int pointer, int button)
-			{
-				return true;
-			}
-
-			@Override
-			public void touchUp(InputEvent event, float x, float y,
-					int pointer, int button)
-			{
-				screenHandler.moveToOtherScreen(screenHandler.rpgScreen);
-			}
-		});
-
-		// SETTINGS BUTTON FUNCTIONALITY
-		buttonSettings.addListener(new InputListener()
-		{
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y,
-					int pointer, int button)
-			{
-				return true;
-			}
-
-			@Override
-			public void touchUp(InputEvent event, float x, float y,
-					int pointer, int button)
-			{
-				screenHandler.moveToOtherScreen(screenHandler.rpgScreen);
-			}
-		});
-
 		// if Enter is pressed, go to game screen
-		// TODO this is triggered during the game state, so we need to limit
-		// this listener to just the start menu
 		// TODO add keyboard functionality to start menu -Mark
 		stage.addListener(new InputListener()
 		{

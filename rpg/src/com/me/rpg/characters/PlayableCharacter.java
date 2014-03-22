@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
@@ -287,7 +288,7 @@ public class PlayableCharacter extends GameCharacter
 		GameCharacter c = currentMap.checkCollisionWithCharacters(hitbox, this);
 		if (c != null)
 		{
-			DialogueSystem dialogueSystem = currentMap.getWorld().getDialogueSystem();
+			DialogueSystem dialogueSystem = World.getInstance().getDialogueSystem();
 			boolean foundDialogue = dialogueSystem.startConversation(this, c);
 			if(foundDialogue){
 				c.setFaceDirection(this.getFaceDirection().opposite());
