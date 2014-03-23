@@ -40,7 +40,6 @@ import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
 import com.me.rpg.state.RandomWalkState;
 import com.me.rpg.state.RunAwayState;
-import com.me.rpg.state.action.RandomWalkAction;
 import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.state.transition.AndCondition;
 import com.me.rpg.state.transition.Condition;
@@ -200,18 +199,16 @@ public final class World implements Disposable
 				height, 16, 16, 0.15f);
 		player.setSpeed(200f);
 
-		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
-
 		Texture spritesheet2 = RPG.manager.get(NPC_TEXTURE_PATH);
-		RectangleMapObject boundary1 = (RectangleMapObject) exampleWalkingBoundaries
-				.get(NPC1_NAME);
 		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height,
 				16, 16, 0.15f);
-
-		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries
-				.get(NPC2_NAME);
 		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height,
 				16, 16, 0.15f);
+
+		// get walking boundaries
+		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
+		// RectangleMapObject boundary1 = (RectangleMapObject) exampleWalkingBoundaries.get(NPC1_NAME);
+		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries.get(NPC2_NAME);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
@@ -306,7 +303,11 @@ public final class World implements Disposable
 		}
 
 		// render HUD and overlays
-		float fpsX = camera.position.x - camera.viewportWidth / 2 + 15;
+		float healthX = camera.position.x - camera.viewportWidth / 2 + 15;
+		float healthY = camera.position.y + camera.viewportHeight / 2 - 15;
+		debugFont.draw(batch, "Health: " + player.getHealth(), healthX, healthY);
+
+		float fpsX = camera.position.x + camera.viewportWidth / 2 - 70;
 		float fpsY = camera.position.y + camera.viewportHeight / 2 - 15;
 		debugFont.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(),
 				fpsX, fpsY);
