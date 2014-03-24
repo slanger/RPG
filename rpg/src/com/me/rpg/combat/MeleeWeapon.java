@@ -52,26 +52,7 @@ public class MeleeWeapon extends Weapon
 			SpriteBatch batch) {
 
 		Sprite sprite = getWeaponSprite();
-		
-		float centerX = charRectangle.getX() + charRectangle.getWidth()/2;
-		float centerY = charRectangle.getY() + charRectangle.getHeight()/2;
-		float bottomLeftX = centerX - sprite.getWidth() / 2;
-		float bottomLeftY = centerY - sprite.getHeight() / 2;
-		
-		switch (currentStyle) {
-			// straight poking
-			case POKING:
-				sprite.setPosition(bottomLeftX + (getRenderOffset() + charRectangle.getWidth() - 8)*direction.getDx(), bottomLeftY + (getRenderOffset() + charRectangle.getHeight() - 8)*direction.getDy());
-				break;
-			
-			// slashing
-			case SLASHING:
-				float strangeMultiplier = (direction == Direction.RIGHT ? -1 : 1);
-				sprite.setRotation(getDegreeOffset() * strangeMultiplier);
-				sprite.setPosition(bottomLeftX + (charRectangle.getWidth() - 4)*direction.getDx(), bottomLeftY + (charRectangle.getHeight() - 4)*direction.getDy());
-				sprite.setOrigin(sprite.getWidth()/2 * (-direction.getDx() + 1), sprite.getHeight()/2 * (-direction.getDy() + 1));
-				break;
-		}
+		doUpdate(0f);
 		sprite.draw(batch);
 	}
 	
@@ -94,7 +75,32 @@ public class MeleeWeapon extends Weapon
 		return Math.min(degreeRange/2, (degreeRange * stateTime / speed) - degreeRange/2);
 	}
 	
-	protected void doUpdate() {}
+	protected void doUpdate(float deltaTime) {
+		GameCharacter owner = getOwner();
+		Rectangle charRectangle = owner.getHitBox();
+		Sprite sprite = getWeaponSprite();
+		Direction direction = getLastDirection();
+		
+		float centerX = charRectangle.getX() + charRectangle.getWidth()/2;
+		float centerY = charRectangle.getY() + charRectangle.getHeight()/2;
+		float bottomLeftX = centerX - sprite.getWidth() / 2;
+		float bottomLeftY = centerY - sprite.getHeight() / 2;
+		
+		switch (currentStyle) {
+			// straight poking
+			case POKING:
+				sprite.setPosition(bottomLeftX + (getRenderOffset() + charRectangle.getWidth() - 8)*direction.getDx(), bottomLeftY + (getRenderOffset() + charRectangle.getHeight() - 8)*direction.getDy());
+				break;
+			
+			// slashing
+			case SLASHING:
+				float strangeMultiplier = (direction == Direction.RIGHT ? -1 : 1);
+				sprite.setRotation(getDegreeOffset() * strangeMultiplier);
+				sprite.setPosition(bottomLeftX + (charRectangle.getWidth() - 4)*direction.getDx(), bottomLeftY + (charRectangle.getHeight() - 4)*direction.getDy());
+				sprite.setOrigin(sprite.getWidth()/2 * (-direction.getDx() + 1), sprite.getHeight()/2 * (-direction.getDy() + 1));
+				break;
+		}
+	}
 	
 	protected void doAttackCleanup() {
 		getItemSprite(Direction.UP).setRotation(0);

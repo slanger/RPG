@@ -503,7 +503,6 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	{
 		if (strikeImmunity > 0)
 			return;
-
 		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(weapon);
 		if (result)
@@ -675,7 +674,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 
 	public Rectangle getHitBox()
 	{
-		Rectangle r = sprite.getBoundingRectangle();
+		Rectangle r = bottomLeftCorner.getBottomLeftRectangle(width, height);
 		Vector2 center = new Vector2();
 		r.getCenter(center);
 		// TODO: Looks unnatural/bad when arrow disappears "before" it hits (because character has clear pixels)

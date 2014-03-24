@@ -83,5 +83,9 @@ public class Coordinate implements Serializable
 	public Rectangle getCenteredRectangle(float width, float height) {
 		return new Rectangle(x - width/2.0f, y - width/2.0f, width, height);
 	}
+	
+	public Rectangle getBottomLeftRectangle(float width, float height) {
+		return new Rectangle(x, y, width, height);
+	}
 
 }

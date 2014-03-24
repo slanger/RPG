@@ -72,6 +72,11 @@ public abstract class Weapon extends Equippable
 		return getWeaponSprite().getBoundingRectangle();
 	}
 	
+	public Rectangle getHitBox() {
+		doUpdate(0f);
+		return getWeaponSprite().getBoundingRectangle();
+	}
+	
 	public boolean isAttacking() {
 		return attacking;
 	}
@@ -115,7 +120,7 @@ public abstract class Weapon extends Equippable
 	
 	public void update(float deltaTime) {
 		stateTime += deltaTime;
-		doUpdate();
+		doUpdate(deltaTime);
 		if (!attacking) {
 			return;
 		}
@@ -127,7 +132,7 @@ public abstract class Weapon extends Equippable
 		}
 	}
 	
-	protected abstract void doUpdate();
+	protected abstract void doUpdate(float deltaTime);
 
 	public abstract void switchStyle();
 	

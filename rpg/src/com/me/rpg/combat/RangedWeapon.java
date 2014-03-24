@@ -57,7 +57,7 @@ public class RangedWeapon extends Weapon
 	}
 
 	@Override
-	protected void doUpdate() {
+	protected void doUpdate(float deltaTime) {
 		
 	}
 
