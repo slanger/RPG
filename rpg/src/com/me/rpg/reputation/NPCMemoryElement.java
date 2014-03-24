@@ -1,8 +1,14 @@
 package com.me.rpg.reputation;
 
+import java.io.Serializable;
+
 import com.me.rpg.characters.GameCharacter;
 
-public class NPCMemoryElement {
+public class NPCMemoryElement implements Serializable
+{
+
+	private static final long serialVersionUID = 928305096707093169L;
+
 	private EventID id;
 	private int magnitude;
 	//private time timestamp;

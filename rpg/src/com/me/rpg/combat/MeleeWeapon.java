@@ -7,8 +7,11 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Direction;
 
-public class MeleeWeapon extends Weapon {
-	
+public class MeleeWeapon extends Weapon
+{
+
+	private static final long serialVersionUID = 9043712495403662726L;
+
 	private enum AttackStyle {
 		POKING,
 		SLASHING
@@ -16,8 +19,10 @@ public class MeleeWeapon extends Weapon {
 	
 	private AttackStyle currentStyle;
 	
-	public MeleeWeapon(String weaponName) {
-		super(weaponName);
+	public MeleeWeapon(String weaponName, String weaponSpritePath, int width,
+			int height, int tileWidth, int tileHeight)
+	{
+		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight);
 		setStatsDefault();
 	}
 	

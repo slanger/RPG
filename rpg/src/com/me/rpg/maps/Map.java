@@ -1,15 +1,15 @@
 package com.me.rpg.maps;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
@@ -19,7 +19,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.me.rpg.RPG;
+import com.me.rpg.ScreenHandler;
 import com.me.rpg.World;
 import com.me.rpg.characters.DeadCharacter;
 import com.me.rpg.characters.GameCharacter;
@@ -28,45 +28,43 @@ import com.me.rpg.combat.Weapon;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Timer;
 
-public abstract class Map implements Disposable
+public abstract class Map implements Disposable, Serializable
 {
+
+	private static final long serialVersionUID = 6670415681217808756L;
 
 	public static final String GRAVESTONE_PATH = "gravestones.png";
 
-	protected World world;
-	protected SpriteBatch batch;
-	protected OrthographicCamera camera;
+	protected final World world;
+	protected final MapType mapType;
+	private final String mapTmxPath;
 
 	protected GameCharacter focusedCharacter;
 	protected int mapWidth;
 	protected int mapHeight;
 
-	protected ArrayList<GameCharacter> charactersOnMap;
-	protected ArrayList<Projectile> flyingProjectiles;
-	protected ArrayList<Weapon> equippedWeapons;
-	protected ArrayList<DeadCharacter> corpses;
+	protected ArrayList<GameCharacter> charactersOnMap = new ArrayList<GameCharacter>();
+	protected ArrayList<Projectile> flyingProjectiles = new ArrayList<Projectile>();
+	protected ArrayList<Weapon> equippedWeapons = new ArrayList<Weapon>();
+	protected ArrayList<DeadCharacter> corpses = new ArrayList<DeadCharacter>();
 
-	protected RectangleMapObject[] collidables;
-	protected RectangleMapObject[] warpPoints;
+	protected transient RectangleMapObject[] collidables;
+	protected transient RectangleMapObject[] warpPoints;
 
 	// Tiled map variables
-	protected TiledMap tiledMap;
-	protected OrthogonalTiledMapRenderer tiledMapRenderer;
+	protected transient TiledMap tiledMap;
+	protected transient OrthogonalTiledMapRenderer tiledMapRenderer;
 
 	// Tiled layers drawn behind characters, labeled by index
-	protected int[] backgroundLayers;
+	protected final int[] backgroundLayers = new int[] { 0, 1, 2 };
 	// Tiled layers drawn in front of characters, labeled by index
-	protected int[] foregroundLayers;
+	protected final int[] foregroundLayers = new int[] { 3 };
 
 	private boolean enableCameraSwitch = false;
 	private boolean cameraPan = false;
 	private float oldCameraZoom = 0f;
 
-	protected Timer timer;
-
-	protected MapType mapType;
-
-	protected TextureRegion gravestone;
+	protected Timer timer = new Timer();
 
 	public MapType getMapType()
 	{
@@ -103,25 +101,19 @@ public abstract class Map implements Disposable
 		return timer;
 	}
 
-	public Map()
+	protected Map(World world, MapType mapType, String mapTmxPath)
 	{
-		world = World.getInstance();
-		batch = RPG.batch;
-		camera = RPG.camera;
-
-		timer = new Timer();
-
-		charactersOnMap = new ArrayList<GameCharacter>();
-		flyingProjectiles = new ArrayList<Projectile>();
-		equippedWeapons = new ArrayList<Weapon>();
-		corpses = new ArrayList<DeadCharacter>();
-
-		Texture graves = RPG.manager.get(GRAVESTONE_PATH);
-		gravestone = new TextureRegion(graves, 0, 0, 34, 41);
+		this.world = world;
+		this.mapType = mapType;
+		this.mapTmxPath = mapTmxPath;
 	}
 
 	protected void setup()
 	{
+		// get Tiled map
+		tiledMap = ScreenHandler.manager.get(mapTmxPath, TiledMap.class);
+		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, world.batch);
+
 		// get map width and height from .tmx file
 		MapProperties mapProperties = tiledMap.getProperties();
 		int tileWidth = (Integer) mapProperties.get("tilewidth");
@@ -144,6 +136,12 @@ public abstract class Map implements Disposable
 		{
 			warpPoints[i] = (RectangleMapObject) warpObjects.get(i);
 		}
+	}
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		setup();
 	}
 
 	protected MapObjects getCollidables()
@@ -179,6 +177,7 @@ public abstract class Map implements Disposable
 
 	private void cameraPanMovement()
 	{
+		OrthographicCamera camera = world.camera;
 		if (Gdx.input.isKeyPressed(Keys.A))
 		{
 			camera.zoom += 0.02;
@@ -266,7 +265,7 @@ public abstract class Map implements Disposable
 	 * Draws the background image of the map, followed by all the Characters
 	 * that are in view nearby the focusedCharacter
 	 */
-	public void render()
+	public void render(OrthographicCamera camera, SpriteBatch batch)
 	{
 		Coordinate focusedCoordinate = Coordinate.ZERO;
 		if (focusedCharacter != null)
@@ -385,11 +384,11 @@ public abstract class Map implements Disposable
 				cameraPan = !cameraPan;
 				if (cameraPan)
 				{
-					oldCameraZoom = camera.zoom;
+					oldCameraZoom = world.camera.zoom;
 				}
 				else
 				{
-					camera.zoom = oldCameraZoom;
+					world.camera.zoom = oldCameraZoom;
 				}
 			}
 		}
@@ -427,7 +426,7 @@ public abstract class Map implements Disposable
 			if (character.isDead())
 			{
 				charIter.remove();
-				corpses.add(new DeadCharacter(character, new Sprite(gravestone), 3.0f));
+				corpses.add(new DeadCharacter(character, GRAVESTONE_PATH, 3.0f));
 			}
 		}
 

@@ -1,41 +1,47 @@
 package com.me.rpg.maps;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.me.rpg.RPG;
+import com.me.rpg.ScreenHandler;
+import com.me.rpg.World;
 import com.me.rpg.utils.Timer;
 
 public class PrototypeMap extends Map
 {
-	
+
+	private static final long serialVersionUID = -5562012439124121495L;
+
 	public static final String MAP_TMX_PATH = "maps/prototype_map/prototype_map.tmx";
 	public static final String BACKGROUND_MUSIC_START = "music/ALTTP_overworld_start.wav";
 	public static final String BACKGROUND_MUSIC_LOOP = "music/ALTTP_overworld_loop.wav";
 
-	private Music startMusic, loopMusic;
+	private transient Music startMusic, loopMusic;
 	private StartLoopMusicTask startLoopMusicTask = new StartLoopMusicTask();
 
-	public PrototypeMap()
+	public PrototypeMap(World world)
 	{
-		super();
-
-		mapType = MapType.PROTOTYPE;
-
-		// get Tiled map
-		tiledMap = RPG.manager.get(MAP_TMX_PATH, TiledMap.class);
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
-
-		// set layers
-		backgroundLayers = new int[] { 0, 1 };
-		foregroundLayers = new int[] { 2 };
+		super(world, MapType.PROTOTYPE, MAP_TMX_PATH);
 
 		// map setup
 		setup();
 
+		create();
+	}
+
+	private void create()
+	{
 		// get music
-		startMusic = RPG.manager.get(BACKGROUND_MUSIC_START);
-		loopMusic = RPG.manager.get(BACKGROUND_MUSIC_LOOP);
+		startMusic = ScreenHandler.manager.get(BACKGROUND_MUSIC_START);
+		loopMusic = ScreenHandler.manager.get(BACKGROUND_MUSIC_LOOP);
+	}
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		setup();
+		create();
 	}
 
 	@Override
@@ -43,7 +49,7 @@ public class PrototypeMap extends Map
 	{
 		super.open();
 		startMusic.play();
-		timer.scheduleTask(startLoopMusicTask, 7.0f); // length of intro music
+		timer.scheduleTask(startLoopMusicTask, 6.9f); // length of intro music
 	}
 
 	@Override
@@ -57,6 +63,8 @@ public class PrototypeMap extends Map
 
 	private class StartLoopMusicTask extends Timer.Task
 	{
+
+		private static final long serialVersionUID = -165838319556649887L;
 
 		@Override
 		public void run()

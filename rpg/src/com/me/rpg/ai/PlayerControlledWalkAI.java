@@ -8,7 +8,6 @@ import static com.me.rpg.utils.Direction.UP;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
@@ -17,14 +16,18 @@ import com.me.rpg.utils.Direction;
 
 public class PlayerControlledWalkAI implements WalkAI
 {
-	private GameCharacter character;
+
+	private static final long serialVersionUID = 2647691917043351571L;
+
+	private final GameCharacter character;
 	private KeyMap keyMap = KeyMap.DEFAULT;
 	private boolean strafeEnabler = false;
-	
-	public PlayerControlledWalkAI (GameCharacter character) {
+
+	public PlayerControlledWalkAI(GameCharacter character)
+	{
 		this.character = character;
 	}
-	
+
 	@Override
 	public void update(float deltaTime, Map currentMap)
 	{
@@ -105,8 +108,8 @@ public class PlayerControlledWalkAI implements WalkAI
 						x, y, spriteWidth, spriteHeight), warpCoordinate);
 				if (newMapType != null)
 				{
-					// World.getInstance().warpPlayerToAnotherMap(newMapType, warpCoordinate);
-					World.getInstance().movePlayerToAnotherMap(newMapType, warpCoordinate);
+					// character.getWorld().warpPlayerToOtherMap(newMapType, warpCoordinate);
+					character.getWorld().movePlayerToOtherMap(newMapType, warpCoordinate);
 				}
 			}
 		}

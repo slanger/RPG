@@ -1,22 +1,27 @@
 package com.me.rpg.characters;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.me.rpg.World;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.MapType;
 import com.me.rpg.state.State;
 import com.me.rpg.state.UpdateResult;
 import com.me.rpg.state.action.Action;
+import com.me.rpg.utils.Coordinate;
 
 public class NonplayableCharacter extends GameCharacter
 {
 
+	private static final long serialVersionUID = 5970053678208573292L;
+
 	private boolean enableAttack = false;
 	private State stateMachine;
 
-	public NonplayableCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration)
+	public NonplayableCharacter(String name, String spritesheetPath, int width,
+			int height, int tileWidth, int tileHeight, float animationDuration,
+			World world)
 	{
-		super(name, spritesheet, width, height, tileWidth, tileHeight,
-				animationDuration);
+		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
+				animationDuration, world);
 
 		stateMachine = null;
 	}
@@ -56,5 +61,18 @@ public class NonplayableCharacter extends GameCharacter
 
 		updateTexture();
 	}
-	
+
+	@Override
+	public void moveToOtherMap(MapType mapType, Coordinate newLocation)
+	{
+		// TODO move NPC to other map 'quietly'--without interrupting the player
+	}
+
+	@Override
+	public void warpToOtherMap(MapType mapType, Coordinate newLocation)
+	{
+		// just use moveToOtherMap(); nothing flashy for NPC
+		moveToOtherMap(mapType, newLocation);
+	}
+
 }

@@ -1,5 +1,10 @@
 package com.me.rpg.state.action;
 
-public interface Action {
+import java.io.Serializable;
+
+public interface Action extends Serializable
+{
+
 	public void doAction(float delta);
+
 }

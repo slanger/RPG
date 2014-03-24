@@ -1,5 +1,6 @@
 package com.me.rpg.state;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.me.rpg.characters.GameCharacter;
@@ -11,8 +12,11 @@ import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableFloat;
 
-public abstract class State {
-	
+public abstract class State implements Serializable
+{
+
+	private static final long serialVersionUID = 4400404981305958456L;
+
 	protected HierarchicalState parent;
 	protected Transition[] transitions;
 	protected boolean setTransitions;

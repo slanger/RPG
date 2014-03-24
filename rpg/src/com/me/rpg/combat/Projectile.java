@@ -1,54 +1,73 @@
 package com.me.rpg.combat;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.ScreenHandler;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
-public class Projectile implements Cloneable {
+public class Projectile implements Cloneable, Serializable
+{
+
+	private static final long serialVersionUID = -7980922753062226654L;
+
+	private String name;
+	private String spritePath;
+	private int width, height;
+	private int tileWidth, tileHeight;
+
+	private RangedWeapon firedFrom = null;
+	private Direction firedDirection = Direction.RIGHT;
+	private boolean fired = false;
+	private boolean finished = false;
+	private int piercing = 1;
+	private Coordinate origin = null;
+	private float stateTime = 0f;
 	
-	private RangedWeapon firedFrom;
-	private Direction firedDirection;
-	private boolean fired;
-	private boolean finished;
-	private int piercing;
-	private Coordinate origin;
-	private float stateTime;
+	private transient Sprite weaponRight, weaponUp, weaponLeft, weaponDown;
 	
-	private Sprite weaponRight, weaponUp, weaponLeft, weaponDown;
-	
-	private float speedMultiplier;
+	private float speedMultiplier = 1.0f;
 	private float degreeRotation;
-	private int range;
-	private int power;
+	private int range = 0;
+	private int power = 0;
 	
-	private StatusEffect[] effects;
+	private StatusEffect[] effects = new StatusEffect[0];
 	
-	public Projectile(String name, Texture projectile, int width, int height, int tileWidth, int tileHeight) {
+	public Projectile(String name, String spritePath, int width, int height, int tileWidth, int tileHeight)
+	{
+		this.name = name;
+		this.spritePath = spritePath;
+		this.width = width;
+		this.height = height;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
+
+		create();
+	}
+
+	private void create()
+	{
+		Texture projectile = ScreenHandler.manager.get(spritePath, Texture.class);
 		TextureRegion[][] sheet = TextureRegion.split(projectile, tileWidth, tileHeight);
 		weaponRight = new Sprite(sheet[0][0], 0, 0, width, height);
 		weaponUp = new Sprite(sheet[0][1], 0, 0, height, width);
 		weaponLeft = new Sprite(sheet[0][2], 0, 0, width, height);
 		weaponDown = new Sprite(sheet[0][3], 0, 0, height, width);
-		
-		fired = false;
-		finished = false;
-		piercing = 1;
-		origin = null;
-		firedDirection = Direction.RIGHT;
-		firedFrom = null;
-		stateTime = 0f;
-		
-		power = 0;
-		speedMultiplier = 1.0f;
-		range = 0;
-		
-		effects = new StatusEffect[0];
 	}
-	
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		create();
+	}
+
 	public StatusEffect[] getEffects() {
 		StatusEffect[] partial = firedFrom.getEffects();
 		StatusEffect[] ret = new StatusEffect[effects.length + partial.length];

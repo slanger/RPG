@@ -1,5 +1,10 @@
 package com.me.rpg;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -78,7 +83,7 @@ public class StartScreen implements Screen, InputProcessor
 		buttonSettings = new TextButton("", textScoreButtonStyle);
 
 		// if Enter is pressed, go to game screen
-		// TODO add keyboard functionality to start menu -Mark
+		// TODO add more keyboard functionality to start menu
 		stage.addListener(new InputListener()
 		{
 			@Override
@@ -87,7 +92,31 @@ public class StartScreen implements Screen, InputProcessor
 				if (keycode == Keys.ENTER)
 				{
 					stage.removeListener(this);
-					screenHandler.moveToOtherScreen(screenHandler.rpgScreen);
+					screenHandler.setScreen(new RPG(screenHandler, World.getNewInstance(), 1));
+				}
+				else if (keycode == Keys.NUM_1)
+				{
+					stage.removeListener(this);
+					World world = retrieveSaveFile(1);
+					if (world == null)
+						world = World.getNewInstance();
+					screenHandler.setScreen(new RPG(screenHandler, world, 1));
+				}
+				else if (keycode == Keys.NUM_2)
+				{
+					stage.removeListener(this);
+					World world = retrieveSaveFile(2);
+					if (world == null)
+						world = World.getNewInstance();
+					screenHandler.setScreen(new RPG(screenHandler, world, 2));
+				}
+				else if (keycode == Keys.NUM_3)
+				{
+					stage.removeListener(this);
+					World world = retrieveSaveFile(3);
+					if (world == null)
+						world = World.getNewInstance();
+					screenHandler.setScreen(new RPG(screenHandler, world, 3));
 				}
 				return true;
 			}
@@ -106,6 +135,35 @@ public class StartScreen implements Screen, InputProcessor
 
 		// ADD TABLE (aka ACTOR) TO STAGE
 		stage.addActor(table);
+	}
+
+	private World retrieveSaveFile(int saveFileId)
+	{
+		String fileName = saveFileId + ".sav";
+
+		try
+		{
+			FileInputStream saveFile = new FileInputStream(fileName);
+			ObjectInputStream retrieveStream = new ObjectInputStream(saveFile);
+			World world = (World) retrieveStream.readObject();
+			retrieveStream.close();
+			System.out.println("Game retrieved from " + fileName);
+			return world;
+		}
+		catch (FileNotFoundException e)
+		{
+			System.err.println("Could not find file: " + saveFileId + ".sav");
+			System.err.println("Creating new file for " + saveFileId + ".sav");
+			return null;
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (ClassNotFoundException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

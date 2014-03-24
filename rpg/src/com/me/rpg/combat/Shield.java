@@ -6,14 +6,19 @@ import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Direction;
 
-public class Shield extends Equippable implements IAttackable {
-	
+public class Shield extends Equippable implements IAttackable
+{
+
+	private static final long serialVersionUID = -7805024725475369090L;
+
 	private int health;
 	
 	private Direction lastDirection; // last direction shield was facing when used
 	
-	public Shield(String shieldName) {
-		super(shieldName);
+	public Shield(String shieldName, String shieldSpritePath, int width,
+			int height, int tileWidth, int tileHeight)
+	{
+		super(shieldName, shieldSpritePath, width, height, tileWidth, tileHeight);
 		health = 100;
 	}
 	

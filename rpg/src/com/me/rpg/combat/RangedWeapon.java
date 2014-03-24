@@ -7,14 +7,19 @@ import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
-public class RangedWeapon extends Weapon {
-	
+public class RangedWeapon extends Weapon
+{
+
+	private static final long serialVersionUID = -6979569030885145029L;
+
 	private Projectile equippedAmmo;
 	protected float degreeRotation;
 	private int ammoCount;
 	
-	public RangedWeapon(String weaponName) {
-		super(weaponName);
+	public RangedWeapon(String weaponName, String weaponSpritePath, int width,
+			int height, int tileWidth, int tileHeight)
+	{
+		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight);
 		setStatsDefault();
 	}
 	

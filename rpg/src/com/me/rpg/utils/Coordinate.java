@@ -1,10 +1,14 @@
 package com.me.rpg.utils;
 
+import java.io.Serializable;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Coordinate
+public class Coordinate implements Serializable
 {
+
+	private static final long serialVersionUID = -1843687349069001351L;
 
 	public static final Coordinate ZERO = new Coordinate(0f, 0f);
 	public static final float EPS = 0.00000001f;

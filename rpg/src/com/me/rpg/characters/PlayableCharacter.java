@@ -2,13 +2,14 @@ package com.me.rpg.characters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.MapType;
+import com.me.rpg.utils.Coordinate;
 
 public class PlayableCharacter extends GameCharacter
 {
@@ -17,6 +18,9 @@ public class PlayableCharacter extends GameCharacter
 	// private Texture redHitboxTexture;
 	// private Rectangle redHitbox = new Rectangle(0, 0, 0, 0);
 
+	private static final long serialVersionUID = 2335023793457785574L;
+
+	private boolean enableSaving = true;
 	private boolean enableAttack = true;
 	private boolean enableWeaponSwitch = true;
 	private boolean enableStyleSwitch = true;
@@ -41,15 +45,15 @@ public class PlayableCharacter extends GameCharacter
 		this.enableControls = enableControls;
 	}
 
-	public PlayableCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration)
+	public PlayableCharacter(String name, String spritesheetPath, int width,
+			int height, int tileWidth, int tileHeight, float animationDuration,
+			World world)
 	{
-		super(name, spritesheet, width, height, tileWidth, tileHeight,
-				animationDuration);
+		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
+				animationDuration, world);
 		npcMemory = null;
 		walkAI = new PlayerControlledWalkAI(this);
-		// redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH,
-		// Texture.class);
+		// redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH, Texture.class);
 	}
 
 	@Override
@@ -77,6 +81,24 @@ public class PlayableCharacter extends GameCharacter
 		{
 			return;
 		}
+
+		// save the game
+		if (Gdx.input.isKeyPressed(Keys.ENTER))
+		{
+			if (enableSaving)
+			{
+				enableSaving = false;
+				world.setSaveGame(true);
+			}
+		}
+		else
+		{
+			enableSaving = true;
+		}
+
+		/*
+		 * DIALOGUE
+		 */
 
 		if(world.getDialogueSystem().getInDialogue()) 
 		{
@@ -126,6 +148,11 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * END MOVEMENT
 		 */
+
+		/*
+		 * ACTIONS
+		 */
+
 		// push a character
 		if (Gdx.input.isKeyPressed(Keys.S))
 		{
@@ -143,7 +170,6 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * END ACTIONS
 		 */
-
 
 		/*
 		 * COMBAT
@@ -288,7 +314,7 @@ public class PlayableCharacter extends GameCharacter
 		GameCharacter c = currentMap.checkCollisionWithCharacters(hitbox, this);
 		if (c != null)
 		{
-			DialogueSystem dialogueSystem = World.getInstance().getDialogueSystem();
+			DialogueSystem dialogueSystem = world.getDialogueSystem();
 			boolean foundDialogue = dialogueSystem.startConversation(this, c);
 			if(foundDialogue){
 				c.setFaceDirection(this.getFaceDirection().opposite());
@@ -306,6 +332,18 @@ public class PlayableCharacter extends GameCharacter
 	private boolean advanceDialogue(String key)
 	{	
 		return world.getDialogueSystem().advanceDialogue(key);
+	}
+
+	@Override
+	public void moveToOtherMap(MapType mapType, Coordinate newLocation)
+	{
+		world.movePlayerToOtherMap(mapType, newLocation);
+	}
+
+	@Override
+	public void warpToOtherMap(MapType mapType, Coordinate newLocation)
+	{
+		world.warpPlayerToOtherMap(mapType, newLocation);
 	}
 
 }

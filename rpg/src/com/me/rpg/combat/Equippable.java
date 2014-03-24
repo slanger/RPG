@@ -1,29 +1,44 @@
 package com.me.rpg.combat;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.me.rpg.ScreenHandler;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Direction;
 
-public abstract class Equippable implements Cloneable {
-	
+public abstract class Equippable implements Cloneable, Serializable
+{
+
+	private static final long serialVersionUID = 6962601626879883410L;
+
 	private String itemName;
+	private String itemSpritePath;
+	private int width, height;
+	private int tileWidth, tileHeight;
+
 	private GameCharacter owner;
 	private GameCharacter lastOwner;
-	
-	private boolean spriteInit;
-	private Sprite spriteRight;
-	private Sprite spriteUp;
-	private Sprite spriteLeft;
-	private Sprite spriteDown;
-	
-	protected Equippable(String itemName)
+
+	private transient Sprite spriteLeft, spriteRight, spriteUp, spriteDown;
+
+	protected Equippable(String itemName, String itemSpritePath, int width,
+			int height, int tileWidth, int tileHeight)
 	{
 		this.itemName = itemName;
-		spriteInit = false;
+		this.itemSpritePath = itemSpritePath;
+		this.width = width;
+		this.height = height;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
+
+		create();
 	}
-	
+
 	/**
 	 * Expects itemSprite images to be in order "right up left down"
 	 * Expects each image to be in 4 adjacent regions of tileWidth x tileHeight
@@ -35,22 +50,25 @@ public abstract class Equippable implements Cloneable {
 	 * @param tileWidth Width of the tiles the itemSprite texture is split into
 	 * @param tileHeight Height of the tiles the itemSprite texture is split into
 	 */
-	public void initSprite(Texture itemSprite, int width, int height,
-			int tileWidth, int tileHeight) {
-		if (spriteInit) {
-			throw new RuntimeException("Item " + this + " already has initialized its sprite.");
-		}
+	public void create()
+	{
 		// IMPORTANT: Expects images to be in order "right up left down"
 		//			AND dimensions for right -- up are reversed
 		//			AND that given dimensions are for right
+		Texture itemSprite = ScreenHandler.manager.get(itemSpritePath, Texture.class);
 		TextureRegion[][] sheet = TextureRegion.split(itemSprite, tileWidth, tileHeight);
 		spriteRight = new Sprite(sheet[0][0], 0, 0, width, height);
 		spriteUp = new Sprite(sheet[0][1], 0, 0, height, width);
 		spriteLeft = new Sprite(sheet[0][2], 0, 0, width, height);
 		spriteDown = new Sprite(sheet[0][3], 0, 0, height, width);
-		spriteInit = true;
 	}
-	
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		create();
+	}
+
 	/**
 	 * Get the sprite corresponding to the passed in direction
 	 * @param direction Desired direction of sprite
@@ -129,8 +147,7 @@ public abstract class Equippable implements Cloneable {
 			e.itemName = itemName;
 			e.owner = null;
 			e.lastOwner = null;
-			
-			e.spriteInit = true;
+
 			e.spriteRight = new Sprite(spriteRight);
 			e.spriteUp = new Sprite(spriteUp);
 			e.spriteLeft = new Sprite(spriteLeft);

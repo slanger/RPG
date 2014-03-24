@@ -2,15 +2,13 @@ package com.me.rpg.ai;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,22 +18,20 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.me.rpg.RPG;
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.utils.Direction;
 
+public class DialogueSystem implements Serializable
+{
 
-public class DialogueSystem {
+	private static final long serialVersionUID = -4602444631718545740L;
 
 	private Queue<Node> nodeStorage;
 	private ArrayList<Node> rootNodes;
 	
-	private BitmapFont dialogueFont;
-	private SpriteBatch batch;
-	private OrthographicCamera camera;
-	private Stage debugStage;
-	private Table table;
-	private Texture texture;
+	private transient BitmapFont dialogueFont;
+	private transient Stage debugStage;
+	private transient Table table;
+	private transient Texture texture;
 	
 	//per conversation stuff
 	private boolean inDialogue = false;
@@ -52,8 +48,6 @@ public class DialogueSystem {
 	{
 		//initialize renderer stuff
 		dialogueFont = new BitmapFont();
-		batch = RPG.batch;
-		camera = RPG.camera;
 		inDialogue = false;
 		table = new Table();
 		texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
@@ -72,7 +66,6 @@ public class DialogueSystem {
 		{
 			Node newRootNode = nodeStorage.poll(); 
 			rootNodes.add(newRootNode);
-			System.out.println("added to rootnodes");
 			newRootNode.addChildNode(assembleTree(newRootNode));
 		}
 	}
@@ -99,13 +92,8 @@ public class DialogueSystem {
 	
 	public boolean advanceDialogue(String key) //returns true if dialogue ended
 	{
-		
-		System.out.println(key);
-		
 		if(key.equals("ENTER"))
-		{
-			System.out.println("advancing on enter");
-		
+		{		
 			if(currentDialogueNode.getNumChildren() > 0 )
 			{
 				currentDialogueNode = currentDialogueNode.getChild(choiceIndex);
@@ -129,8 +117,6 @@ public class DialogueSystem {
 		}
 		else if(key.equals("UP"))
 		{
-			System.out.println("advancing on up");
-
 			if(choiceIndex > 0)
 			{
 				choiceIndex--;
@@ -140,8 +126,6 @@ public class DialogueSystem {
 		}
 		else if(key.equals("DOWN"))
 		{
-			System.out.println("advancing on down");
-
 			if(choiceIndex < currentDialogueNode.getNumChildren()-1) 
 			{
 				choiceIndex++;
@@ -152,7 +136,6 @@ public class DialogueSystem {
 					
 			}
 		}
-		else{}
 		System.out.println("choiceIndex: " +choiceIndex);
 		System.out.println("showIndex: "+showIndex);
 		return false;
@@ -161,9 +144,6 @@ public class DialogueSystem {
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
-		this.batch = batch;
-		this.camera = camera;
-		
 		//stage = new Stage();
 		
 		float desiredY = (camera.viewportHeight);
@@ -276,14 +256,16 @@ public class DialogueSystem {
 		return inDialogue;
 	}
 	
-	class Node
+	class Node implements Serializable
 	{
-		//root node only
+
+		private static final long serialVersionUID = -8686936011407735399L;
+
+		// root node only
 		private String objectType;
 		private String objectID;
 		private String disposition;
-		
-		
+
 		private String dialogue;
 		private String trigger;
 		private int numChildren;
@@ -384,7 +366,7 @@ public class DialogueSystem {
 			for(int i = 0; i < currentNode.getNumChildren(); i++)
 			{
 				Node nextNode = assembleTree(currentNode);
-				System.out.println("added node "+nextNode.getDialogue()+ " under "+currentNode.getDialogue());
+				// System.out.println("added node "+nextNode.getDialogue()+ " under "+currentNode.getDialogue());
 				currentNode.addChildNode(nextNode);
 			}
 		}
@@ -402,8 +384,7 @@ public class DialogueSystem {
 		catch(FileNotFoundException error)
 		{
 			scanner = null;
-			System.out.println("File DialogueFile.txt not found.");
-			
+			System.err.println("File DialogueFile.txt not found.");
 		}
 		if(scanner!=null)	
 		{

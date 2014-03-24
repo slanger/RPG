@@ -1,10 +1,15 @@
 package com.me.rpg.ai;
 
+import java.io.Serializable;
+
 import com.badlogic.gdx.Input.Keys;
 import com.me.rpg.utils.Direction;
 
-public class KeyMap {
-	
+public class KeyMap implements Serializable
+{
+
+	private static final long serialVersionUID = -6564686280577008184L;
+
 	public static final KeyMap DEFAULT = new KeyMap();
 	
 	private int[] map;

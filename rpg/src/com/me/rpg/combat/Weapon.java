@@ -6,8 +6,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Direction;
 
-public abstract class Weapon extends Equippable {
-	
+public abstract class Weapon extends Equippable
+{
+
+	private static final long serialVersionUID = -8054453214554512536L;
+
 	protected float speed;			// how long it takes for the weapon to reach the end of its stroke, in seconds
 	protected float fireRate; 		// how long the user must wait after attacking to attack or switch weapons, in seconds 
 	protected int range; 			// how far the weapon can reach, in pixels?
@@ -27,8 +30,10 @@ public abstract class Weapon extends Equippable {
 		return lastDirection;
 	}
 	
-	public Weapon(String weaponName) {
-		super(weaponName);
+	public Weapon(String weaponName, String weaponSpritePath, int width,
+			int height, int tileWidth, int tileHeight)
+	{
+		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight);
 		lastDirection = Direction.DOWN;
 		effects = new StatusEffect[0];
 	}

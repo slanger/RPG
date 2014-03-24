@@ -1,11 +1,16 @@
 package com.me.rpg.reputation;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;
 
-public class ReputationEvent {
+public class ReputationEvent implements Serializable
+{
+
+	private static final long serialVersionUID = 3012016206183543799L;
+
 	private EventID id;
 	private Coordinate coordinate;
 	private Date date;

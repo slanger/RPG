@@ -10,6 +10,8 @@ import com.me.rpg.utils.Timer;
 public class RandomWalkAI implements WalkAI
 {
 
+	private static final long serialVersionUID = 1422490159208848504L;
+
 	private GameCharacter character;
 	private float delaySeconds;
 	private float intervalSeconds;
@@ -19,6 +21,8 @@ public class RandomWalkAI implements WalkAI
 
 	private class MoveTask extends Timer.Task
 	{
+
+		private static final long serialVersionUID = 8358425947248410536L;
 
 		@Override
 		public void run()

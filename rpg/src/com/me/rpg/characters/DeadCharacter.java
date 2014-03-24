@@ -1,26 +1,49 @@
 package com.me.rpg.characters;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.ScreenHandler;
 
-public class DeadCharacter
+public class DeadCharacter implements Serializable
 {
 
-	private GameCharacter deceased;
-	private Sprite gravestone;
-	private float fadeTime;
-	private float passedTime;
+	private static final long serialVersionUID = 1544763022077391987L;
 
-	public DeadCharacter(GameCharacter deceased, Sprite gravestone,
+	private GameCharacter deceased;
+	private String gravestoneSpritePath;
+	private float fadeTime;
+	private float passedTime = 0f;
+
+	private transient Sprite gravestone;
+
+	public DeadCharacter(GameCharacter deceased, String gravestoneSpritePath,
 			float fadeTime)
 	{
 		this.deceased = deceased;
-		this.gravestone = gravestone;
+		this.gravestoneSpritePath = gravestoneSpritePath;
 		this.fadeTime = fadeTime;
-		passedTime = 0f;
-		this.gravestone.setPosition(deceased.getBottomLeftX(),
-				deceased.getBottomLeftY());
+
+		create();
+	}
+
+	private void create()
+	{
+		Texture gravestoneTexture = ScreenHandler.manager.get(gravestoneSpritePath, Texture.class);
+		gravestone = new Sprite(new TextureRegion(gravestoneTexture, 0, 0, 34, 41));
+		gravestone.setPosition(deceased.getBottomLeftX(), deceased.getBottomLeftY());
+	}
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		create();
 	}
 
 	public Rectangle getHitBox()

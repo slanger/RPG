@@ -1,29 +1,28 @@
 package com.me.rpg.maps;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.me.rpg.RPG;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+import com.me.rpg.World;
 
 public class WestTownInsideHouse extends Map
 {
 
+	private static final long serialVersionUID = 3457569492167907359L;
+
 	public static final String MAP_TMX_PATH = "maps/west_town/inside_house/inside_house.tmx";
 
-	public WestTownInsideHouse()
+	public WestTownInsideHouse(World world)
 	{
-		super();
-
-		mapType = MapType.WEST_TOWN_INSIDE_HOUSE;
-
-		// get Tiled map
-		tiledMap = RPG.manager.get(MAP_TMX_PATH, TiledMap.class);
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
-
-		// set layers
-		backgroundLayers = new int[] { 0, 1, 2 };
-		foregroundLayers = new int[] { 3 };
+		super(world, MapType.WEST_TOWN_INSIDE_HOUSE, MAP_TMX_PATH);
 
 		// map setup
+		setup();
+	}
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
 		setup();
 	}
 

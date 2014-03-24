@@ -2,7 +2,10 @@ package com.me.rpg.combat;
 
 import com.me.rpg.characters.GameCharacter;
 
-public class Poison extends RepeatingEffect {
+public class Poison extends RepeatingEffect
+{
+
+	private static final long serialVersionUID = -3794562934502809351L;
 
 	private int power;			// how much damage the poison does, 1:1 with health
 	

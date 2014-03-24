@@ -1,27 +1,27 @@
 package com.me.rpg.reputation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.utils.Coordinate;
-import com.me.rpg.utils.Direction;
-import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.World;
+import com.me.rpg.characters.GameCharacter;
+import com.me.rpg.utils.Coordinate;
 
-public class ReputationSystem {
+public class ReputationSystem implements Serializable
+{
+
+	private static final long serialVersionUID = 344768799531050144L;
+
 	private World world;
 	private ArrayList<ReputationEvent> MasterEventList;
 	private EventTemplate[] EventTemplateList = new EventTemplate[10];
 
-	public ReputationSystem() {
-		world = World.getInstance();
+	public ReputationSystem(World world) {
+		this.world = world;
 		initializeTemplates();
 		MasterEventList = new ArrayList<ReputationEvent>();
 	}

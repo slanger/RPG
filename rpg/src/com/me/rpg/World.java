@@ -1,11 +1,15 @@
 package com.me.rpg;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -50,10 +54,10 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Timer;
 
-public final class World implements Disposable
+public final class World implements Disposable, Serializable
 {
 
-	private static World instance = null;
+	private static final long serialVersionUID = -3230953287610036756L;
 
 	public static final String WARP_SOUND_PATH = "music/ALTTP_warp_sound.mp3";
 	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
@@ -63,49 +67,28 @@ public final class World implements Disposable
 	public static final String ARROW_PATH = "arrow.png";
 	public static final String SHIELD_PATH = "shield.png";
 
-	private SpriteBatch batch;
-	private ShapeRenderer shapeRenderer;
-	private OrthographicCamera camera;
-	private BitmapFont debugFont;
-	private List<Map> maps;
-	private Map currentMap;
+	public transient OrthographicCamera camera;
+	public transient SpriteBatch batch;
+	private transient ShapeRenderer shapeRenderer;
+	private transient BitmapFont debugFont;
+	private final List<Map> maps = new ArrayList<Map>();
+	private final Timer timer = new Timer();
 
+	private Map currentMap;
 	private PlayableCharacter player;
 
-	private Timer timer = new Timer();
-
-	private DialogueSystem dialogueSystem;
+	private final DialogueSystem dialogueSystem = new DialogueSystem();
 	private ReputationSystem reputationSystem;
 
 	private boolean warping = false;
 	private float warpingAlpha;
-	private Sound warpSound;
-	private Sprite whiteScreen;
+	private transient Sound warpSound;
+	private transient Sprite whiteScreen;
 
 	private boolean isGameOver = false;
+	private boolean saveGame = false;
 	private boolean movingToAnotherMap = false;
 	private boolean updateEnable = true;
-
-	public static World getInstance()
-	{
-		if (instance == null)
-		{
-			System.out.println("*** initialize world ***");
-			instance = new World();
-			instance.initializeWorld();
-		}
-		return instance;
-	}
-
-	public static void clearInstance()
-	{
-		if (instance == null)
-		{
-			return;
-		}
-		instance.dispose();
-		instance = null;
-	}
 
 	public DialogueSystem getDialogueSystem()
 	{
@@ -137,48 +120,75 @@ public final class World implements Disposable
 		this.isGameOver = isGameOver;
 	}
 
+	public boolean saveGame()
+	{
+		return saveGame;
+	}
+
+	public void setSaveGame(boolean saveGame)
+	{
+		this.saveGame = saveGame;
+	}
+
+	public boolean updateEnable()
+	{
+		return updateEnable;
+	}
+
 	public void setUpdateEnable(boolean updateEnable)
 	{
 		this.updateEnable = updateEnable;
 	}
 
-	/*
-	 *  You CANNOT call World.getInstance() in this constructor--it will cause an
-	 *  infinite loop. Things that call World.getInstance() need to be placed in
-	 *  initializeWorld()
-	 */
+	public static World getNewInstance()
+	{
+		World world = new World();
+		world.initializeWorld();
+		return world;
+	}
+
 	private World()
 	{
-		batch = RPG.batch;
-		camera = RPG.camera;
+		create();
+	}
 
+	private void create()
+	{
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight());
+
+		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 
-		dialogueSystem = new DialogueSystem();
-
-		// create debug font
 		debugFont = new BitmapFont();
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 
 		// warp resources
-		warpSound = RPG.manager.get(WARP_SOUND_PATH, Sound.class);
-		whiteScreen = new Sprite(RPG.manager.get(RPG.WHITE_DOT_PATH, Texture.class));
+		warpSound = ScreenHandler.manager.get(WARP_SOUND_PATH, Sound.class);
+		Texture whiteScreenTexture = ScreenHandler.manager.get(LoadScreen.WHITE_DOT_PATH, Texture.class);
+		whiteScreen = new Sprite(whiteScreenTexture);
+	}
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		create();
+		inputStream.defaultReadObject();
 	}
 
 	private void initializeWorld()
 	{
 		// create reputation system
-		reputationSystem = new ReputationSystem();
+		reputationSystem = new ReputationSystem(this);
 
 		// create maps
-		maps = new ArrayList<Map>();
-		Map exampleMap = new ExampleMap();
+		Map exampleMap = new ExampleMap(this);
 		maps.add(exampleMap);
-		Map prototypeMap = new PrototypeMap();
+		Map prototypeMap = new PrototypeMap(this);
 		maps.add(prototypeMap);
-		Map westTown = new WestTownMap();
+		Map westTown = new WestTownMap(this);
 		maps.add(westTown);
-		Map westTownInsideHouse = new WestTownInsideHouse();
+		Map westTownInsideHouse = new WestTownInsideHouse(this);
 		maps.add(westTownInsideHouse);
 
 		currentMap = maps.get(MapType.EXAMPLE.getMapIndex());
@@ -194,16 +204,14 @@ public final class World implements Disposable
 		final int height = 28;
 
 		// create characters
-		Texture spritesheet1 = RPG.manager.get(PLAYER_TEXTURE_PATH);
-		player = new PlayableCharacter(PLAYER_NAME, spritesheet1, width,
-				height, 16, 16, 0.15f);
+		player = new PlayableCharacter(PLAYER_NAME, PLAYER_TEXTURE_PATH, width,
+				height, 16, 16, 0.15f, this);
 		player.setSpeed(200f);
 
-		Texture spritesheet2 = RPG.manager.get(NPC_TEXTURE_PATH);
-		npc1 = new NonplayableCharacter(NPC1_NAME, spritesheet2, width, height,
-				16, 16, 0.15f);
-		npc2 = new NonplayableCharacter(NPC2_NAME, spritesheet2, width, height,
-				16, 16, 0.15f);
+		npc1 = new NonplayableCharacter(NPC1_NAME, NPC_TEXTURE_PATH, width,
+				height, 16, 16, 0.15f, this);
+		npc2 = new NonplayableCharacter(NPC2_NAME, NPC_TEXTURE_PATH, width,
+				height, 16, 16, 0.15f, this);
 
 		// get walking boundaries
 		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
@@ -275,12 +283,15 @@ public final class World implements Disposable
 
 	public void render()
 	{
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 		if (movingToAnotherMap)
 		{
 			return;
 		}
 
-		currentMap.render();
+		currentMap.render(camera, batch);
 
 		temporaryVisionConeTest();
 
@@ -317,6 +328,7 @@ public final class World implements Disposable
 
 	public void update(float deltaTime)
 	{
+		camera.update();
 		timer.update(deltaTime);
 
 		if (!updateEnable)
@@ -333,7 +345,7 @@ public final class World implements Disposable
 		}
 	}
 
-	public void movePlayerToAnotherMap(final MapType mapType, final Coordinate newLocation)
+	public void movePlayerToOtherMap(final MapType mapType, final Coordinate newLocation)
 	{
 		currentMap.close();
 		updateEnable = false;
@@ -343,6 +355,8 @@ public final class World implements Disposable
 		// Exception in thread "LWJGL Application" java.util.ConcurrentModificationException
 		timer.scheduleTask(new Timer.Task()
 		{
+
+			private static final long serialVersionUID = -8637765287661966185L;
 
 			@Override
 			public void run()
@@ -355,10 +369,10 @@ public final class World implements Disposable
 				currentMap.open();
 			}
 
-		}, 1);
+		}, 0.5f);
 	}
 
-	public void warpPlayerToAnotherMap(MapType mapType, Coordinate newLocation)
+	public void warpPlayerToOtherMap(MapType mapType, Coordinate newLocation)
 	{
 		currentMap.close();
 		updateEnable = false;
@@ -367,6 +381,8 @@ public final class World implements Disposable
 		warpSound.play();
 		timer.scheduleTask(new Timer.Task()
 		{
+
+			private static final long serialVersionUID = -4094471058413909756L;
 
 			@Override
 			public void run()
@@ -381,16 +397,18 @@ public final class World implements Disposable
 
 		}, 0f, 0.1f);
 		Map newMap = maps.get(mapType.getMapIndex());
-		timer.scheduleTask(new WarpToAnotherMapTask(newMap, newLocation), 3.0f);
+		timer.scheduleTask(new WarpToOtherMapTask(newMap, newLocation), 3.0f);
 	}
 
-	private class WarpToAnotherMapTask extends Timer.Task
+	private class WarpToOtherMapTask extends Timer.Task
 	{
+
+		private static final long serialVersionUID = -5872915237104152890L;
 
 		private Map newMap;
 		private Coordinate newLocation;
 
-		WarpToAnotherMapTask(Map newMap, Coordinate newLocation)
+		WarpToOtherMapTask(Map newMap, Coordinate newLocation)
 		{
 			this.newMap = newMap;
 			this.newLocation = newLocation;
@@ -406,6 +424,8 @@ public final class World implements Disposable
 			timer.scheduleTask(new Timer.Task()
 			{
 
+				private static final long serialVersionUID = -1100673244597339611L;
+
 				@Override
 				public void run()
 				{
@@ -416,6 +436,8 @@ public final class World implements Disposable
 
 			timer.scheduleTask(new Timer.Task()
 			{
+
+				private static final long serialVersionUID = 4263563367493321895L;
 
 				@Override
 				public void run()
@@ -448,14 +470,9 @@ public final class World implements Disposable
 		int height = 32;
 
 		// melee attack test stuff
-		Texture swordSprite = RPG.manager.get(World.SWORD_PATH);
-		Texture shieldSprite = RPG.manager.get(World.SHIELD_PATH);
-		Shield shield = new Shield("lameShield");
-		Weapon sword = new MeleeWeapon("LameSword");
-		Weapon sword2 = new MeleeWeapon("Sword2");
-		sword2.initSprite(swordSprite, width, height, 32, 32);
-		sword.initSprite(swordSprite, width, height, 32, 32);
-		shield.initSprite(shieldSprite, width, height, 32, 32);
+		Shield shield = new Shield("LameShield", SHIELD_PATH, width, height, 32, 32);
+		Weapon sword = new MeleeWeapon("LameSword", SWORD_PATH, width, height, 32, 32);
+		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, width, height, 32, 32);
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		sword2.addEffect(poison);
@@ -466,19 +483,17 @@ public final class World implements Disposable
 		npc.equipWeapon(map, sword2);
 
 		// ranged attack test stuff
-		Texture bowSprite = RPG.manager.get(World.ARROW_PATH);
-		RangedWeapon bow = new RangedWeapon("LameBow");
-		bow.initSprite(bowSprite, width, height, 32, 32);
-
-		player.equipWeapon(map, bow);
-		Projectile arrow = new Projectile("arrow", bowSprite, width, height,
+		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, width, height,
 				32, 32);
+		player.equipWeapon(map, bow);
+		Projectile arrow = new Projectile("Arrow", ARROW_PATH, width, height, 32,
+				32);
 		bow.equipProjectile(arrow, 1000);
 
-		Shield plainShield = new Shield("plain shield");
-		plainShield.initSprite(shieldSprite, width, height, 32, 32);
+		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, width,
+				height, 32, 32);
 		npc.equipShield(plainShield);
-		//npc.usingShield(true);
+		// npc.usingShield(true);
 	}
 
 	public void temporaryVisionConeTest()

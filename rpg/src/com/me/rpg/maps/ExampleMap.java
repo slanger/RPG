@@ -1,29 +1,28 @@
 package com.me.rpg.maps;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.me.rpg.RPG;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+import com.me.rpg.World;
 
 public class ExampleMap extends Map
 {
 
+	private static final long serialVersionUID = -8785472881082229152L;
+
 	public static final String MAP_TMX_PATH = "maps/example/example.tmx";
 
-	public ExampleMap()
+	public ExampleMap(World world)
 	{
-		super();
-
-		mapType = MapType.EXAMPLE;
-
-		// get Tiled map
-		tiledMap = RPG.manager.get(MAP_TMX_PATH, TiledMap.class);
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
-
-		// set layers
-		backgroundLayers = new int[] { 0, 1 };
-		foregroundLayers = new int[] { 2 };
+		super(world, MapType.EXAMPLE, MAP_TMX_PATH);
 
 		// map setup
+		setup();
+	}
+
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
 		setup();
 	}
 

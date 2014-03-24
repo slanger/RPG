@@ -1,6 +1,8 @@
 package com.me.rpg.utils;
 
-public enum Direction
+import java.io.Serializable;
+
+public enum Direction implements Serializable
 {
 
 	RIGHT	(0,  1,  0, 0),

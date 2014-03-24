@@ -1,9 +1,12 @@
 package com.me.rpg.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Timer
+public class Timer implements Serializable
 {
+
+	private static final long serialVersionUID = -7457628628332157767L;
 
 	static final int CANCELLED = -1;
 	static final int FOREVER = -2;
@@ -66,8 +69,10 @@ public class Timer
 		scheduleTask(task, delaySeconds, intervalSeconds, FOREVER);
 	}
 
-	public static abstract class Task implements Runnable
+	public static abstract class Task implements Runnable, Serializable
 	{
+
+		private static final long serialVersionUID = -4675247770364747791L;
 
 		long timeLeftBeforeExecute; // in milliseconds
 		long intervalMillis; // in milliseconds

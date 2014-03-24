@@ -1,101 +1,78 @@
 package com.me.rpg;
 
-import com.badlogic.gdx.Gdx;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.me.rpg.maps.ExampleMap;
-import com.me.rpg.maps.Map;
-import com.me.rpg.maps.PrototypeMap;
-import com.me.rpg.maps.WestTownInsideHouse;
-import com.me.rpg.maps.WestTownMap;
-import com.me.rpg.utils.LoadBar;
 
 public class RPG implements Screen
 {
 
-	public static final String WHITE_DOT_PATH = "white_dot.png";
-	public static final String FONT_PATH = "font/Microsoft_Uighur_white.fnt";
-
-	public static final AssetManager manager = new AssetManager();
-	public static final OrthographicCamera camera = new OrthographicCamera();
-	public static final SpriteBatch batch = new SpriteBatch();
-
 	public final ScreenHandler screenHandler;
+	public final World world;
+	private final int saveFileId;
 
-	private LoadBar loadBar;
-	private BitmapFont font;
-
-	public RPG(ScreenHandler screenHandler)
+	public RPG(ScreenHandler screenHandler, World world, int saveFileId)
 	{
-		loadLoadBarAssets();
-		loadAssets();
-
 		this.screenHandler = screenHandler;
-
-		camera.setToOrtho(false, Gdx.graphics.getWidth(),
-				Gdx.graphics.getHeight());
-
-		float offset = 10;
-		float width = camera.viewportWidth - 2 * offset;
-		float height = camera.viewportHeight / 8;
-		float x = offset;
-		float y = camera.viewportHeight / 2 - height / 2;
-		loadBar = new LoadBar(x, y, width, height, manager.get(WHITE_DOT_PATH, Texture.class));
-
-		font = manager.get(FONT_PATH, BitmapFont.class);
+		this.world = world;
+		this.saveFileId = saveFileId;
 	}
 
 	@Override
-	public void dispose()
+	public void render(float deltaTime)
 	{
-		batch.dispose();
-		manager.dispose();
-		World.clearInstance();
-	}
-
-	@Override
-	public void render(float delta)
-	{
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		// if AssetManager is still loading assets, draw load bar
-		if (!manager.update())
-		{
-			loadBar.update(manager.getProgress());
-			batch.begin();
-			loadBar.render(batch);
-			font.draw(batch, "Loading", loadBar.x, loadBar.y);
-			batch.end();
-			return;
-		}
-
 		// update before render
-		update();
+		update(deltaTime);
 
 		// render World
-		World.getInstance().render();
+		world.render();
 	}
 
-	private void update()
+	private void update(float deltaTime)
 	{
-		float deltaTime = Gdx.graphics.getDeltaTime();
-		camera.update();
-		World world = World.getInstance();
 		world.update(deltaTime);
 		if (world.isGameOver())
 		{
-			screenHandler.moveToOtherScreen(screenHandler.endScreen);
+			gameOver();
+		}
+		if (world.saveGame())
+		{
+			saveGame();
+		}
+	}
+
+	private void gameOver()
+	{
+		screenHandler.setScreen(new GameOverScreen(screenHandler));
+	}
+
+	/**
+	 * Save world instance to a file
+	 */
+	private void saveGame()
+	{
+		String fileName = saveFileId + ".sav";
+
+		world.setSaveGame(false);
+
+		try
+		{
+			FileOutputStream saveFile = new FileOutputStream(fileName);
+			ObjectOutputStream saveStream = new ObjectOutputStream(saveFile);
+			saveStream.writeObject(world);
+			saveStream.close();
+			System.out.println("Game saved to " + fileName);
+		}
+		catch (FileNotFoundException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -125,46 +102,15 @@ public class RPG implements Screen
 	@Override
 	public void pause()
 	{
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void resume()
 	{
+		// TODO Auto-generated method stub
 
-	}
-
-	private void loadLoadBarAssets()
-	{
-		manager.load(WHITE_DOT_PATH, Texture.class);
-		manager.load(FONT_PATH, BitmapFont.class);
-		manager.update();
-		manager.finishLoading();
-	}
-
-	private void loadAssets()
-	{
-		// load Tiled maps
-		manager.setLoader(TiledMap.class, new TmxMapLoader(
-				new InternalFileHandleResolver()));
-		manager.load(ExampleMap.MAP_TMX_PATH, TiledMap.class);
-		manager.load(PrototypeMap.MAP_TMX_PATH, TiledMap.class);
-		manager.load(WestTownMap.MAP_TMX_PATH, TiledMap.class);
-		manager.load(WestTownInsideHouse.MAP_TMX_PATH, TiledMap.class);
-
-		// load textures
-		manager.load(World.PLAYER_TEXTURE_PATH, Texture.class);
-		manager.load(World.NPC_TEXTURE_PATH, Texture.class);
-		manager.load(World.SWORD_PATH, Texture.class);
-		manager.load(World.ARROW_PATH, Texture.class);
-		manager.load(Map.GRAVESTONE_PATH, Texture.class);
-		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
-		manager.load(World.SHIELD_PATH, Texture.class);
-
-		// load sounds and music
-		manager.load(World.WARP_SOUND_PATH, Sound.class);
-		manager.load(PrototypeMap.BACKGROUND_MUSIC_START, Music.class);
-		manager.load(PrototypeMap.BACKGROUND_MUSIC_LOOP, Music.class);
 	}
 
 	@Override
@@ -177,7 +123,13 @@ public class RPG implements Screen
 	@Override
 	public void hide()
 	{
-		World.clearInstance();
+		dispose();
+	}
+
+	@Override
+	public void dispose()
+	{
+		world.dispose();
 	}
 
 }

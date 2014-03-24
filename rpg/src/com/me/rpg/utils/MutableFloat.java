@@ -1,7 +1,12 @@
 package com.me.rpg.utils;
 
-public class MutableFloat {
-	
+import java.io.Serializable;
+
+public class MutableFloat implements Serializable
+{
+
+	private static final long serialVersionUID = 4666746116789970306L;
+
 	private float value;
 	
 	public MutableFloat() {

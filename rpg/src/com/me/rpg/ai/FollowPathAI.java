@@ -10,6 +10,8 @@ import com.me.rpg.utils.Direction;
 public class FollowPathAI implements WalkAI
 {
 
+	private static final long serialVersionUID = -7616245852566751180L;
+
 	private GameCharacter character;
 	private Rectangle[] path;
 	private int currentIndex = 0;

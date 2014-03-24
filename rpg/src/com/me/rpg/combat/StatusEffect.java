@@ -1,9 +1,14 @@
 package com.me.rpg.combat;
 
+import java.io.Serializable;
+
 import com.me.rpg.characters.GameCharacter;
 
-public abstract class StatusEffect implements Cloneable {
-	
+public abstract class StatusEffect implements Cloneable, Serializable
+{
+
+	private static final long serialVersionUID = 3495984866599101794L;
+
 	private StatusEffect parent;
 	private boolean isPrototype;
 	

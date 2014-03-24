@@ -1,5 +1,8 @@
 package com.me.rpg.characters;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.me.rpg.ScreenHandler;
 import com.me.rpg.World;
 import com.me.rpg.combat.IAttackable;
 import com.me.rpg.combat.Projectile;
@@ -20,28 +24,37 @@ import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.MapType;
 import com.me.rpg.reputation.NPCMemory;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
-public abstract class GameCharacter implements IAttackable
+public abstract class GameCharacter implements IAttackable, Serializable
 {
-	
+
+	private static final long serialVersionUID = -5812091877699740886L;
+
 	private static final int MAX_HEALTH = 100;
-	
+
 	private String name;
-	private Sprite sprite;
+	private String spritesheetPath;
+	private int width, height;
+	private int tileWidth, tileHeight;
+	private float animationDuration;
 	private Coordinate bottomLeftCorner;
-	private TextureRegion rightIdle, leftIdle, upIdle, downIdle;
-	private Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation,
-			downWalkAnimation;
 	private Direction moveDirection = Direction.DOWN;
 	private Direction faceDirection = Direction.DOWN;
 	private boolean moving = false;
 	private float stateTime = 0f;
 	private float speed = 100f;
 
+	private transient Sprite sprite;
+	private transient TextureRegion rightIdle, leftIdle, upIdle, downIdle;
+	private transient Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation,
+			downWalkAnimation;
+
 	protected Map currentMap = null;
+	protected final World world;
 
 	// Combat stuff
 	protected Weapon weaponSlot;
@@ -55,17 +68,38 @@ public abstract class GameCharacter implements IAttackable
 	protected float strikeImmunity;
 	protected boolean strafing;
 
-	//
-	
 	// Reputation Stuff
 	protected NPCMemory npcMemory;
-	protected World world;
 	protected float sightDistance;
 
-	protected GameCharacter(String name, Texture spritesheet, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration)
+	protected GameCharacter(String name, String spritesheetPath, int width,
+			int height, int tileWidth, int tileHeight, float animationDuration,
+			World world)
 	{
 		this.name = name;
+		this.spritesheetPath = spritesheetPath;
+		this.width = width;
+		this.height = height;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
+		this.animationDuration = animationDuration;
+		this.world = world;
+
+		inflictedEffects = new LinkedList<StatusEffect>();
+		immunityHash = new HashMap<StatusEffect, Float>();
+		maxHealth = 100;
+		health = getMaxHealth();
+
+		npcMemory = new NPCMemory(world.getReputationSystem()
+				.getMasterEventList());
+		sightDistance = 450.0f;
+
+		create();
+	}
+
+	private void create()
+	{
+		Texture spritesheet = ScreenHandler.manager.get(spritesheetPath, Texture.class);
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
 				tileHeight);
 		int columns = sheet[0].length;
@@ -91,16 +125,12 @@ public abstract class GameCharacter implements IAttackable
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
 		sprite.setRegion(downIdle);
+	}
 
-		inflictedEffects = new LinkedList<StatusEffect>();
-		immunityHash = new HashMap<StatusEffect, Float>();
-		maxHealth = 100;
-		health = getMaxHealth();
-
-		world = World.getInstance();
-		npcMemory = new NPCMemory(world.getReputationSystem()
-				.getMasterEventList());
-		sightDistance = 450.0f;
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		create();
 	}
 
 	public String getName()
@@ -324,7 +354,16 @@ public abstract class GameCharacter implements IAttackable
 	public boolean isAttacking() {
 		return weaponSlot == null ? false : weaponSlot.isAttacking();
 	}
-	
+
+	public World getWorld()
+	{
+		return world;
+	}
+
+	public abstract void moveToOtherMap(MapType mapType, Coordinate newLocation);
+
+	public abstract void warpToOtherMap(MapType mapType, Coordinate newLocation);
+
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);

@@ -45,7 +45,7 @@ public class GameOverScreen implements Screen
 		{
 			if (Gdx.input.isTouched())
 			{
-				screenHandler.moveToOtherScreen(screenHandler.startScreen);
+				screenHandler.setScreen(new StartScreen(screenHandler));
 			}
 		}
 	}
@@ -63,6 +63,8 @@ public class GameOverScreen implements Screen
 		enableControls = false;
 		timer.scheduleTask(new Timer.Task()
 		{
+
+			private static final long serialVersionUID = -3969566518053207935L;
 
 			@Override
 			public void run()

@@ -2,8 +2,11 @@ package com.me.rpg.combat;
 
 import com.me.rpg.characters.GameCharacter;
 
-public abstract class RepeatingEffect extends StatusEffect {
-	
+public abstract class RepeatingEffect extends StatusEffect
+{
+
+	private static final long serialVersionUID = 8372421538556927465L;
+
 	private int appliedCount;
 	private float repeatRate;
 	

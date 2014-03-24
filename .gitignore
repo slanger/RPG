@@ -21,3 +21,6 @@ tmp/
 *.launch
 *.cfg
 *.properties
+
+# Game specific
+*.sav
