@@ -145,6 +145,19 @@ public class DialogueSystem implements Serializable
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
 		//stage = new Stage();
+		if(dialogueFont == null)
+		{
+			dialogueFont = new BitmapFont();
+		}
+		if(table == null)
+		{
+			table = new Table();
+		}
+		if(texture == null)
+		{
+			texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
+		}
+		
 		
 		float desiredY = (camera.viewportHeight);
 		
