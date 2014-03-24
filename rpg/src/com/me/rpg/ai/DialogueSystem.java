@@ -2,6 +2,8 @@ package com.me.rpg.ai;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,7 +16,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -29,7 +30,6 @@ public class DialogueSystem implements Serializable
 	private ArrayList<Node> rootNodes;
 	
 	private transient BitmapFont dialogueFont;
-	private transient Stage debugStage;
 	private transient Table table;
 	private transient Texture texture;
 	
@@ -46,13 +46,23 @@ public class DialogueSystem implements Serializable
 	
 	public DialogueSystem()
 	{
-		//initialize renderer stuff
+		create();
+		initializeDialogueSystem();
+	}
+	
+	private void create()
+	{
+		// initialize renderer stuff
 		dialogueFont = new BitmapFont();
 		inDialogue = false;
 		table = new Table();
 		texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
-		
-		initializeDialogueSystem();
+	}
+	
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	{
+		inputStream.defaultReadObject();
+		create();
 	}
 	
 	public void initializeDialogueSystem()
@@ -144,21 +154,6 @@ public class DialogueSystem implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
-		//stage = new Stage();
-		if(dialogueFont == null)
-		{
-			dialogueFont = new BitmapFont();
-		}
-		if(table == null)
-		{
-			table = new Table();
-		}
-		if(texture == null)
-		{
-			texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
-		}
-		
-		
 		float desiredY = (camera.viewportHeight);
 		
 		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2;
