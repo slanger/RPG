@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -71,6 +72,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	// Reputation Stuff
 	protected NPCMemory npcMemory;
 	protected float sightDistance;
+	protected float hearingRadius;
 
 	protected GameCharacter(String name, String spritesheetPath, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
@@ -93,7 +95,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		npcMemory = new NPCMemory(world.getReputationSystem()
 				.getMasterEventList());
 		sightDistance = 450.0f;
-
+		hearingRadius = 75.0f;
 		create();
 	}
 
@@ -720,6 +722,11 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		return sightDistance;
 	}
 	
+	public float getHearingRadius()
+	{
+		return hearingRadius;
+	}
+	
 	public boolean checkCoordinateInVision(float x, float y)
 	{
 		float tempX = getCenterX();
@@ -773,6 +780,18 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		
 		Polygon visionCone = new Polygon(visionFieldPoints);
 		if(visionCone.contains(x,y))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean checkCoordinateWithinHearing(float x, float y)
+	{
+		Circle circle = new Circle(getCenterX(),
+				getCenterY(), hearingRadius);
+		if(circle.contains(x, y))
 		{
 			return true;
 		}

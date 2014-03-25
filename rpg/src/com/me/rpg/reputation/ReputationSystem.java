@@ -115,10 +115,8 @@ public class ReputationSystem implements Serializable
 		while (iterator1.hasNext()) {
 			GameCharacter tempCharacter = iterator1.next();
 			if (tempCharacter.getName() != "Player") {
-				Circle circle = new Circle(tempCharacter.getCenterX(),
-						tempCharacter.getCenterY(), 150.0f);
 				if (tempCharacter.checkCoordinateInVision(coordinate.getX(),
-						coordinate.getY()) || circle.contains(coordinate.getX(), coordinate.getY())) 
+						coordinate.getY()) || tempCharacter.checkCoordinateWithinHearing(coordinate.getX(), coordinate.getY())) 
 				{
 					if (tempCharacter.getNPCMemory() != null) {
 						//tempCharacter.setFaceDirection(Direction.RIGHT);

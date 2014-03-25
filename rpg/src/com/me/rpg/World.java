@@ -294,7 +294,8 @@ public final class World implements Disposable, Serializable
 		currentMap.render(camera, batch);
 
 		temporaryVisionConeTest();
-
+		temporaryHearingTest();
+		
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
@@ -579,4 +580,32 @@ public final class World implements Disposable, Serializable
 		shapeRenderer.end();
 	}
 
+	public void temporaryHearingTest()
+	{
+		float tempX = 0.0f;
+		float tempY = 0.0f;
+		float tempHearingRadius = 0.0f;
+
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeType.Line);
+
+		ArrayList<GameCharacter> charactersOnMap = currentMap.getCharactersOnMap();
+		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
+		while (iterator1.hasNext())
+		{
+			GameCharacter tempCharacter = iterator1.next();
+			if (tempCharacter.getName() != "Player")
+			{
+				tempHearingRadius = tempCharacter.getHearingRadius();
+				
+				tempX = tempCharacter.getCenterX();
+				tempY = tempCharacter.getCenterY();
+				
+				shapeRenderer.setColor(0, 1, 0, 0.025f);
+				shapeRenderer.circle(tempX, tempY, tempHearingRadius);
+			}
+		}
+		shapeRenderer.end();
+	}
+	
 }
