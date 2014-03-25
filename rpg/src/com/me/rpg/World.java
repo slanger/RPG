@@ -76,6 +76,10 @@ public final class World implements Disposable, Serializable
 
 	private Map currentMap;
 	private PlayableCharacter player;
+	private int dayCount = 0;
+	private final int NUM_SECONDS_PER_DAY = 60;
+	private final int NUM_DAYS = 10;
+	private Timer dayTimer = new Timer();
 
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
 	private ReputationSystem reputationSystem;
@@ -178,6 +182,23 @@ public final class World implements Disposable, Serializable
 
 	private void initializeWorld()
 	{
+		dayTimer.scheduleTask(new Timer.Task()
+		{
+
+			private static final long serialVersionUID = 121629940674023363L;
+
+			@Override
+			public void run()
+			{
+				dayCount++;
+				if (dayCount >= NUM_DAYS)
+				{
+					setGameOver(true);
+				}
+			}
+
+		}, 0, NUM_SECONDS_PER_DAY);
+
 		// create reputation system
 		reputationSystem = new ReputationSystem(this);
 
@@ -319,6 +340,11 @@ public final class World implements Disposable, Serializable
 		float healthY = camera.position.y + camera.viewportHeight / 2 - 15;
 		debugFont.draw(batch, "Health: " + player.getHealth(), healthX, healthY);
 
+		float dayCountX = camera.position.x - camera.viewportWidth / 2 + 15;
+		float dayCountY = camera.position.y + camera.viewportHeight / 2 - 35;
+		int daysLeft = NUM_DAYS - dayCount;
+		debugFont.draw(batch, "Days left: " + daysLeft, dayCountX, dayCountY);
+
 		float fpsX = camera.position.x + camera.viewportWidth / 2 - 70;
 		float fpsY = camera.position.y + camera.viewportHeight / 2 - 15;
 		debugFont.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(),
@@ -337,6 +363,8 @@ public final class World implements Disposable, Serializable
 			player.handleDialogueInput();
 			return;
 		}
+
+		dayTimer.update(deltaTime);
 
 		Iterator<Map> iter = maps.iterator();
 		while (iter.hasNext())
