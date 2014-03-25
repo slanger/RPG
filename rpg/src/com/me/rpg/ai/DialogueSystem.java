@@ -163,9 +163,9 @@ public class DialogueSystem implements Serializable
 		//float dialogueHeight = (camera.viewportHeight - 8*desiredX);;
 		float dialogueHeight = 250.0f;
 	
-		LabelStyle style = new LabelStyle(dialogueFont, Color.WHITE);
+		LabelStyle style = new LabelStyle(dialogueFont, Color.DARK_GRAY);
 		LabelStyle selectedStyle = new LabelStyle(dialogueFont, Color.BLUE);
-		LabelStyle separatorStyle = new LabelStyle(dialogueFont, Color.GRAY );
+		LabelStyle separatorStyle = new LabelStyle(dialogueFont, Color.DARK_GRAY );
 		
 ////---------------------------------------------------------------------------------	
 //		Label objectName = new Label("John" , style);
