@@ -48,6 +48,9 @@ import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.state.transition.AndCondition;
 import com.me.rpg.state.transition.Condition;
 import com.me.rpg.state.transition.DistanceCondition;
+import com.me.rpg.state.transition.HearPeopleCondition;
+import com.me.rpg.state.transition.NotCondition;
+import com.me.rpg.state.transition.OrCondition;
 import com.me.rpg.state.transition.SeePeopleCondition;
 import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
@@ -254,10 +257,14 @@ public final class World implements Disposable, Serializable
 		MeleeFightState fight0 = new MeleeFightState(parent, npc1);
 		
 		SeePeopleCondition canSee = new SeePeopleCondition(npc1, 0, Comparison.NOTEQUALS);
-		SeePeopleCondition cannotSee = new SeePeopleCondition(npc1, 0, Comparison.EQUALS);
+		HearPeopleCondition canHear = new HearPeopleCondition(npc1, 0, Comparison.NOTEQUALS);
+		Condition cannotSee = new NotCondition(canSee);
+		Condition cannotHear = new NotCondition(canHear);
+		Condition canSeeOrHear = new OrCondition(canSee, canHear);
+		Condition cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
 		
-		Transition patrolToFight = new Transition(fight0, canSee);
-		Transition fightToPatrol = new Transition(patrol0, cannotSee);
+		Transition patrolToFight = new Transition(fight0, canSeeOrHear);
+		Transition fightToPatrol = new Transition(patrol0, cannotSeeNorHear);
 		
 		patrol0.setTransitions(patrolToFight);
 		fight0.setTransitions(fightToPatrol);
@@ -287,16 +294,20 @@ public final class World implements Disposable, Serializable
 		Transition notCenToRandom = new Transition(randomWalkState, dist);
 		
 		canSee = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
-		cannotSee = new SeePeopleCondition(npc2, 0, Comparison.EQUALS);
+		canHear = new HearPeopleCondition(npc2, 0, Comparison.NOTEQUALS);
+		cannotSee = new NotCondition(canSee);
+		cannotHear = new NotCondition(canHear);
+		canSeeOrHear = new OrCondition(canSee, canHear);
+		cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
 		
 		Condition timer = runaway.getFloatCondition("timeInState", 5f, Comparison.GREATER);
-		Condition and = new AndCondition(cannotSee, timer);
-		Transition subStateToRun = new Transition(runaway, canSee);
+		Condition and = new AndCondition(cannotSeeNorHear, timer);
+		Transition subStateToRun = new Transition(runaway, canSeeOrHear);
 		Transition runToNotAtCen = new Transition(notAtCen, and);
 		
-		randomWalkState.setTransitions(subStateToRun);
-		notAtCen.setTransitions(notCenToRandom, subStateToRun);
+		notAtCen.setTransitions(notCenToRandom);
 		runaway.setTransitions(runToNotAtCen);
+		subparent.setTransitions(subStateToRun);
 		
 		npc2.setStateMachine(parent);
 		// setup weapons

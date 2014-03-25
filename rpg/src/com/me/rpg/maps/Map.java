@@ -600,27 +600,42 @@ public abstract class Map implements Disposable, Serializable
 	}
 	
 	/**
-	 * Currently lazy implementation - it will just return characters in a certain radius
-	 * from the given character
+	 * Better implementation - checks if characters are inside the vision cone of given char
 	 * @param mainChar
 	 * @return List of Characters than the input Character can see
 	 */
-	// TODO: make this based off of the line-of-sight cone of the character
-	public ArrayList<GameCharacter> canSeeCharacters(GameCharacter mainChar, int dist) {
+	public ArrayList<GameCharacter> canSeeCharacters(GameCharacter mainChar) {
 		Iterator<GameCharacter> iter = charactersOnMap.iterator();
-		Coordinate mainCenter = mainChar.getCenter();
 		ArrayList<GameCharacter> result = new ArrayList<GameCharacter>();
 		while (iter.hasNext()) {
 			GameCharacter next = iter.next();
 			if (next == mainChar)
 				continue;
 			Coordinate center = next.getCenter();
-			float diffx = center.getX() - mainCenter.getX();
-			float diffy = center.getY() - mainCenter.getY();
-			if (diffx*diffx + diffy*diffy < dist*dist)
+			if (mainChar.checkCoordinateInVision(center))
 				result.add(next);
 		}
 		return result;
+	}
+	
+	public ArrayList<GameCharacter> canHearCharacters(GameCharacter mainChar) {
+		Iterator<GameCharacter> iter = charactersOnMap.iterator();
+		ArrayList<GameCharacter> result = new ArrayList<GameCharacter>();
+		while (iter.hasNext()) {
+			GameCharacter next = iter.next();
+			if (next == mainChar)
+				continue;
+			Coordinate center = next.getCenter();
+			if (mainChar.checkCoordinateWithinHearing(center))
+				result.add(next);
+		}
+		return result;
+	}
+	
+	public ArrayList<GameCharacter> canSeeOrHearCharacters(GameCharacter mainChar) {
+		ArrayList<GameCharacter> chars = canSeeCharacters(mainChar);
+		chars.addAll(canHearCharacters(mainChar));
+		return chars;
 	}
 
 	private Coordinate getWarpCoordinate(RectangleMapObject warpPoint)

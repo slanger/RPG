@@ -18,7 +18,7 @@ public class SeePeopleCondition implements Condition {
 	
 	@Override
 	public boolean test() {
-		seePeople.setValue(character.getCurrentMap().canSeeCharacters(character, 200).size());
+		seePeople.setValue(character.getCurrentMap().canSeeCharacters(character).size());
 		return condition.test();
 	}
 

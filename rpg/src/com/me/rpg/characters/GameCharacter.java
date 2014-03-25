@@ -95,8 +95,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 
 		npcMemory = new NPCMemory(world.getReputationSystem()
 				.getMasterEventList());
-		sightDistance = 450.0f;
-		hearingRadius = 75.0f;
+		sightDistance = 225.0f;
+		hearingRadius = 125.0f;
 		create();
 	}
 
@@ -738,6 +738,10 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		return hearingRadius;
 	}
 	
+	public boolean checkCoordinateInVision(Coordinate c) {
+		return checkCoordinateInVision(c.getX(), c.getY());
+	}
+	
 	public boolean checkCoordinateInVision(float x, float y)
 	{
 		float tempX = getCenterX();
@@ -796,6 +800,10 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		}
 		
 		return false;
+	}
+	
+	public boolean checkCoordinateWithinHearing(Coordinate c) {
+		return checkCoordinateWithinHearing(c.getX(), c.getY());
 	}
 	
 	public boolean checkCoordinateWithinHearing(float x, float y)

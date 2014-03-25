@@ -37,7 +37,7 @@ public class RunAwayState extends State {
 	}
 	
 	protected ArrayList<Action> doGetActions() {
-		ArrayList<GameCharacter> people = character.getCurrentMap().canSeeCharacters(character, 200);
+		ArrayList<GameCharacter> people = character.getCurrentMap().canSeeOrHearCharacters(character);
 		if (people.size() == 0 && lastSeen > 3f) {
 			character.setMoving(false);
 			return super.doGetActions();

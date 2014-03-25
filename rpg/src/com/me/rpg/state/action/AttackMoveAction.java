@@ -25,7 +25,7 @@ public class AttackMoveAction implements Action {
 		Weapon weapon = main.getEquippedWeapon();
 		//int range = weapon.getRange();
 		Map map = main.getCurrentMap();
-		ArrayList<GameCharacter> enemy = map.canSeeCharacters(main, 200);
+		ArrayList<GameCharacter> enemy = map.canSeeOrHearCharacters(main);
 		//enemyCount.setValue(enemy.size());
 		if (enemy.size() == 0)
 			return;
