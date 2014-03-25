@@ -228,40 +228,6 @@ public abstract class Map implements Disposable, Serializable
 	}
 
 	/**
-	 * This method has a lot of hardcoding and should be used just for testing.
-	 */
-	public Rectangle[] getTestPath()
-	{
-		MapObjects waypointObjects = getWaypoints();
-		RectangleMapObject castleWaypoint = (RectangleMapObject) waypointObjects
-				.get("castle");
-		RectangleMapObject desertWaypoint = (RectangleMapObject) waypointObjects
-				.get("desert");
-		Rectangle[] returnPath = { castleWaypoint.getRectangle(),
-				desertWaypoint.getRectangle() };
-		return returnPath;
-	}
-
-	public Rectangle getEnclosingWalkingBounds(
-			Rectangle characterBoundingRectangle)
-	{
-		MapObjects walkingBoundaries = getWalkingBoundaries();
-		int count = walkingBoundaries.getCount();
-		Rectangle r;
-		for (int i = 0; i < count; i++)
-		{
-			r = ((RectangleMapObject) walkingBoundaries.get(i)).getRectangle();
-			if (r.contains(characterBoundingRectangle))
-			{
-				return r;
-			}
-		}
-		throw new RuntimeException(
-				"Cannot find a walking boundary for Rectangle: "
-						+ characterBoundingRectangle.toString());
-	}
-
-	/**
 	 * Draws the background image of the map, followed by all the Characters
 	 * that are in view nearby the focusedCharacter
 	 */
@@ -490,7 +456,7 @@ public abstract class Map implements Disposable, Serializable
 	 * points.
 	 */
 	public boolean checkCollision(float x, float y, float oldX, float oldY,
-			GameCharacter thisCharacter, Coordinate newCoordinate)
+			GameCharacter thisCharacter, final Coordinate newCoordinate)
 	{
 		boolean canMoveInXDirection = true;
 		boolean canMoveInYDirection = true;
@@ -554,7 +520,7 @@ public abstract class Map implements Disposable, Serializable
 	}
 
 	public boolean checkCollisionWithObjects(float x, float y, float oldX,
-			float oldY, float width, float height, Coordinate newCoordinate)
+			float oldY, float width, float height, final Coordinate newCoordinate)
 	{
 		newCoordinate.setX(x);
 		newCoordinate.setY(y);
