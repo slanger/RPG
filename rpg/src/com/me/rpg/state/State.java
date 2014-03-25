@@ -27,8 +27,12 @@ public abstract class State implements Serializable
 	private String stateName;
 	private ArrayList<State> parentStates;
 	
+	public State(GameCharacter character) {
+		this(null, character);
+	}
+	
 	public State(HierarchicalState parent, GameCharacter character) {
-		this.parent = parent;
+		this.parent = null;
 		this.character = character;
 		transitions = null;
 		emptyActions = new ArrayList<Action>();
@@ -38,9 +42,17 @@ public abstract class State implements Serializable
 		
 		stateName = this.getClass().getCanonicalName();
 		parentStates = null;
-		if (parent != null) {
-			parent.addChild(this);
-		}
+		if (parent != null)
+			setParent(parent);
+	}
+	
+	public void setParent(HierarchicalState parent) {
+		if (this.parent != null)
+			throw new RuntimeException("Cannot set the parent more than once.");
+		if (parent == null)
+			throw new NullPointerException("Cannot set the parent to be null.");
+		this.parent = parent;
+		parent.addChild(this);
 	}
 	
 	public void setName(String newName) {

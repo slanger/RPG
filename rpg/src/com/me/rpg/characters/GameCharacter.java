@@ -47,7 +47,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	private Direction faceDirection = Direction.DOWN;
 	private boolean moving = false;
 	private float stateTime = 0f;
-	private float speed = 100f;
+	private float baseSpeed = 100f;
+	private float speedModifier = 1.0f;
 
 	private transient Sprite sprite;
 	private transient TextureRegion rightIdle, leftIdle, upIdle, downIdle;
@@ -315,13 +316,23 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	public float getSpeed()
 	{
 		if (!strafing)
-			return speed;
-		return speed * 0.6f;
+			return baseSpeed * speedModifier;
+		return baseSpeed * 0.6f * speedModifier;
+	}
+	
+	public float getSpeedModifier() {
+		return speedModifier;
+	}
+	
+	public void setSpeedModifier(float modifier) {
+		if (modifier < 0)
+			throw new RuntimeException("Can't have a negative speed modifier: " + modifier);
+		speedModifier = modifier;
 	}
 
-	public void setSpeed(float newSpeed)
+	public void setBaseSpeed(float newSpeed)
 	{
-		this.speed = newSpeed;
+		this.baseSpeed = newSpeed;
 	}
 
 	public float getSpriteWidth()

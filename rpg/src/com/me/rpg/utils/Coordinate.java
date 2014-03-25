@@ -80,6 +80,10 @@ public class Coordinate implements Serializable
 		return (x-target.x)*(x-target.x) + (y-target.y)*(y-target.y);
 	}
 	
+	public Rectangle getSmallCenteredRectangle() {
+		return getCenteredRectangle(EPS*2, EPS*2);
+	}
+	
 	public Rectangle getCenteredRectangle(float width, float height) {
 		return new Rectangle(x - width/2.0f, y - width/2.0f, width, height);
 	}

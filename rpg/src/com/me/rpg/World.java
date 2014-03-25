@@ -47,6 +47,7 @@ import com.me.rpg.state.RunAwayState;
 import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.state.transition.AndCondition;
 import com.me.rpg.state.transition.Condition;
+import com.me.rpg.state.transition.DistanceCondition;
 import com.me.rpg.state.transition.SeePeopleCondition;
 import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
@@ -227,7 +228,7 @@ public final class World implements Disposable, Serializable
 		// create characters
 		player = new PlayableCharacter(PLAYER_NAME, PLAYER_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
-		player.setSpeed(200f);
+		player.setBaseSpeed(200f);
 
 		npc1 = new NonplayableCharacter(NPC1_NAME, NPC_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
@@ -247,7 +248,7 @@ public final class World implements Disposable, Serializable
 		// setup State
 		HierarchicalState parent = new HierarchicalState(null, npc1);
 		
-		Coordinate[] patrol = new Coordinate[] {new Coordinate(50,50), new Coordinate(400,50), new Coordinate(400,400), new Coordinate(50,400)};
+		Coordinate[] patrol = new Coordinate[] {new Coordinate(50,50), new Coordinate(300,50), new Coordinate(300,300), new Coordinate(50,300)};
 		PatrolState patrol0 = new PatrolState(parent, npc1, patrol);
 		
 		MeleeFightState fight0 = new MeleeFightState(parent, npc1);
@@ -282,8 +283,8 @@ public final class World implements Disposable, Serializable
 		//RandomWalkAction randomWalkAction0= new RandomWalkAction(npc2, boundary2.getRectangle());
 		//randomWalkState.setActions(randomWalkAction0);
 		
-		Condition timed = notAtCen.getFloatCondition("timeInState", 5f, Comparison.GREATER);
-		Transition notCenToRandom = new Transition(randomWalkState, timed);
+		Condition dist = new DistanceCondition(npc2, exampleMap, new Coordinate(500, 100));
+		Transition notCenToRandom = new Transition(randomWalkState, dist);
 		
 		canSee = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
 		cannotSee = new SeePeopleCondition(npc2, 0, Comparison.EQUALS);
