@@ -372,13 +372,9 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		if (strikeImmunity > 0)
 		{
 			Color c = sprite.getColor();
-			sprite.setColor(c.r, c.g, c.b,
-					(float) Math.abs(Math.cos(strikeImmunity * 16))); // 16 is a
-																		// good
-																		// value
-																		// for
-																		// blinking
-																		// rate
+			// 16 is a good value for blinking rate
+			float alpha = (float) Math.abs(Math.cos(strikeImmunity * 16));
+			sprite.setColor(c.r, c.g, c.b, alpha);
 		}
 		
 		// if we are facing up and using shield, draw shield before character sprite
@@ -415,6 +411,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	public final void update(float deltaTime, Map currentMap)
 	{
 		addToStateTime(deltaTime);
+
 		Iterator<StatusEffect> iter = inflictedEffects.iterator();
 		while (iter.hasNext())
 		{
@@ -425,9 +422,14 @@ public abstract class GameCharacter implements IAttackable, Serializable
 				iter.remove();
 			}
 		}
+
 		if (weaponSlot != null)
 			weaponSlot.update(deltaTime);
+
 		doUpdate(deltaTime, currentMap);
+
+		// update position
+		setPosition(getBottomLeftX(), getBottomLeftY());
 	}
 
 	protected abstract void doUpdate(float deltaTime, Map currentMap);

@@ -2,7 +2,6 @@ package com.me.rpg.characters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
@@ -14,10 +13,6 @@ import com.me.rpg.utils.Coordinate;
 public class PlayableCharacter extends GameCharacter
 {
 
-	// for debugging hitboxes
-	// private Texture redHitboxTexture;
-	// private Rectangle redHitbox = new Rectangle(0, 0, 0, 0);
-
 	private static final long serialVersionUID = 2335023793457785574L;
 
 	private boolean enableSaving = true;
@@ -27,11 +22,10 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableControls = true;
 	private boolean enablePushing = true;
 
-	//dialogue keys
+	// dialogue keys
 	private boolean enableInputE = true;  //for initiating dialogue with character, selecting response option
 	private boolean enableInputUp = true;
 	private boolean enableInputDown = true;
-	//end dialogue keys
 	
 	private PlayerControlledWalkAI walkAI;
 	
@@ -53,7 +47,6 @@ public class PlayableCharacter extends GameCharacter
 				animationDuration, world);
 		npcMemory = null;
 		walkAI = new PlayerControlledWalkAI(this);
-		// redHitboxTexture = RPG.manager.get(World.FADED_RED_DOT_PATH, Texture.class);
 	}
 
 	@Override
@@ -66,13 +59,6 @@ public class PlayableCharacter extends GameCharacter
 
 		// update texture
 		updateTexture();
-	}
-
-	@Override
-	public void doRenderAfter(SpriteBatch batch)
-	{
-		// batch.draw(redHitboxTexture, redHitbox.x, redHitbox.y,
-		// redHitbox.width, redHitbox.height);
 	}
 
 	public void handleInput(float deltaTime)

@@ -340,26 +340,23 @@ public abstract class Map implements Disposable, Serializable
 			}
 		}
 
-		Iterator<GameCharacter> iter = charactersOnMap.iterator();
-		while (iter.hasNext())
+		Iterator<GameCharacter> charIter = charactersOnMap.iterator();
+		while (charIter.hasNext())
 		{
-			GameCharacter selected = iter.next();
-			Coordinate selectedLocation = selected.getBottomLeftCorner();
-			selected.setPosition(selectedLocation.getX(),
-					selectedLocation.getY());
+			GameCharacter selected = charIter.next();
 			if (selected.getBoundingRectangle().overlaps(cameraBounds))
 			{
 				selected.render(batch);
 			}
 		}
 
-		Iterator<Projectile> it = flyingProjectiles.iterator();
-		while (it.hasNext())
+		Iterator<Projectile> projectileIter = flyingProjectiles.iterator();
+		while (projectileIter.hasNext())
 		{
-			Projectile p = it.next();
+			Projectile p = projectileIter.next();
 			if (p.isFinished() || !p.isFired())
 			{
-				it.remove();
+				projectileIter.remove();
 				continue;
 			}
 			Rectangle projectileLoc = p.getSpriteBounds();
