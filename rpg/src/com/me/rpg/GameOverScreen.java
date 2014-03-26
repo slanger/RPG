@@ -32,7 +32,10 @@ public class GameOverScreen implements Screen
 
 		spriteBatch.begin();
 
-		debugFont.draw(spriteBatch, "GAME OVER", 150, 250);
+		String message = "GAME OVER";
+		float x = (float) ((Gdx.graphics.getWidth() - debugFont.getBounds(message).width) / 2.0);
+		float y = (float) ((Gdx.graphics.getHeight() - debugFont.getBounds(message).height) / 2.0);
+		debugFont.draw(spriteBatch, message, x, y);
 
 		spriteBatch.end();
 	}

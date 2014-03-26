@@ -34,9 +34,14 @@ public class RPG implements Screen
 	private void update(float deltaTime)
 	{
 		world.update(deltaTime);
+
 		if (world.isGameOver())
 		{
 			gameOver();
+		}
+		if (world.resetGame())
+		{
+			resetGame();
 		}
 		if (world.saveGame())
 		{
@@ -47,6 +52,11 @@ public class RPG implements Screen
 	private void gameOver()
 	{
 		screenHandler.setScreen(new GameOverScreen(screenHandler));
+	}
+
+	private void resetGame()
+	{
+		screenHandler.setScreen(new StartScreen(screenHandler));
 	}
 
 	/**

@@ -15,6 +15,7 @@ public class PlayableCharacter extends GameCharacter
 
 	private static final long serialVersionUID = 2335023793457785574L;
 
+	private boolean enableReseting = true;
 	private boolean enableSaving = true;
 	private boolean enableAttack = true;
 	private boolean enableWeaponSwitch = true;
@@ -66,6 +67,20 @@ public class PlayableCharacter extends GameCharacter
 		if (!enableControls)
 		{
 			return;
+		}
+
+		// reset the game
+		if (Gdx.input.isKeyPressed(Keys.R))
+		{
+			if (enableReseting)
+			{
+				enableReseting = true;
+				world.setResetGame(true);
+			}
+		}
+		else
+		{
+			enableReseting = true;
 		}
 
 		// save the game

@@ -94,6 +94,7 @@ public final class World implements Disposable, Serializable
 	private transient Sprite whiteScreen;
 
 	private boolean isGameOver = false;
+	private boolean resetGame = false;
 	private boolean saveGame = false;
 	private boolean movingToAnotherMap = false;
 	private boolean updateEnable = true;
@@ -126,6 +127,16 @@ public final class World implements Disposable, Serializable
 	public void setGameOver(boolean isGameOver)
 	{
 		this.isGameOver = isGameOver;
+	}
+
+	public boolean resetGame()
+	{
+		return resetGame;
+	}
+
+	public void setResetGame(boolean resetGame)
+	{
+		this.resetGame = resetGame;
 	}
 
 	public boolean saveGame()
@@ -201,7 +212,7 @@ public final class World implements Disposable, Serializable
 				}
 			}
 
-		}, 0, NUM_SECONDS_PER_DAY);
+		}, NUM_SECONDS_PER_DAY, NUM_SECONDS_PER_DAY);
 
 		// create reputation system
 		reputationSystem = new ReputationSystem(this);
