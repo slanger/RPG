@@ -564,7 +564,7 @@ public final class World implements Disposable, Serializable
 		while (iterator1.hasNext())
 		{
 			GameCharacter tempCharacter = iterator1.next();
-			if (tempCharacter.getName() != "Player")
+			if (!tempCharacter.equals(player))
 			{
 				tempSightDistance = tempCharacter.getSightDistance();
 				tempDirection = tempCharacter.getFaceDirection();
@@ -645,7 +645,7 @@ public final class World implements Disposable, Serializable
 		while (iterator1.hasNext())
 		{
 			GameCharacter tempCharacter = iterator1.next();
-			if (tempCharacter.getName() != "Player")
+			if (!tempCharacter.equals(player))
 			{
 				tempHearingRadius = tempCharacter.getHearingRadius();
 				
