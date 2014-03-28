@@ -691,10 +691,10 @@ public final class World implements Disposable, Serializable
 	private void renderMessage() 
 	{
 		float messagePositionX = (float) (camera.position.x - camera.viewportWidth / 2  + (0.1 * camera.viewportWidth));
-		float messagePositionY = (float) (camera.position.y - camera.viewportHeight / 2 + (0.1 * camera.viewportHeight));
+		float messagePositionY = camera.position.y - camera.viewportHeight / 2;
 		
 		float messageWidth = (float) (camera.viewportWidth*0.8);
-		float messageHeight = 60.0f;
+		float messageHeight = 40.0f;
 	
 		LabelStyle style = new LabelStyle(messageFont, Color.DARK_GRAY);
 		Label messageLabel = new Label(message, style);
