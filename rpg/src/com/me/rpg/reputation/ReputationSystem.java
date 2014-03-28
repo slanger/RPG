@@ -87,6 +87,8 @@ public class ReputationSystem implements Serializable
 						EventTemplateList[i], coordinate, date);
 				MasterEventList.add(reputationEvent);
 				System.out.println("Event Added To MasterEventList");
+				world.pushMessage("Event: "+eventType+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
+						"  Location: "+(int)coordinate.getX()+", "+(int)coordinate.getY());
 				int masterListIndex = MasterEventList.indexOf(reputationEvent);
 				if (masterListIndex >= 0) {
 					CheckForWitnesses(reputationEvent, coordinate);

@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,6 +22,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Disposable;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.characters.GameCharacter;
@@ -87,7 +92,7 @@ public final class World implements Disposable, Serializable
 
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
 	private ReputationSystem reputationSystem;
-
+	
 	private boolean warping = false;
 	private float warpingAlpha;
 	private transient Sound warpSound;
@@ -99,6 +104,12 @@ public final class World implements Disposable, Serializable
 	private boolean movingToAnotherMap = false;
 	private boolean updateEnable = true;
 
+	private boolean renderMessage = false;
+	private String message = null;
+	long startMessageDisplayTime = 0;
+	private transient BitmapFont messageFont;
+	private transient Texture messageTexture;
+	
 	public DialogueSystem getDialogueSystem()
 	{
 		return dialogueSystem;
@@ -183,6 +194,9 @@ public final class World implements Disposable, Serializable
 		debugFont = new BitmapFont();
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 
+		messageFont = new BitmapFont();
+		messageTexture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
+		
 		// warp resources
 		warpSound = ScreenHandler.manager.get(WARP_SOUND_PATH, Sound.class);
 		Texture whiteScreenTexture = ScreenHandler.manager.get(LoadScreen.WHITE_DOT_PATH, Texture.class);
@@ -350,6 +364,20 @@ public final class World implements Disposable, Serializable
 		}
 		// end dialogue stuff
 
+		// rendering reputation, and other notifications
+		if(renderMessage)
+		{
+			if(((Calendar.getInstance().getTimeInMillis() - startMessageDisplayTime)/1000) < 10)
+			{
+				renderMessage();
+			}
+			else
+			{
+				renderMessage = false;
+			}
+		}
+		//
+		
 		if (warping)
 		{
 			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
@@ -375,6 +403,7 @@ public final class World implements Disposable, Serializable
 
 		batch.end();
 	}
+
 
 	public void update(float deltaTime)
 	{
@@ -657,6 +686,32 @@ public final class World implements Disposable, Serializable
 			}
 		}
 		shapeRenderer.end();
+	}
+
+	private void renderMessage() 
+	{
+		float messagePositionX = (float) (camera.position.x - camera.viewportWidth / 2  + (0.1 * camera.viewportWidth));
+		float messagePositionY = (float) (camera.position.y - camera.viewportHeight / 2 + (0.1 * camera.viewportHeight));
+		
+		float messageWidth = (float) (camera.viewportWidth*0.8);
+		float messageHeight = 60.0f;
+	
+		LabelStyle style = new LabelStyle(messageFont, Color.DARK_GRAY);
+		Label messageLabel = new Label(message, style);
+		messageLabel.setWrap(true);
+		messageLabel.setBounds(messagePositionX, messagePositionY, messageWidth, messageHeight);
+	    
+	 	batch.draw(messageTexture, messagePositionX, messagePositionY, messageWidth, messageHeight);
+	
+		messageLabel.draw(batch, 1.0f);
+		messageLabel.clear();
+	}
+	
+	public void pushMessage(String message)
+	{
+		renderMessage = true;
+		this.message = message;
+		startMessageDisplayTime =  Calendar.getInstance().getTimeInMillis();
 	}
 	
 }
