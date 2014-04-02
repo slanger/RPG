@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,7 +62,8 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Timer;
 
-public final class World implements Disposable, Serializable
+public final class World
+	implements Disposable, Serializable
 {
 
 	private static final long serialVersionUID = -3230953287610036756L;
@@ -92,7 +92,7 @@ public final class World implements Disposable, Serializable
 
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
 	private ReputationSystem reputationSystem;
-	
+
 	private boolean warping = false;
 	private float warpingAlpha;
 	private transient Sound warpSound;
@@ -109,7 +109,7 @@ public final class World implements Disposable, Serializable
 	long startMessageDisplayTime = 0;
 	private transient BitmapFont messageFont;
 	private transient Texture messageTexture;
-	
+
 	public DialogueSystem getDialogueSystem()
 	{
 		return dialogueSystem;
@@ -195,15 +195,18 @@ public final class World implements Disposable, Serializable
 		debugFont.setColor(0.95f, 0f, 0.23f, 1f); // "Munsell" red
 
 		messageFont = new BitmapFont();
-		messageTexture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
-		
+		messageTexture = new Texture(
+				Gdx.files.internal("images/DialogueBackground.png"));
+
 		// warp resources
 		warpSound = ScreenHandler.manager.get(WARP_SOUND_PATH, Sound.class);
-		Texture whiteScreenTexture = ScreenHandler.manager.get(LoadScreen.WHITE_DOT_PATH, Texture.class);
+		Texture whiteScreenTexture = ScreenHandler.manager.get(
+				LoadScreen.WHITE_DOT_PATH, Texture.class);
 		whiteScreen = new Sprite(whiteScreenTexture);
 	}
 
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream inputStream)
+		throws IOException, ClassNotFoundException
 	{
 		create();
 		inputStream.defaultReadObject();
@@ -265,75 +268,85 @@ public final class World implements Disposable, Serializable
 
 		// get walking boundaries
 		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
-		// RectangleMapObject boundary1 = (RectangleMapObject) exampleWalkingBoundaries.get(NPC1_NAME);
-		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries.get(NPC2_NAME);
+		// RectangleMapObject boundary1 = (RectangleMapObject)
+		// exampleWalkingBoundaries.get(NPC1_NAME);
+		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries
+				.get(NPC2_NAME);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
 		exampleMap.addCharacterToMap(npc1, 544, 544);
 		exampleMap.addCharacterToMap(npc2, 480, 128);
-		
+
 		// setup State
 		HierarchicalState parent = new HierarchicalState(null, npc1);
-		
-		Coordinate[] patrol = new Coordinate[] {new Coordinate(50,50), new Coordinate(300,50), new Coordinate(300,300), new Coordinate(50,300)};
+
+		Coordinate[] patrol = new Coordinate[] { new Coordinate(50, 50),
+				new Coordinate(300, 50), new Coordinate(300, 300),
+				new Coordinate(50, 300) };
 		PatrolState patrol0 = new PatrolState(parent, npc1, patrol);
-		
+
 		MeleeFightState fight0 = new MeleeFightState(parent, npc1);
-		
-		SeePeopleCondition canSee = new SeePeopleCondition(npc1, 0, Comparison.NOTEQUALS);
-		HearPeopleCondition canHear = new HearPeopleCondition(npc1, 0, Comparison.NOTEQUALS);
+
+		SeePeopleCondition canSee = new SeePeopleCondition(npc1, 0,
+				Comparison.NOTEQUALS);
+		HearPeopleCondition canHear = new HearPeopleCondition(npc1, 0,
+				Comparison.NOTEQUALS);
 		Condition cannotSee = new NotCondition(canSee);
 		Condition cannotHear = new NotCondition(canHear);
 		Condition canSeeOrHear = new OrCondition(canSee, canHear);
 		Condition cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
-		
+
 		Transition patrolToFight = new Transition(fight0, canSeeOrHear);
 		Transition fightToPatrol = new Transition(patrol0, cannotSeeNorHear);
-		
+
 		patrol0.setTransitions(patrolToFight);
 		fight0.setTransitions(fightToPatrol);
 		parent.setInitialState(patrol0);
 		npc1.setStateMachine(parent);
-		
+
 		// StateMachine for npc2
 		parent = new HierarchicalState(null, npc2);
 		HierarchicalState subparent = new HierarchicalState(parent, npc2);
 		subparent.setName("subParent");
 		CustomState notAtCen = new CustomState(subparent, npc2);
 		notAtCen.setName("notAtCen");
-		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2, boundary2.getRectangle());
+		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2,
+				boundary2.getRectangle());
 		randomWalkState.setName("randomWalk");
 		RunAwayState runaway = new RunAwayState(parent, npc2);
 		runaway.setName("runaway");
-		
+
 		subparent.setInitialState(notAtCen);
 		parent.setInitialState(subparent);
-		
-		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500,100));
+
+		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500, 100));
 		notAtCen.setActions(walkAction0);
-		//RandomWalkAction randomWalkAction0= new RandomWalkAction(npc2, boundary2.getRectangle());
-		//randomWalkState.setActions(randomWalkAction0);
-		
-		Condition dist = new DistanceCondition(npc2, exampleMap, new Coordinate(500, 100));
+		// RandomWalkAction randomWalkAction0= new RandomWalkAction(npc2,
+		// boundary2.getRectangle());
+		// randomWalkState.setActions(randomWalkAction0);
+
+		Condition dist = new DistanceCondition(npc2, exampleMap,
+				new Coordinate(500, 100));
 		Transition notCenToRandom = new Transition(randomWalkState, dist);
-		
+
 		canSee = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
 		canHear = new HearPeopleCondition(npc2, 0, Comparison.NOTEQUALS);
 		cannotSee = new NotCondition(canSee);
 		cannotHear = new NotCondition(canHear);
 		canSeeOrHear = new OrCondition(canSee, canHear);
 		cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
-		
-		Condition timer = runaway.getFloatCondition("timeInState", 5f, Comparison.GREATER);
+
+		Condition timer = runaway.getFloatCondition("timeInState", 5f,
+				Comparison.GREATER);
 		Condition and = new AndCondition(cannotSeeNorHear, timer);
 		Transition subStateToRun = new Transition(runaway, canSeeOrHear);
 		Transition runToNotAtCen = new Transition(notAtCen, and);
-		
+
 		notAtCen.setTransitions(notCenToRandom);
 		runaway.setTransitions(runToNotAtCen);
 		subparent.setTransitions(subStateToRun);
-		
+
 		npc2.setStateMachine(parent);
 		// setup weapons
 		genericWeaponSetup(player, npc1, exampleMap);
@@ -353,7 +366,7 @@ public final class World implements Disposable, Serializable
 
 		temporaryVisionConeTest();
 		temporaryHearingTest();
-		
+
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
@@ -362,12 +375,11 @@ public final class World implements Disposable, Serializable
 		{
 			dialogueSystem.render(batch, camera);
 		}
-		// end dialogue stuff
 
 		// rendering reputation, and other notifications
-		if(renderMessage)
+		if (renderMessage)
 		{
-			if(((Calendar.getInstance().getTimeInMillis() - startMessageDisplayTime)/1000) < 10)
+			if (((Calendar.getInstance().getTimeInMillis() - startMessageDisplayTime) / 1000) < 10)
 			{
 				renderMessage();
 			}
@@ -376,8 +388,7 @@ public final class World implements Disposable, Serializable
 				renderMessage = false;
 			}
 		}
-		//
-		
+
 		if (warping)
 		{
 			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
@@ -389,7 +400,8 @@ public final class World implements Disposable, Serializable
 		// render HUD and overlays
 		float healthX = camera.position.x - camera.viewportWidth / 2 + 15;
 		float healthY = camera.position.y + camera.viewportHeight / 2 - 15;
-		debugFont.draw(batch, "Health: " + player.getHealth(), healthX, healthY);
+		debugFont
+				.draw(batch, "Health: " + player.getHealth(), healthX, healthY);
 
 		float dayCountX = camera.position.x - camera.viewportWidth / 2 + 15;
 		float dayCountY = camera.position.y + camera.viewportHeight / 2 - 35;
@@ -403,7 +415,6 @@ public final class World implements Disposable, Serializable
 
 		batch.end();
 	}
-
 
 	public void update(float deltaTime)
 	{
@@ -426,14 +437,16 @@ public final class World implements Disposable, Serializable
 		}
 	}
 
-	public void movePlayerToOtherMap(final MapType mapType, final Coordinate newLocation)
+	public void movePlayerToOtherMap(final MapType mapType,
+			final Coordinate newLocation)
 	{
 		currentMap.close();
 		updateEnable = false;
 		movingToAnotherMap = true;
 
 		// cannot remove player from Map until the Map has stopped updating
-		// Exception in thread "LWJGL Application" java.util.ConcurrentModificationException
+		// Exception in thread "LWJGL Application"
+		// java.util.ConcurrentModificationException
 		timer.scheduleTask(new Timer.Task()
 		{
 
@@ -481,7 +494,8 @@ public final class World implements Disposable, Serializable
 		timer.scheduleTask(new WarpToOtherMapTask(newMap, newLocation), 3.0f);
 	}
 
-	private class WarpToOtherMapTask extends Timer.Task
+	private class WarpToOtherMapTask
+		extends Timer.Task
 	{
 
 		private static final long serialVersionUID = -5872915237104152890L;
@@ -545,15 +559,19 @@ public final class World implements Disposable, Serializable
 		}
 	}
 
-	private void genericWeaponSetup(GameCharacter character, GameCharacter npc, Map map)
+	private void genericWeaponSetup(GameCharacter character, GameCharacter npc,
+			Map map)
 	{
 		int width = 32;
 		int height = 32;
 
 		// melee attack test stuff
-		Shield shield = new Shield("LameShield", SHIELD_PATH, width, height, 32, 32);
-		Weapon sword = new MeleeWeapon("LameSword", SWORD_PATH, width, height, 32, 32);
-		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, width, height, 32, 32);
+		Shield shield = new Shield("LameShield", SHIELD_PATH, width, height,
+				32, 32);
+		Weapon sword = new MeleeWeapon("LameSword", SWORD_PATH, width, height,
+				32, 32);
+		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, width, height,
+				32, 32);
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		sword2.addEffect(poison);
@@ -564,11 +582,11 @@ public final class World implements Disposable, Serializable
 		npc.equipWeapon(map, sword2);
 
 		// ranged attack test stuff
-		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, width, height,
-				32, 32);
+		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, width,
+				height, 32, 32);
 		player.equipWeapon(map, bow);
-		Projectile arrow = new Projectile("Arrow", ARROW_PATH, width, height, 32,
-				32);
+		Projectile arrow = new Projectile("Arrow", ARROW_PATH, width, height,
+				32, 32);
 		bow.equipProjectile(arrow, 1000);
 
 		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, width,
@@ -588,7 +606,8 @@ public final class World implements Disposable, Serializable
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
 
-		ArrayList<GameCharacter> charactersOnMap = currentMap.getCharactersOnMap();
+		ArrayList<GameCharacter> charactersOnMap = currentMap
+				.getCharactersOnMap();
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
 		while (iterator1.hasNext())
 		{
@@ -669,7 +688,8 @@ public final class World implements Disposable, Serializable
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
 
-		ArrayList<GameCharacter> charactersOnMap = currentMap.getCharactersOnMap();
+		ArrayList<GameCharacter> charactersOnMap = currentMap
+				.getCharactersOnMap();
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
 		while (iterator1.hasNext())
 		{
@@ -677,10 +697,10 @@ public final class World implements Disposable, Serializable
 			if (!tempCharacter.equals(player))
 			{
 				tempHearingRadius = tempCharacter.getHearingRadius();
-				
+
 				tempX = tempCharacter.getCenterX();
 				tempY = tempCharacter.getCenterY();
-				
+
 				shapeRenderer.setColor(0, 1, 0, 0.025f);
 				shapeRenderer.circle(tempX, tempY, tempHearingRadius);
 			}
@@ -688,30 +708,33 @@ public final class World implements Disposable, Serializable
 		shapeRenderer.end();
 	}
 
-	private void renderMessage() 
+	private void renderMessage()
 	{
-		float messagePositionX = (float) (camera.position.x - camera.viewportWidth / 2  + (0.1 * camera.viewportWidth));
+		float messagePositionX = (float) (camera.position.x
+				- camera.viewportWidth / 2 + (0.1 * camera.viewportWidth));
 		float messagePositionY = camera.position.y - camera.viewportHeight / 2;
-		
-		float messageWidth = (float) (camera.viewportWidth*0.8);
+
+		float messageWidth = (float) (camera.viewportWidth * 0.8);
 		float messageHeight = 40.0f;
-	
+
 		LabelStyle style = new LabelStyle(messageFont, Color.DARK_GRAY);
 		Label messageLabel = new Label(message, style);
 		messageLabel.setWrap(true);
-		messageLabel.setBounds(messagePositionX, messagePositionY, messageWidth, messageHeight);
-	    
-	 	batch.draw(messageTexture, messagePositionX, messagePositionY, messageWidth, messageHeight);
-	
+		messageLabel.setBounds(messagePositionX, messagePositionY,
+				messageWidth, messageHeight);
+
+		batch.draw(messageTexture, messagePositionX, messagePositionY,
+				messageWidth, messageHeight);
+
 		messageLabel.draw(batch, 1.0f);
 		messageLabel.clear();
 	}
-	
+
 	public void pushMessage(String message)
 	{
 		renderMessage = true;
 		this.message = message;
-		startMessageDisplayTime =  Calendar.getInstance().getTimeInMillis();
+		startMessageDisplayTime = Calendar.getInstance().getTimeInMillis();
 	}
-	
+
 }

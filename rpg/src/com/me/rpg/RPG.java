@@ -7,7 +7,8 @@ import java.io.ObjectOutputStream;
 
 import com.badlogic.gdx.Screen;
 
-public class RPG implements Screen
+public class RPG
+	implements Screen
 {
 
 	public final ScreenHandler screenHandler;

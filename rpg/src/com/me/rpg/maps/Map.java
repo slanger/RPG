@@ -28,7 +28,8 @@ import com.me.rpg.combat.Weapon;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Timer;
 
-public abstract class Map implements Disposable, Serializable
+public abstract class Map
+	implements Disposable, Serializable
 {
 
 	private static final long serialVersionUID = 6670415681217808756L;
@@ -138,7 +139,8 @@ public abstract class Map implements Disposable, Serializable
 		}
 	}
 
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream inputStream)
+		throws IOException, ClassNotFoundException
 	{
 		inputStream.defaultReadObject();
 		setup();
@@ -520,7 +522,8 @@ public abstract class Map implements Disposable, Serializable
 	}
 
 	public boolean checkCollisionWithObjects(float x, float y, float oldX,
-			float oldY, float width, float height, final Coordinate newCoordinate)
+			float oldY, float width, float height,
+			final Coordinate newCoordinate)
 	{
 		newCoordinate.setX(x);
 		newCoordinate.setY(y);
@@ -579,10 +582,11 @@ public abstract class Map implements Disposable, Serializable
 
 	/**
 	 * A collision check that only checks warp points. Returns a reference to a
-	 * MapType object if the input hitbox collides with a warp point. Returns null
-	 * otherwise.
+	 * MapType object if the input hitbox collides with a warp point. Returns
+	 * null otherwise.
 	 */
-	public MapType checkCollisionWithWarpPoints(Rectangle hitbox, Coordinate warpCoordinate)
+	public MapType checkCollisionWithWarpPoints(Rectangle hitbox,
+			Coordinate warpCoordinate)
 	{
 		Vector2 centerPoint = hitbox.getCenter(new Vector2());
 		for (RectangleMapObject warpPoint : warpPoints)
@@ -598,16 +602,20 @@ public abstract class Map implements Disposable, Serializable
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Better implementation - checks if characters are inside the vision cone of given char
+	 * Better implementation - checks if characters are inside the vision cone
+	 * of given char
+	 * 
 	 * @param mainChar
 	 * @return List of Characters than the input Character can see
 	 */
-	public ArrayList<GameCharacter> canSeeCharacters(GameCharacter mainChar) {
+	public ArrayList<GameCharacter> canSeeCharacters(GameCharacter mainChar)
+	{
 		Iterator<GameCharacter> iter = charactersOnMap.iterator();
 		ArrayList<GameCharacter> result = new ArrayList<GameCharacter>();
-		while (iter.hasNext()) {
+		while (iter.hasNext())
+		{
 			GameCharacter next = iter.next();
 			if (next == mainChar)
 				continue;
@@ -617,11 +625,13 @@ public abstract class Map implements Disposable, Serializable
 		}
 		return result;
 	}
-	
-	public ArrayList<GameCharacter> canHearCharacters(GameCharacter mainChar) {
+
+	public ArrayList<GameCharacter> canHearCharacters(GameCharacter mainChar)
+	{
 		Iterator<GameCharacter> iter = charactersOnMap.iterator();
 		ArrayList<GameCharacter> result = new ArrayList<GameCharacter>();
-		while (iter.hasNext()) {
+		while (iter.hasNext())
+		{
 			GameCharacter next = iter.next();
 			if (next == mainChar)
 				continue;
@@ -631,8 +641,10 @@ public abstract class Map implements Disposable, Serializable
 		}
 		return result;
 	}
-	
-	public ArrayList<GameCharacter> canSeeOrHearCharacters(GameCharacter mainChar) {
+
+	public ArrayList<GameCharacter> canSeeOrHearCharacters(
+			GameCharacter mainChar)
+	{
 		ArrayList<GameCharacter> chars = canSeeCharacters(mainChar);
 		chars.addAll(canHearCharacters(mainChar));
 		return chars;
@@ -640,8 +652,10 @@ public abstract class Map implements Disposable, Serializable
 
 	private Coordinate getWarpCoordinate(RectangleMapObject warpPoint)
 	{
-		float warpX = Float.parseFloat(warpPoint.getProperties().get("x", String.class));
-		float warpY = Float.parseFloat(warpPoint.getProperties().get("y", String.class));
+		float warpX = Float.parseFloat(warpPoint.getProperties().get("x",
+				String.class));
+		float warpY = Float.parseFloat(warpPoint.getProperties().get("y",
+				String.class));
 		return new Coordinate(warpX, warpY);
 	}
 

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.badlogic.gdx.math.Circle;
 import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;
