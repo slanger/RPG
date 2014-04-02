@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -92,11 +93,6 @@ public abstract class Map
 		return charactersOnMap;
 	}
 
-	public RectangleMapObject[] getObjectsOnMap()
-	{
-		return collidables;
-	}
-
 	public Timer getTimer()
 	{
 		return timer;
@@ -122,13 +118,8 @@ public abstract class Map
 		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
 		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
 
-		// get collidables
-		MapObjects collidableObjects = getCollidables();
-		collidables = new RectangleMapObject[collidableObjects.getCount()];
-		for (int i = 0; i < collidables.length; i++)
-		{
-			collidables[i] = (RectangleMapObject) collidableObjects.get(i);
-		}
+		// load collidables
+		loadCollidables();
 
 		// get warp points
 		MapObjects warpObjects = getWarpPoints();
@@ -146,23 +137,15 @@ public abstract class Map
 		setup();
 	}
 
-	protected MapObjects getCollidables()
+	private void loadCollidables()
 	{
 		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
-		return collisionLayer.getObjects();
-	}
-
-	protected MapObjects getSpawnPoints()
-	{
-		MapLayer spawnLayer = tiledMap.getLayers().get("Spawn");
-		return spawnLayer.getObjects();
-	}
-
-	public MapObjects getWalkingBoundaries()
-	{
-		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get(
-				"WalkingBoundaries");
-		return walkingBoundariesLayer.getObjects();
+		MapObjects collidableObjects = collisionLayer.getObjects();
+		collidables = new RectangleMapObject[collidableObjects.getCount()];
+		for (int i = 0; i < collidables.length; i++)
+		{
+			collidables[i] = (RectangleMapObject) collidableObjects.get(i);
+		}
 	}
 
 	protected MapObjects getWarpPoints()
@@ -453,6 +436,149 @@ public abstract class Map
 		}
 	}
 
+	/*
+	 * COMPILE MAP
+	 * Create waypoints for shortest path navigation
+	 */
+
+	/*
+	private void createConnections(List<Waypoint> waypoints, List<ObjectElement> collidables)
+	{
+		final int length = waypoints.size();
+		for (int i = 0; i < length; i++)
+		{
+			Waypoint waypoint = waypoints.get(i);
+			for (int j = i + 1; j < length; j++)
+			{
+				Waypoint w = waypoints.get(j);
+				if (pointsConnected(waypoint.rectangle.getCenter(), w.rectangle.getCenter(), collidables))
+				{
+					waypoint.addConnection(w.getName());
+					w.addConnection(waypoint.getName());
+				}
+			}
+		}
+	}
+
+	private List<Waypoint> createWaypoints(List<ObjectElement> objectList)
+	{
+		List<Waypoint> waypoints = new ArrayList<Waypoint>();
+		int index = 0;
+		for (ObjectElement object : objectList)
+		{
+			int x = object.getX();
+			int y = object.getY();
+			int width = object.getWidth();
+			int height = object.getHeight();
+
+			Rectangle bottomLeft = new Rectangle(x - tileWidth, y - tileHeight,
+					tileWidth, tileHeight);
+			if (checkRectangle(bottomLeft, waypoints, objectList))
+				waypoints.add(new Waypoint("" + index++, bottomLeft));
+
+			Rectangle topLeft = new Rectangle(x - tileWidth, y + height,
+					tileWidth, tileHeight);
+			if (checkRectangle(topLeft, waypoints, objectList))
+				waypoints.add(new Waypoint("" + index++, topLeft));
+
+			Rectangle topRight = new Rectangle(x + width, y + height,
+					tileWidth, tileHeight);
+			if (checkRectangle(topRight, waypoints, objectList))
+				waypoints.add(new Waypoint("" + index++, topRight));
+
+			Rectangle bottomRight = new Rectangle(x + width, y - tileHeight,
+					tileWidth, tileHeight);
+			if (checkRectangle(bottomRight, waypoints, objectList))
+				waypoints.add(new Waypoint("" + index++, bottomRight));
+		}
+
+		return waypoints;
+	}
+
+	private boolean checkRectangle(Rectangle rectangle,
+			List<Waypoint> waypoints, List<ObjectElement> collidables)
+	{
+		// check if waypoint is out of bounds
+		if (!checkIfInBounds(rectangle))
+		{
+			return false;
+		}
+
+		// check if waypoint equals another waypoint we've already added
+		for (Waypoint w : waypoints)
+		{
+			Rectangle r = w.rectangle;
+			if (sameRectangles(rectangle, r))
+			{
+				return false;
+			}
+		}
+
+		// check if waypoint is inside a static collidable
+		for (ObjectElement collidable : collidables)
+		{
+			Rectangle r = new Rectangle(collidable.getX(), collidable.getY(),
+					collidable.getWidth(), collidable.getHeight());
+			if (rectangle.overlaps(r))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean checkIfInBounds(Rectangle r)
+	{
+		if (r.x < 0 || r.x > mapWidth)
+			return false;
+		if (r.y < 0 || r.y > mapHeight)
+			return false;
+		if (r.x + r.width < 0 || r.x + r.width > mapWidth)
+			return false;
+		if (r.y + r.height < 0 || r.y + r.height > mapHeight)
+			return false;
+
+		return true;
+	}
+
+	private boolean sameRectangles(Rectangle r1, Rectangle r2)
+	{
+		return (r1.x == r2.x && r1.y == r2.y && r1.width == r2.width && r1.height == r2.height);
+	}
+
+	private boolean pointsConnected(Coordinate c1, Coordinate c2, List<ObjectElement> collidables)
+	{
+		int deltaX = Math.abs(c1.x - c2.x);
+		int deltaY = Math.abs(c1.y - c2.y);
+		int dx = (c1.x < c2.x) ? 1 : (c2.x < c1.x) ? -1 : 0;
+		int dy = (c1.y < c2.y) ? 1 : (c2.y < c1.y) ? -1 : 0;
+		int n = (int) (Math.sqrt((((double) (deltaX * deltaX + deltaY * deltaY)) / ((double) (tileWidth * tileWidth + tileHeight * tileHeight)))) * 2);
+
+		for (int i = 0; i <= n; i++)
+		{
+			int x = c1.x + i * (deltaX / n) * dx;
+			int y = c1.y + i * (deltaY / n) * dy;
+			Coordinate c = new Coordinate(x, y);
+			for (ObjectElement collidable : collidables)
+			{
+				Rectangle r = new Rectangle(collidable.getX(), collidable.getY(),
+						collidable.getWidth(), collidable.getHeight());
+				if (r.contains(c))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+	*/
+
+	/*
+	 * END COMPILE MAP
+	 */
+
 	/**
 	 * Checks collision with objects and characters on map. Does not check warp
 	 * points.
@@ -509,8 +635,7 @@ public abstract class Map
 	 */
 	public boolean checkCollisionWithObjects(Rectangle boundingRectangle)
 	{
-		RectangleMapObject[] objectsOnMap = getObjectsOnMap();
-		for (RectangleMapObject object : objectsOnMap)
+		for (RectangleMapObject object : collidables)
 		{
 			Rectangle r = object.getRectangle();
 			if (r.overlaps(boundingRectangle))

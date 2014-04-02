@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,8 +18,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Disposable;
@@ -106,7 +104,9 @@ public final class World
 
 	private boolean renderMessage = false;
 	private String message = null;
-	long startMessageDisplayTime = 0;
+	private long startMessageDisplayTime = 0;
+	private final long MESSAGE_DISPLAY_SECONDS = 5;
+
 	private transient BitmapFont messageFont;
 	private transient Texture messageTexture;
 
@@ -266,13 +266,6 @@ public final class World
 		npc2 = new NonplayableCharacter(NPC2_NAME, NPC_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
 
-		// get walking boundaries
-		MapObjects exampleWalkingBoundaries = exampleMap.getWalkingBoundaries();
-		// RectangleMapObject boundary1 = (RectangleMapObject)
-		// exampleWalkingBoundaries.get(NPC1_NAME);
-		RectangleMapObject boundary2 = (RectangleMapObject) exampleWalkingBoundaries
-				.get(NPC2_NAME);
-
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
 		exampleMap.addCharacterToMap(npc1, 544, 544);
@@ -311,8 +304,9 @@ public final class World
 		subparent.setName("subParent");
 		CustomState notAtCen = new CustomState(subparent, npc2);
 		notAtCen.setName("notAtCen");
+		Rectangle walkingBoundary = new Rectangle(32, 32, 576, 224);
 		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2,
-				boundary2.getRectangle());
+				walkingBoundary);
 		randomWalkState.setName("randomWalk");
 		RunAwayState runaway = new RunAwayState(parent, npc2);
 		runaway.setName("runaway");
@@ -322,9 +316,6 @@ public final class World
 
 		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500, 100));
 		notAtCen.setActions(walkAction0);
-		// RandomWalkAction randomWalkAction0= new RandomWalkAction(npc2,
-		// boundary2.getRectangle());
-		// randomWalkState.setActions(randomWalkAction0);
 
 		Condition dist = new DistanceCondition(npc2, exampleMap,
 				new Coordinate(500, 100));
@@ -348,6 +339,7 @@ public final class World
 		subparent.setTransitions(subStateToRun);
 
 		npc2.setStateMachine(parent);
+
 		// setup weapons
 		genericWeaponSetup(player, npc1, exampleMap);
 	}
@@ -379,7 +371,7 @@ public final class World
 		// rendering reputation, and other notifications
 		if (renderMessage)
 		{
-			if (((Calendar.getInstance().getTimeInMillis() - startMessageDisplayTime) / 1000) < 10)
+			if (((System.currentTimeMillis() - startMessageDisplayTime) / 1000) < MESSAGE_DISPLAY_SECONDS)
 			{
 				renderMessage();
 			}
@@ -734,7 +726,7 @@ public final class World
 	{
 		renderMessage = true;
 		this.message = message;
-		startMessageDisplayTime = Calendar.getInstance().getTimeInMillis();
+		startMessageDisplayTime = System.currentTimeMillis();
 	}
 
 }
