@@ -35,6 +35,7 @@ import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
+import com.me.rpg.inventory.InventoryMenu;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
@@ -91,6 +92,7 @@ public final class World
 	private Timer dayTimer = new Timer();
 
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
+	private final InventoryMenu	inventoryMenu	= new InventoryMenu();
 	private ReputationSystem reputationSystem;
 
 	private boolean warping = false;
@@ -120,6 +122,11 @@ public final class World
 		return reputationSystem;
 	}
 
+	public InventoryMenu getInventoryMenu()
+	{
+		return inventoryMenu;
+	}
+	
 	public Map getCurrentMap()
 	{
 		return currentMap;
@@ -234,6 +241,8 @@ public final class World
 		// create reputation system
 		reputationSystem = new ReputationSystem(this);
 
+		//
+		
 		// create maps
 		Map exampleMap = new ExampleMap(this);
 		maps.add(exampleMap);
@@ -376,6 +385,11 @@ public final class World
 			dialogueSystem.render(batch, camera);
 		}
 
+		if(inventoryMenu.getInMenu())
+		{
+			inventoryMenu.render(batch, camera);
+		}
+		
 		// rendering reputation, and other notifications
 		if (renderMessage)
 		{
@@ -426,7 +440,7 @@ public final class World
 			player.handleDialogueInput();
 			return;
 		}
-
+		
 		dayTimer.update(deltaTime);
 
 		Iterator<Map> iter = maps.iterator();
