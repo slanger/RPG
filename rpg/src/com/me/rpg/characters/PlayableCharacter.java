@@ -7,7 +7,6 @@ import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
 import com.me.rpg.utils.Coordinate;
 
 public class PlayableCharacter extends GameCharacter
@@ -24,12 +23,14 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enablePushing = true;
 
 	// dialogue keys
-	private boolean enableInputE = true;  //for initiating dialogue with character, selecting response option
+	private boolean enableInputE = true; // for initiating dialogue with
+											// character, selecting response
+											// option
 	private boolean enableInputUp = true;
 	private boolean enableInputDown = true;
-	
+
 	private PlayerControlledWalkAI walkAI;
-	
+
 	public boolean getEnableControls()
 	{
 		return enableControls;
@@ -51,7 +52,7 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	@Override
-	public void doUpdate(float deltaTime, Map currentMap)
+	public void doUpdate(float deltaTime)
 	{
 		setMoving(false);
 
@@ -101,11 +102,11 @@ public class PlayableCharacter extends GameCharacter
 		 * DIALOGUE
 		 */
 
-		if(world.getDialogueSystem().getInDialogue()) 
+		if (world.getDialogueSystem().getInDialogue())
 		{
 			return;
 		}
-		
+
 		if (Gdx.input.isKeyPressed(Keys.E))
 		{
 			boolean dialogueEnded = false;
@@ -115,8 +116,8 @@ public class PlayableCharacter extends GameCharacter
 				if (!world.getDialogueSystem().getInDialogue())
 				{
 					initiateDialogue();
-					if(world.getDialogueSystem().getInDialogue())
-					{						
+					if (world.getDialogueSystem().getInDialogue())
+					{
 						dialogueEnded = advanceDialogue("ENTER");
 					}
 				}
@@ -124,7 +125,8 @@ public class PlayableCharacter extends GameCharacter
 				{ // currently in dialogue
 					dialogueEnded = advanceDialogue("ENTER");
 				}
-				if(dialogueEnded == true) world.setUpdateEnable(true);
+				if (dialogueEnded == true)
+					world.setUpdateEnable(true);
 			}
 		}
 		else
@@ -134,17 +136,17 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * END DIALOGUE
 		 */
-		
-		if(world.getDialogueSystem().getInDialogue() == true)
+
+		if (world.getDialogueSystem().getInDialogue() == true)
 		{
 			return;
 		}
-		
+
 		/*
 		 * MOVEMENT
 		 */
 
-		walkAI.update(deltaTime, currentMap);
+		walkAI.update(deltaTime);
 
 		/*
 		 * END MOVEMENT
@@ -181,7 +183,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if (weaponSlot != null && enableAttack)
 			{
-				weaponSlot.attack(currentMap, getFaceDirection(), getBoundingRectangle());
+				weaponSlot.attack(currentMap, getFaceDirection(),
+						getBoundingRectangle());
 				enableAttack = false;
 			}
 		}
@@ -242,8 +245,8 @@ public class PlayableCharacter extends GameCharacter
 				if (!world.getDialogueSystem().getInDialogue())
 				{
 					initiateDialogue();
-					if(world.getDialogueSystem().getInDialogue())
-					{						
+					if (world.getDialogueSystem().getInDialogue())
+					{
 						dialogueEnded = advanceDialogue("ENTER");
 					}
 				}
@@ -251,19 +254,20 @@ public class PlayableCharacter extends GameCharacter
 				{ // currently in dialogue
 					dialogueEnded = advanceDialogue("ENTER");
 				}
-				if(dialogueEnded == true) world.setUpdateEnable(true);
+				if (dialogueEnded == true)
+					world.setUpdateEnable(true);
 			}
 		}
 		else
 		{
 			enableInputE = true;
 		}
-		if(Gdx.input.isKeyPressed(Keys.UP))
+		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
-			if(enableInputUp)
+			if (enableInputUp)
 			{
 				enableInputUp = false;
-				if(world.getDialogueSystem().getInDialogue())
+				if (world.getDialogueSystem().getInDialogue())
 				{
 					advanceDialogue("UP");
 				}
@@ -273,10 +277,10 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputUp = true;
 		}
-		
+
 		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			if(enableInputDown == true)
+			if (enableInputDown == true)
 			{
 				enableInputDown = false;
 				if (world.getDialogueSystem().getInDialogue())
@@ -289,13 +293,12 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputDown = true;
 		}
-		
+
 		/*
 		 * END DIALOGUE
 		 */
-		
+
 	}
-	
 
 	private void doPush()
 	{
@@ -317,7 +320,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			DialogueSystem dialogueSystem = world.getDialogueSystem();
 			boolean foundDialogue = dialogueSystem.startConversation(this, c);
-			if(foundDialogue){
+			if (foundDialogue)
+			{
 				c.setFaceDirection(this.getFaceDirection().opposite());
 				world.setUpdateEnable(false);
 			}
@@ -331,20 +335,20 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	private boolean advanceDialogue(String key)
-	{	
+	{
 		return world.getDialogueSystem().advanceDialogue(key);
 	}
 
 	@Override
-	public void moveToOtherMap(MapType mapType, Coordinate newLocation)
+	public void moveToOtherMap(Map newMap, Coordinate newLocation)
 	{
-		world.movePlayerToOtherMap(mapType, newLocation);
+		world.movePlayerToOtherMap(newMap, newLocation);
 	}
 
 	@Override
-	public void warpToOtherMap(MapType mapType, Coordinate newLocation)
+	public void warpToOtherMap(Map newMap, Coordinate newLocation)
 	{
-		world.warpPlayerToOtherMap(mapType, newLocation);
+		world.warpPlayerToOtherMap(newMap, newLocation);
 	}
 
 }

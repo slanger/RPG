@@ -8,11 +8,13 @@ import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.utils.Coordinate;
 
 public class PatrolState extends State {
-	
-	private int idx = 0;
-	private ArrayList<Action> actions;
+
+	private static final long serialVersionUID = -127716873166546219L;
+
+	private ArrayList<Action> actions = new ArrayList<Action>();
 	private WalkAction patrolLoc;
 	private Coordinate[] patrol;
+	private int idx = 0;
 	
 	public PatrolState(HierarchicalState parent, GameCharacter character, Coordinate[] patrol) {
 		super(parent, character);
@@ -25,12 +27,12 @@ public class PatrolState extends State {
 		this.patrol = new Coordinate[patrol.length];
 		System.arraycopy(patrol, 0, this.patrol, 0, patrol.length);
 		patrolLoc = new WalkAction(character, patrol[0]);
-		actions = new ArrayList<Action>();
 		actions.add(patrolLoc);
 	}
 	
+	@Override
 	public ArrayList<Action> doGetEntryActions() {
-		// find closest patrol location.
+		// find closest patrol location
 		float min = Float.MAX_VALUE;
 		Coordinate center = character.getCenter();
 		for (int i = 0; i < patrol.length; ++i) {
@@ -38,17 +40,22 @@ public class PatrolState extends State {
 			if (dist2 < min) {
 				min = dist2;
 				idx = i;
-				patrolLoc.setNewLoc(patrol[idx]);
+				// TODO this is not ideal
+				actions.remove(patrolLoc);
+				patrolLoc = new WalkAction(character, patrol[idx]);
 			}
 		}
 		return super.doGetEntryActions();
 	}
 	
+	@Override
 	public ArrayList<Action> doGetActions() {
 		if (character.isCenterNear(patrol[idx])) {
 			++idx;
 			idx %= patrol.length;
-			patrolLoc.setNewLoc(patrol[idx]);
+			// TODO this is not ideal
+			actions.remove(patrolLoc);
+			patrolLoc = new WalkAction(character, patrol[idx]);
 		}
 		return actions;
 	}

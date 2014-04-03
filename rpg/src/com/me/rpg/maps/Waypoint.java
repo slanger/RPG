@@ -5,24 +5,31 @@ import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
 
-public class Waypoint
+public class Waypoint implements Comparable<Waypoint>
 {
 
-	public final String name;
 	public final Rectangle rectangle;
+	public final Map mapLocatedOn;
+	public final String name;
 	public final String connectedWarpPointName;
 	public final List<Edge> connections = new ArrayList<Edge>();
+	public Waypoint connectedWarpPoint;
+	// to be used by dijkstra's algorithm
+	public float distanceFromSource;
+	public Waypoint previousVertex;
 
-	public Waypoint(Rectangle rectangle)
+	public Waypoint(Rectangle rectangle, Map mapLocatedOn)
 	{
 		this.rectangle = rectangle;
+		this.mapLocatedOn = mapLocatedOn;
 		name = null;
 		connectedWarpPointName = null;
 	}
 
-	public Waypoint(Rectangle rectangle, String name, String connectedWarpPointName)
+	public Waypoint(Rectangle rectangle, Map mapLocatedOn, String name, String connectedWarpPointName)
 	{
 		this.rectangle = rectangle;
+		this.mapLocatedOn = mapLocatedOn;
 		this.name = name;
 		this.connectedWarpPointName = connectedWarpPointName;
 	}
@@ -30,6 +37,23 @@ public class Waypoint
 	public boolean isWarpPoint()
 	{
 		return !(connectedWarpPointName == null);
+	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("(%s; %s); isWarpPoint=%s", rectangle.toString(), mapLocatedOn.getMapType().getMapName(), isWarpPoint());
+	}
+
+	// compare distances of the Waypoints
+	@Override
+	public int compareTo(Waypoint other)
+	{
+		if (this.distanceFromSource < other.distanceFromSource)
+			return -1;
+		if (this.distanceFromSource > other.distanceFromSource)
+			return 1;
+		return 0;
 	}
 
 	public static class Edge

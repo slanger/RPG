@@ -10,7 +10,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
@@ -29,7 +28,7 @@ public class PlayerControlledWalkAI implements WalkAI
 	}
 
 	@Override
-	public void update(float deltaTime, Map currentMap)
+	public void update(float deltaTime)
 	{
 		float spriteWidth = character.getSpriteWidth();
 		float spriteHeight = character.getSpriteHeight();
@@ -95,7 +94,7 @@ public class PlayerControlledWalkAI implements WalkAI
 		if (moving)
 		{
 			// collision detection with objects on map
-			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, newCoordinate);
+			boolean didMove = character.getCurrentMap().checkCollision(x, y, oldX, oldY, character, newCoordinate);
 			moving = didMove;
 
 			if (moving)
@@ -104,12 +103,12 @@ public class PlayerControlledWalkAI implements WalkAI
 				x = newCoordinate.getX();
 				y = newCoordinate.getY();
 				Coordinate warpCoordinate = new Coordinate();
-				MapType newMapType = currentMap.checkCollisionWithWarpPoints(new Rectangle(
+				Map newMap = character.getCurrentMap().checkCollisionWithWarpPoints(new Rectangle(
 						x, y, spriteWidth, spriteHeight), warpCoordinate);
-				if (newMapType != null)
+				if (newMap != null)
 				{
-					// character.getWorld().warpPlayerToOtherMap(newMapType, warpCoordinate);
-					character.getWorld().movePlayerToOtherMap(newMapType, warpCoordinate);
+					// character.getWorld().warpPlayerToOtherMap(newMap, warpCoordinate);
+					character.getWorld().movePlayerToOtherMap(newMap, warpCoordinate);
 				}
 			}
 		}

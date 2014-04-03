@@ -2,7 +2,6 @@ package com.me.rpg.ai;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Timer;
@@ -44,7 +43,8 @@ public class RandomWalkAI implements WalkAI
 			else
 			{
 				character.setMoving(true);
-				character.setMoveDirection(Direction.getDirectionByIndex(randomInt));
+				character.setMoveDirection(Direction
+						.getDirectionByIndex(randomInt));
 			}
 			toggleWalking = !toggleWalking;
 		}
@@ -64,7 +64,8 @@ public class RandomWalkAI implements WalkAI
 	@Override
 	public void start()
 	{
-		character.getCurrentMap().getTimer().scheduleTask(moveTask, delaySeconds, intervalSeconds);
+		character.getCurrentMap().getTimer()
+				.scheduleTask(moveTask, delaySeconds, intervalSeconds);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class RandomWalkAI implements WalkAI
 	}
 
 	@Override
-	public void update(float deltaTime, Map currentMap)
+	public void update(float deltaTime)
 	{
 		if (!character.isMoving())
 		{
@@ -120,7 +121,8 @@ public class RandomWalkAI implements WalkAI
 
 		// collision detection with objects on map
 		Coordinate newCoordinate = new Coordinate();
-		boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, newCoordinate);
+		boolean didMove = character.getCurrentMap().checkCollision(x, y, oldX,
+				oldY, character, newCoordinate);
 
 		character.setMoving(didMove);
 		character.setMoveDirection(direction);

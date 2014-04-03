@@ -265,14 +265,13 @@ public final class World
 			{
 				continue;
 			}
-			System.out.println("Looking for: " + waypoint.connectedWarpPointName);
 			for (int j = i + 1; j < length; j++)
 			{
 				Waypoint w = waypoints.get(j);
-				if (w.isWarpPoint())
-					System.out.println("Checking: " + w.name);
 				if (w.isWarpPoint() && w.name.equals(waypoint.connectedWarpPointName))
 				{
+					waypoint.connectedWarpPoint = w;
+					w.connectedWarpPoint = waypoint;
 					waypoint.connections.add(new Waypoint.Edge(w, 0));
 					w.connections.add(new Waypoint.Edge(waypoint, 0));
 				}
@@ -462,7 +461,7 @@ public final class World
 		}
 	}
 
-	public void movePlayerToOtherMap(final MapType mapType,
+	public void movePlayerToOtherMap(final Map newMap,
 			final Coordinate newLocation)
 	{
 		currentMap.close();
@@ -481,7 +480,7 @@ public final class World
 			public void run()
 			{
 				currentMap.removeCharacterFromMap(player);
-				currentMap = maps.get(mapType.getMapIndex());
+				currentMap = newMap;
 				currentMap.addFocusedCharacterToMap(player, newLocation);
 				updateEnable = true;
 				movingToAnotherMap = false;
@@ -491,7 +490,7 @@ public final class World
 		}, 0.5f);
 	}
 
-	public void warpPlayerToOtherMap(MapType mapType, Coordinate newLocation)
+	public void warpPlayerToOtherMap(Map newMap, Coordinate newLocation)
 	{
 		currentMap.close();
 		updateEnable = false;
@@ -515,7 +514,7 @@ public final class World
 			}
 
 		}, 0f, 0.1f);
-		Map newMap = maps.get(mapType.getMapIndex());
+
 		timer.scheduleTask(new WarpToOtherMapTask(newMap, newLocation), 3.0f);
 	}
 

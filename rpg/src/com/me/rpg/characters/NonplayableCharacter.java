@@ -2,7 +2,6 @@ package com.me.rpg.characters;
 
 import com.me.rpg.World;
 import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
 import com.me.rpg.state.State;
 import com.me.rpg.state.UpdateResult;
 import com.me.rpg.state.action.Action;
@@ -31,13 +30,7 @@ public class NonplayableCharacter extends GameCharacter
 	}
 
 	@Override
-	public void addedToMap(Map map)
-	{
-		super.addedToMap(map);
-	}
-
-	@Override
-	public void doUpdate(float deltaTime, Map currentMap)
+	public void doUpdate(float deltaTime)
 	{
 		// update movement
 		UpdateResult result = stateMachine.update(deltaTime);
@@ -63,16 +56,17 @@ public class NonplayableCharacter extends GameCharacter
 	}
 
 	@Override
-	public void moveToOtherMap(MapType mapType, Coordinate newLocation)
+	public void moveToOtherMap(Map newMap, Coordinate newLocation)
 	{
 		// TODO move NPC to other map 'quietly'--without interrupting the player
+		
 	}
 
 	@Override
-	public void warpToOtherMap(MapType mapType, Coordinate newLocation)
+	public void warpToOtherMap(Map newMap, Coordinate newLocation)
 	{
 		// just use moveToOtherMap(); nothing flashy for NPC
-		moveToOtherMap(mapType, newLocation);
+		moveToOtherMap(newMap, newLocation);
 	}
 
 }
