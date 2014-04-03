@@ -817,4 +817,9 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		return false;
 	}
 
+	public Weapon getEquippedMeleeWeapon()
+	{
+		
+		return weaponSlot;
+	}
 }

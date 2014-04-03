@@ -15,11 +15,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.PlayableCharacter;
@@ -33,14 +38,15 @@ public class InventoryMenu implements Serializable
 	
 	private transient Stage stage;
 	
-	private transient BitmapFont dialogueFont;
+	private transient BitmapFont menuFont;
 	
 	private transient Table mainTable;
 	private transient Table leftPane;
 	private transient Table rightPane;
+	private transient Table testTable;
 	
 	private transient Texture texture;
-	
+	private transient Texture texture2;
 	//inventory 
 	private boolean inMenu = false;
 	private PlayableCharacter player;
@@ -78,10 +84,12 @@ public class InventoryMenu implements Serializable
 	{
 		// initialize renderer stuff
 		stage = new Stage();
-		dialogueFont = new BitmapFont();
+		menuFont = new BitmapFont();
 		inMenu = false;
 		mainTable = new Table();
-		texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
+		testTable = new Table();
+		texture = new Texture(Gdx.files.internal("images/inventory_menu_background.png"));
+		texture2 = new Texture(Gdx.files.internal("images/inventory_menu_item_background.png"));
 	}
 	
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
@@ -92,6 +100,8 @@ public class InventoryMenu implements Serializable
 	
 	public void openInventory(PlayableCharacter player)
 	{
+		this.player = player;
+		
 		inMenu = true;
 		rowSelectionIndex = 0;
 		colSelectionIndex = 0;
@@ -213,8 +223,40 @@ public class InventoryMenu implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
+		Sprite equippedWeapon = player.getEquippedMeleeWeapon().getItemSpriteUp();
+		Image equippedWeaponImage = new Image(equippedWeapon);
+		equippedWeaponImage.scale(1.6f);
+		//initialize resources
+		LabelStyle style = new LabelStyle(menuFont, Color.DARK_GRAY);
+		Label label1 = new Label("left pane", style);
+		Label label2 = new Label("right pane",style);
+		Label label3 = new Label("test1", style);
+		Label label4 = new Label("test2", style);
+
+		//add actors
 		mainTable.setFillParent(true);
+		mainTable.setBackground(new TextureRegionDrawable(new TextureRegion(texture)));
 		stage.addActor(mainTable);
+		testTable.setBackground(new TextureRegionDrawable(new TextureRegion(texture2)));
+		testTable.add(equippedWeaponImage);
+		mainTable.add(testTable);
+		mainTable.add(equippedWeaponImage);
+		    mainTable.add(label1).expandX();
+		    mainTable.add(label2).width(200);
+		    mainTable.row();
+		    mainTable.add(label3);
+		    mainTable.add(label4).width(100);
+		    
+		
+		//draw
+		mainTable.debug(); // turn on all debug lines (table, cell, and widget)
+	    mainTable.debugTable(); // turn on only table lines
+	    stage.draw();
+	    Table.drawDebug(stage);
+		mainTable.clear();
+		
+
+	   
 		
 		float desiredY = (camera.viewportHeight);
 		
@@ -225,23 +267,12 @@ public class InventoryMenu implements Serializable
 		//float dialogueHeight = (camera.viewportHeight - 8*desiredX);;
 		float dialogueHeight = camera.viewportHeight;
 	
-		LabelStyle style = new LabelStyle(dialogueFont, Color.DARK_GRAY);
-		LabelStyle selectedStyle = new LabelStyle(dialogueFont, Color.BLUE);
-		LabelStyle separatorStyle = new LabelStyle(dialogueFont, Color.DARK_GRAY );
 		
 	//	Label objectName = new Label(conversingNPC.getName() , style);
 		//Label npcStatement1 = new Label(npcStatement, style);
-		Label separator = new Label("------------------------------------------------------------------"
-				+ "------------------------------------------------", separatorStyle);
-		
-		
 		
 	//	int selectedIndex = rowSelectionIndex - showIndex;
-		
-		Label response1 = new Label("", style);
-		Label response2 = new Label("", style);
-		Label response3 = new Label("", style);
-		
+				
 //		if((currentDialogueNode.getNumChildren()-1) >= showIndex)
 //		{
 //			response1.setText(responses.get(showIndex));
