@@ -24,6 +24,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
@@ -225,7 +227,7 @@ public class InventoryMenu implements Serializable
 	{
 		Sprite equippedWeapon = player.getEquippedMeleeWeapon().getItemSpriteUp();
 		Image equippedWeaponImage = new Image(equippedWeapon);
-		equippedWeaponImage.scale(1.6f);
+		//equippedWeaponImage.scale(1.6f);
 		//initialize resources
 		LabelStyle style = new LabelStyle(menuFont, Color.DARK_GRAY);
 		Label label1 = new Label("left pane", style);
@@ -237,20 +239,21 @@ public class InventoryMenu implements Serializable
 		mainTable.setFillParent(true);
 		mainTable.setBackground(new TextureRegionDrawable(new TextureRegion(texture)));
 		stage.addActor(mainTable);
-		testTable.setBackground(new TextureRegionDrawable(new TextureRegion(texture2)));
-		testTable.add(equippedWeaponImage);
-		mainTable.add(testTable);
+		//testTable.add(equippedWeaponImage);
 		mainTable.add(equippedWeaponImage);
-		    mainTable.add(label1).expandX();
-		    mainTable.add(label2).width(200);
+		    mainTable.add(label1);
+		    mainTable.add(label2);
 		    mainTable.row();
 		    mainTable.add(label3);
-		    mainTable.add(label4).width(100);
+		    mainTable.add(label4);
 		    
 		
 		//draw
 		mainTable.debug(); // turn on all debug lines (table, cell, and widget)
-	    mainTable.debugTable(); // turn on only table lines
+	   // mainTable.debugTable(); // turn on only table lines
+	    testTable.debug();
+	    //testTable.debugTable();
+	    
 	    stage.draw();
 	    Table.drawDebug(stage);
 		mainTable.clear();
