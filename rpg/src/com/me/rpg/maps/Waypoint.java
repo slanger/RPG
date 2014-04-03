@@ -8,29 +8,42 @@ import com.badlogic.gdx.math.Rectangle;
 public class Waypoint
 {
 
-	private final String name;
-	private final Rectangle rectangle;
-	private final List<Waypoint> connections = new ArrayList<Waypoint>();
+	public final String name;
+	public final Rectangle rectangle;
+	public final String connectedWarpPointName;
+	public final List<Edge> connections = new ArrayList<Edge>();
 
-	public String getName()
+	public Waypoint(Rectangle rectangle)
 	{
-		return name;
-	}
-
-	public Rectangle getRectangle()
-	{
-		return rectangle;
-	}
-
-	public List<Waypoint> getConnections()
-	{
-		return connections;
-	}
-
-	public Waypoint(String name, Rectangle rectangle)
-	{
-		this.name = name;
 		this.rectangle = rectangle;
+		name = null;
+		connectedWarpPointName = null;
+	}
+
+	public Waypoint(Rectangle rectangle, String name, String connectedWarpPointName)
+	{
+		this.rectangle = rectangle;
+		this.name = name;
+		this.connectedWarpPointName = connectedWarpPointName;
+	}
+
+	public boolean isWarpPoint()
+	{
+		return !(connectedWarpPointName == null);
+	}
+
+	public static class Edge
+	{
+
+		public final Waypoint connectedWaypoint;
+		public final float cost;
+
+		public Edge(Waypoint connectedWaypoint, float cost)
+		{
+			this.connectedWaypoint = connectedWaypoint;
+			this.cost = cost;
+		}
+
 	}
 
 }

@@ -10,7 +10,9 @@ import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
 
 public class AttackMoveAction implements Action {
-	
+
+	private static final long serialVersionUID = -6512021677482609335L;
+
 	private GameCharacter character;
 	private FollowPathAI walkAI;
 	

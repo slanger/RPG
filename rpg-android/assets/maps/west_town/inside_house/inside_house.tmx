@@ -46,12 +46,5 @@
   <object x="32" y="128" width="24" height="80"/>
   <object x="32" y="128" width="160" height="24"/>
  </objectgroup>
- <objectgroup name="Warp" width="12" height="15">
-  <object name="west_town" x="160" y="448" width="64" height="32">
-   <properties>
-    <property name="x" value="608"/>
-    <property name="y" value="832"/>
-   </properties>
-  </object>
- </objectgroup>
+ <objectgroup name="Warp" width="12" height="15"/>
 </map>

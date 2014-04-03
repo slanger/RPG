@@ -37,6 +37,7 @@ import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.MapType;
 import com.me.rpg.maps.PrototypeMap;
+import com.me.rpg.maps.Waypoint;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationSystem;
@@ -83,6 +84,8 @@ public final class World
 
 	private Map currentMap;
 	private PlayableCharacter player;
+	public List<Waypoint> waypoints;
+
 	private int dayCount = 0;
 	private final int NUM_SECONDS_PER_DAY = 60;
 	private final int NUM_DAYS = 10;
@@ -245,6 +248,36 @@ public final class World
 		maps.add(westTownInsideHouse);
 
 		currentMap = maps.get(MapType.EXAMPLE.getMapIndex());
+
+		// WAYPOINTS SETUP
+
+		waypoints = new ArrayList<Waypoint>();
+		for (Map map : maps)
+		{
+			waypoints.addAll(map.getWaypoints());
+		}
+
+		final int length = waypoints.size();
+		for (int i = 0; i < length; i++)
+		{
+			Waypoint waypoint = waypoints.get(i);
+			if (!waypoint.isWarpPoint())
+			{
+				continue;
+			}
+			System.out.println("Looking for: " + waypoint.connectedWarpPointName);
+			for (int j = i + 1; j < length; j++)
+			{
+				Waypoint w = waypoints.get(j);
+				if (w.isWarpPoint())
+					System.out.println("Checking: " + w.name);
+				if (w.isWarpPoint() && w.name.equals(waypoint.connectedWarpPointName))
+				{
+					waypoint.connections.add(new Waypoint.Edge(w, 0));
+					w.connections.add(new Waypoint.Edge(waypoint, 0));
+				}
+			}
+		}
 
 		// CHARACTER SETUP
 

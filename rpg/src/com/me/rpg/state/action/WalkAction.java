@@ -6,7 +6,9 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;
 
 public class WalkAction implements Action {
-	
+
+	private static final long serialVersionUID = 4776613710435812862L;
+
 	private GameCharacter character;
 	private Rectangle targetLocation;
 	private FollowPathAI walkAI;
