@@ -45,7 +45,6 @@ public class FollowPathAI
 		// destination)
 		if (path == null)
 		{
-			System.err.println("Couldn't find a path for character " + character.getName());
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(destination, destinationMap));
 		}

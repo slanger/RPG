@@ -37,8 +37,8 @@ public class MeleeMoveTowardAction implements Action {
 			}
 		}
 		
-		walkai = new FollowPathAI(character, shiftedTarget[best].getSmallCenteredRectangle());
-		walkai.update(delta, character.getCurrentMap());
+		walkai = new FollowPathAI(character, shiftedTarget[best].getSmallCenteredRectangle(), target.getCurrentMap());
+		walkai.update(delta);
 	}
 
 }

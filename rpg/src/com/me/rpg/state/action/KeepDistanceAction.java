@@ -8,12 +8,10 @@ public class KeepDistanceAction implements Action {
 	
 	private GameCharacter character;
 	private float distance;
-	private WalkAction action;
 	
 	public KeepDistanceAction(GameCharacter character, float distance) {
 		this.character = character;
 		this.distance = distance;
-		action = new WalkAction(character, new Coordinate());
 	}
 	
 	@Override
@@ -24,13 +22,15 @@ public class KeepDistanceAction implements Action {
 		float dist = meCenter.distance2(pCenter);
 		meCenter.setX(2*meCenter.getX() - pCenter.getX());
 		meCenter.setY(2*meCenter.getY() - pCenter.getY());
+		Coordinate targetLoc = null;
 		if (dist > distance*distance+20) {
-			action.setNewLoc(pCenter);
+			targetLoc = pCenter;
 		} else if (dist < distance*distance-20) {
-			action.setNewLoc(meCenter);
+			targetLoc = meCenter;
 		} else {
 			return;
 		}
+		WalkAction action = new WalkAction(character, targetLoc, character.getCurrentMap());
 		action.doAction(delta);
 		Direction d = meCenter.getDirection(pCenter);
 		character.setFaceDirection(d);
