@@ -12,7 +12,9 @@ import com.me.rpg.utils.Coordinate;
  *
  */
 public class DistanceCondition implements Condition {
-	
+
+	private static final long serialVersionUID = -3699971779595607135L;
+
 	private GameCharacter character;
 	private Map targetMap;
 	public Rectangle targetRect;

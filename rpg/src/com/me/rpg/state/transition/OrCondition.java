@@ -3,6 +3,8 @@ package com.me.rpg.state.transition;
 
 public class OrCondition implements Condition {
 
+	private static final long serialVersionUID = -2005208250832936863L;
+
 	private Condition[] parts;
 	
 	public OrCondition(Condition ... parts) {

@@ -451,7 +451,7 @@ public class PlayableCharacter extends GameCharacter
 		if (c != null)
 		{
 			DialogueSystem dialogueSystem = world.getDialogueSystem();
-			boolean foundDialogue = dialogueSystem.startConversation(this, c);
+			boolean foundDialogue = dialogueSystem.startConversation(c);
 			if (foundDialogue)
 			{
 				c.setFaceDirection(this.getFaceDirection().opposite());

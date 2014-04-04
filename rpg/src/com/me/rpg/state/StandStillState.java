@@ -8,7 +8,9 @@ import com.me.rpg.state.action.FaceDirectionAction;
 import com.me.rpg.utils.Direction;
 
 public class StandStillState extends State {
-	
+
+	private static final long serialVersionUID = -9127125400944142907L;
+
 	private ArrayList<Action> entryActions;
 	
 	public StandStillState(HierarchicalState parent, GameCharacter character, Direction faceDirection) {

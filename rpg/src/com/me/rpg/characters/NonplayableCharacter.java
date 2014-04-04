@@ -14,7 +14,6 @@ public class NonplayableCharacter extends GameCharacter
 
 	private static final long serialVersionUID = 5970053678208573292L;
 
-	private boolean enableAttack = false;
 	private State stateMachine;
 
 	public NonplayableCharacter(String name, String spritesheetPath, int width,
@@ -34,25 +33,11 @@ public class NonplayableCharacter extends GameCharacter
 	@Override
 	public void doUpdate(float deltaTime)
 	{
-		// update movement
 		UpdateResult result = stateMachine.update(deltaTime);
-		//System.out.printf("%s name: stateMachine's state: %s\n", getName(), stateMachine.getStates());
 		for (int i = 0; i < result.actions.size(); ++i) {
 			Action a  = result.actions.get(i);
 			a.doAction(deltaTime);
 		}
-
-		// auto attack
-		// attack
-		/*if (weaponSlot != null && enableAttack)
-		{
-			weaponSlot.attack(currentMap, getFaceDirection(), getBoundingRectangle());
-			enableAttack = false;
-		}
-		else
-		{
-			enableAttack = true;
-		}*/
 
 		updateTexture();
 	}

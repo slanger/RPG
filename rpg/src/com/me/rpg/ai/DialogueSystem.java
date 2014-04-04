@@ -36,9 +36,7 @@ public class DialogueSystem implements Serializable
 	//per conversation stuff
 	private boolean inDialogue = false;
 	private Node currentDialogueNode = null;
-	private GameCharacter player = null;
 	private GameCharacter conversingNPC = null;
-	private boolean finishedDialogue = false;
 	private int choiceIndex;
 	private int showIndex;
 	private String npcStatement = null;
@@ -80,9 +78,8 @@ public class DialogueSystem implements Serializable
 		}
 	}
 	
-	public boolean startConversation(GameCharacter player, GameCharacter conversingNPC)
+	public boolean startConversation(GameCharacter conversingNPC)
 	{
-		this.player = player;
 		this.conversingNPC = conversingNPC;
 		
 		for(Node rootNode : rootNodes)
@@ -153,9 +150,7 @@ public class DialogueSystem implements Serializable
 	
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
-	{
-		float desiredY = (camera.viewportHeight);
-		
+	{		
 		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2;
 		float dialoguePositionY = camera.position.y - camera.viewportHeight / 2;
 		

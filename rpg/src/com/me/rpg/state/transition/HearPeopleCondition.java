@@ -5,7 +5,9 @@ import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableInt;
 
 public class HearPeopleCondition implements Condition {
-	
+
+	private static final long serialVersionUID = 6473945699587610769L;
+
 	private GameCharacter character;
 	private IntCondition condition;
 	private MutableInt hearPeople;

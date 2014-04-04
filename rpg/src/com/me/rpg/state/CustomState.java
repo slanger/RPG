@@ -7,6 +7,8 @@ import com.me.rpg.state.action.Action;
 
 public class CustomState extends State {
 
+	private static final long serialVersionUID = 3876614556007275936L;
+
 	private ArrayList<Action> actions;
 	private ArrayList<Action> entryActions;
 	private ArrayList<Action> exitActions;

@@ -86,6 +86,7 @@ public class StartScreen implements Screen, InputProcessor
 		// TODO add more keyboard functionality to start menu
 		stage.addListener(new InputListener()
 		{
+
 			@Override
 			public boolean keyUp(InputEvent event, int keycode)
 			{
@@ -120,6 +121,7 @@ public class StartScreen implements Screen, InputProcessor
 				}
 				return true;
 			}
+
 		});
 
 		// PAD MARGINS BUTTONS
@@ -147,7 +149,7 @@ public class StartScreen implements Screen, InputProcessor
 			ObjectInputStream retrieveStream = new ObjectInputStream(saveFile);
 			World world = (World) retrieveStream.readObject();
 			retrieveStream.close();
-			System.out.println("Game retrieved from " + fileName);
+			world.pushMessage("Game retrieved from " + fileName);
 			return world;
 		}
 		catch (FileNotFoundException e)

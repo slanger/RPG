@@ -4,7 +4,9 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;
 
 public class NearAttackerCondition implements Condition {
-	
+
+	private static final long serialVersionUID = 3304232059378493018L;
+
 	private GameCharacter character;
 	private float distance;
 	

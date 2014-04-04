@@ -9,9 +9,10 @@ import com.me.rpg.state.action.RandomWalkAction;
 
 public class RandomWalkState extends State {
 
+	private static final long serialVersionUID = -2185898702476495717L;
+
 	private RandomWalkAction action;
 	private ArrayList<Action> actions;
-	
 	
 	public RandomWalkState(HierarchicalState parent, GameCharacter character, Rectangle walkingBounds) {
 		this(parent, character, 1.0f, 1.0f, walkingBounds);

@@ -3,7 +3,9 @@ package com.me.rpg.state.action;
 import com.me.rpg.characters.GameCharacter;
 
 public class SetStrafeAction implements Action {
-	
+
+	private static final long serialVersionUID = -8255056322994206225L;
+
 	private GameCharacter character;
 	private boolean strafe;
 	

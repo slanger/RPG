@@ -7,7 +7,9 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
 public class MeleeMoveTowardAction implements Action {
-	
+
+	private static final long serialVersionUID = -1027746630531574165L;
+
 	private GameCharacter character;
 	private WalkAI walkai;
 	

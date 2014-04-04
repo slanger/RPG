@@ -5,7 +5,9 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
 public class AttackAction implements Action {
-	
+
+	private static final long serialVersionUID = -4393140697431833062L;
+
 	private GameCharacter character;
 	
 	public AttackAction(GameCharacter character) {

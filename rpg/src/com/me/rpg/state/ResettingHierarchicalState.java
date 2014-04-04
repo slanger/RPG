@@ -7,6 +7,8 @@ import com.me.rpg.state.transition.Transition;
 
 public class ResettingHierarchicalState extends HierarchicalState {
 
+	private static final long serialVersionUID = -3354500039130064689L;
+
 	public ResettingHierarchicalState(HierarchicalState parent,
 			GameCharacter character) {
 		super(parent, character);

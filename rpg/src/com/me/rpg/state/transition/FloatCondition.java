@@ -4,7 +4,9 @@ import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableFloat;
 
 public class FloatCondition implements Condition {
-	
+
+	private static final long serialVersionUID = -560269924843736996L;
+
 	private MutableFloat mutable;
 	private float target;
 	private Comparison type;

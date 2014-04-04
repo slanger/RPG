@@ -7,7 +7,9 @@ import com.me.rpg.state.action.Action;
 import com.me.rpg.state.transition.Transition;
 
 public class HierarchicalState extends State {
-	
+
+	private static final long serialVersionUID = -185496761908429304L;
+
 	private ArrayList<State> children;
 	private State initialState;
 	private State currentState;

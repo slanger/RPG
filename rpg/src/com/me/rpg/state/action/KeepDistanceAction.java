@@ -5,7 +5,9 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
 public class KeepDistanceAction implements Action {
-	
+
+	private static final long serialVersionUID = -7032150212667126445L;
+
 	private GameCharacter character;
 	private float distance;
 	

@@ -7,7 +7,9 @@ import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
 
 public class RememberNearestPersonAction implements Action {
-	
+
+	private static final long serialVersionUID = 9067191211200020809L;
+
 	private GameCharacter character;
 	private boolean hear;
 	private boolean see;

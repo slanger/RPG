@@ -4,7 +4,9 @@ import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.MutableInt;
 
 public class IntCondition implements Condition {
-	
+
+	private static final long serialVersionUID = -8403029194641936078L;
+
 	private MutableInt mutable;
 	private int target;
 	private Comparison type;

@@ -1,7 +1,9 @@
 package com.me.rpg.state.transition;
 
 public class AndCondition implements Condition {
-	
+
+	private static final long serialVersionUID = 3543360175761443932L;
+
 	private Condition[] conditions;
 	
 	public AndCondition(Condition ... conditions) {

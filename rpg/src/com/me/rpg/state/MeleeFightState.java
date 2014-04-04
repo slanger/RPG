@@ -14,7 +14,9 @@ import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
 
 public class MeleeFightState extends ResettingHierarchicalState {
-	
+
+	private static final long serialVersionUID = -6336726027373780434L;
+
 	public MeleeFightState(HierarchicalState parent, GameCharacter character) {
 		super(parent, character);
 		
@@ -23,6 +25,8 @@ public class MeleeFightState extends ResettingHierarchicalState {
 	}
 	
 	private class MFSConfident extends ResettingHierarchicalState {
+
+		private static final long serialVersionUID = 8500121329510295040L;
 
 		public MFSConfident(HierarchicalState parent, GameCharacter character) {
 			super(parent, character);
@@ -50,7 +54,9 @@ public class MeleeFightState extends ResettingHierarchicalState {
 	}
 	
 	private class MFSCanAttack extends State {
-		
+
+		private static final long serialVersionUID = -9156404073207904722L;
+
 		private ArrayList<Action> actions;
 		
 		public MFSCanAttack(HierarchicalState parent, GameCharacter character) {
@@ -66,7 +72,9 @@ public class MeleeFightState extends ResettingHierarchicalState {
 	}
 	
 	private class MFSCannotAttack extends State {
-		
+
+		private static final long serialVersionUID = 8649088522931762992L;
+
 		private ArrayList<Action> entryActions;
 		private ArrayList<Action> actions;
 		private ArrayList<Action> exitActions;

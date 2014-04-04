@@ -36,7 +36,7 @@ public class Shield extends Equippable implements IAttackable
 		float bottomLeftY = centerY - sprite.getHeight() / 2;
 		
 		// TODO: come up with a better value for protrusion --> the amount that the shield sticks out from character
-		float protrusion = sprite.getWidth()/6;
+		// float protrusion = sprite.getWidth()/6;
 		
 		/*switch (currentStyle) {
 			// straight poking

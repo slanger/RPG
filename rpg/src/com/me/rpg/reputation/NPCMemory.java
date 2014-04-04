@@ -1,4 +1,4 @@
-//Each NPC will have an instance of this class 
+// Each NPC will have an instance of this class 
 
 package com.me.rpg.reputation;
 
