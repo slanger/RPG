@@ -336,6 +336,14 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	public void rememberLastAttacker() {
 		rememberedAttacker = lastAttacker;
 	}
+	
+	public void rememberTarget(GameCharacter target) {
+		rememberedAttacker = target;
+	}
+	
+	public void resetRememberedAttacker() {
+		rememberedAttacker = null;
+	}
 
 	public float getSpeed()
 	{
@@ -674,7 +682,13 @@ public abstract class GameCharacter implements IAttackable, Serializable
 				.format("(CharacterToString){name:%s, sprite:%s, facing:%s, moving:%s, stateTime:%lf}",
 						name, sprite, faceDirection, moving, stateTime);
 	}
-
+	
+	public void initiateAttack() {
+		if (weaponSlot == null) return;
+		
+		weaponSlot.attack(getCurrentMap(), getFaceDirection(), getBoundingRectangle());
+	}
+	
 	/**
 	 * Likely insufficient implementation of equip
 	 * 

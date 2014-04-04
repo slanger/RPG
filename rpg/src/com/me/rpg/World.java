@@ -49,6 +49,8 @@ import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
 import com.me.rpg.state.RandomWalkState;
 import com.me.rpg.state.RunAwayState;
+import com.me.rpg.state.action.Action;
+import com.me.rpg.state.action.RememberNearestPersonAction;
 import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.state.transition.AndCondition;
 import com.me.rpg.state.transition.Condition;
@@ -309,8 +311,10 @@ public final class World
 		Condition cannotHear = new NotCondition(canHear);
 		Condition canSeeOrHear = new OrCondition(canSee, canHear);
 		Condition cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
-
-		Transition patrolToFight = new Transition(fight0, canSeeOrHear);
+		
+		ArrayList<Action> patrolToFightActions = new ArrayList<Action>();
+		patrolToFightActions.add(new RememberNearestPersonAction(npc1, true, true, true));
+		Transition patrolToFight = new Transition(fight0, patrolToFightActions, canSeeOrHear);
 		Transition fightToPatrol = new Transition(patrol0, cannotSeeNorHear);
 
 		patrol0.setTransitions(patrolToFight);
