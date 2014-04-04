@@ -55,7 +55,7 @@ public class RememberNearestPersonAction implements Action {
 			GameCharacter other = visiblePeople.get(i);
 			Coordinate nearbyCen = nearby.getCenter();
 			Coordinate otherCen = other.getCenter();
-			if (otherCen.distance2(myCen) < nearbyCen.distance2(myCen))
+			if (otherCen.distanceSquared(myCen) < nearbyCen.distanceSquared(myCen))
 				nearby = other;
 		}
 		character.rememberTarget(nearby);

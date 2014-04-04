@@ -538,22 +538,18 @@ public abstract class Map
 		for (int i = 0; i < length; i++)
 		{
 			Waypoint waypoint = waypoints.get(i);
-			Vector2 waypointCenter = new Vector2();
-			waypoint.rectangle.getCenter(waypointCenter);
+			Coordinate waypointCenter = new Coordinate(waypoint.rectangle.getCenter(new Vector2()));
 			for (int j = i + 1; j < length; j++)
 			{
 				Waypoint w = waypoints.get(j);
-				Vector2 wCenter = new Vector2();
-				w.rectangle.getCenter(wCenter);
+				Coordinate wCenter = new Coordinate(w.rectangle.getCenter(new Vector2()));
 				if (pointsConnected(waypointCenter, wCenter))
 				{
-					float deltaX = Math.abs(waypointCenter.x - wCenter.x);
-					float deltaY = Math.abs(waypointCenter.y - wCenter.y);
-					float lengthSquared = deltaX * deltaX + deltaY * deltaY;
+					float distance = waypointCenter.distanceTo(wCenter);
 					waypoint.connections
-							.add(new Waypoint.Edge(w, lengthSquared));
+							.add(new Waypoint.Edge(w, distance));
 					w.connections
-							.add(new Waypoint.Edge(waypoint, lengthSquared));
+							.add(new Waypoint.Edge(waypoint, distance));
 				}
 			}
 		}

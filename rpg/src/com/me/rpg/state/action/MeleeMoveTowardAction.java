@@ -34,7 +34,7 @@ public class MeleeMoveTowardAction implements Action {
 		Coordinate myCen = character.getCenter();
 		int best = 0;
 		for (int i = 1; i < 4; ++i) {
-			if (shiftedTarget[best].distance2(myCen) > shiftedTarget[i].distance2(myCen)) {
+			if (shiftedTarget[best].distanceSquared(myCen) > shiftedTarget[i].distanceSquared(myCen)) {
 				best = i;
 			}
 		}

@@ -21,7 +21,7 @@ public class KeepDistanceAction implements Action {
 		GameCharacter target = character.getRememberedAttacker();
 		Coordinate pCenter = target.getCenter();
 		Coordinate meCenter = character.getCenter();
-		float dist = meCenter.distance2(pCenter);
+		float dist = meCenter.distanceSquared(pCenter);
 		meCenter.setX(2*meCenter.getX() - pCenter.getX());
 		meCenter.setY(2*meCenter.getY() - pCenter.getY());
 		Coordinate targetLoc = null;

@@ -22,7 +22,7 @@ public class NearAttackerCondition implements Condition {
 		
 		Coordinate tarCen = target.getCenter();
 		Coordinate meCen = character.getCenter();
-		float dist2 = tarCen.distance2(meCen);
+		float dist2 = tarCen.distanceSquared(meCen);
 		
 		return dist2 < distance*distance;
 	}

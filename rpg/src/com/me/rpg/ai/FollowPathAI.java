@@ -50,9 +50,7 @@ public class FollowPathAI
 		// destination)
 		if (shortestPath == null)
 		{
-			System.err.printf(
-					"Could not find path for %s; destination: %s, %s%n",
-					character.getName(), destination, destinationMap.getName());
+			// System.err.printf("Could not find path for %s; destination: %s, %s%n", character.getName(), destination, destinationMap.getName());
 			isDestinationReachable = false;
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(destination, destinationMap));
