@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.me.rpg.utils.GlobalTimerTask;
 import com.me.rpg.utils.Timer;
 
 public class GameOverScreen implements Screen

@@ -75,6 +75,14 @@ public class Coordinate implements Serializable
 	{
 		return new Coordinate(c.getX(), c.getY());
 	}
+	
+	public Coordinate translate(Coordinate transVector) {
+		return translate(transVector.x, transVector.y);
+	}
+	
+	public Coordinate translate(float x, float y) {
+		return new Coordinate(this.x + x, this.y + y);
+	}
 
 	public boolean isNear(Coordinate target) {
 		double diff = Math.abs(target.x - x) + Math.abs(target.y - y);
@@ -105,6 +113,25 @@ public class Coordinate implements Serializable
 	
 	public Rectangle getBottomLeftRectangle(float width, float height) {
 		return new Rectangle(x, y, width, height);
+	}
+	
+	/**
+	 * Returns the relative direction from this Coordinate to target
+	 * @param target
+	 * @return
+	 */
+	public Direction getDirection(Coordinate target) {
+		Coordinate diffs = target.translate(-x, -y);
+		int dx = 0;
+		int dy = 0;
+		if (Math.abs(diffs.x) > Math.abs(diffs.y)) {
+			dx = (diffs.x > 0 ? 1 : -1);
+			dy = 0;
+		} else {
+			dx = 0;
+			dy = (diffs.y > 0 ? 1 : -1);
+		}
+		return Direction.getDirectionByDiff(dx, dy);
 	}
 
 }

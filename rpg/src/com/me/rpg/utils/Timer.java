@@ -50,7 +50,7 @@ public class Timer implements Serializable
 		if (task.repeatCount != CANCELLED)
 		{
 			throw new IllegalArgumentException(
-					"The same Task may not be scheduled twice.");
+					"The same Task may not be scheduled twice." + task.repeatCount);
 		}
 		task.timeLeftBeforeExecute = (long) (delaySeconds * 1000);
 		task.intervalMillis = (long) (intervalSeconds * 1000);

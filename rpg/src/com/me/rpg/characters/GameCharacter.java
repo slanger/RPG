@@ -28,6 +28,8 @@ import com.me.rpg.maps.Map;
 import com.me.rpg.reputation.NPCMemory;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
+import com.me.rpg.utils.GlobalTimerTask;
+import com.me.rpg.utils.GlobalTimerTask.Time;
 
 public abstract class GameCharacter
 	implements IAttackable, Serializable
@@ -72,6 +74,10 @@ public abstract class GameCharacter
 	protected int maxHealth;
 	protected float strikeImmunity;
 	protected boolean strafing;
+	
+	protected GameCharacter lastAttacker;
+	protected GameCharacter rememberedAttacker;
+	protected Time lastAttackTime;
 
 	// Reputation Stuff
 	protected NPCMemory npcMemory;
@@ -224,10 +230,11 @@ public abstract class GameCharacter
 	{
 		return strafing;
 	}
-
-	private void setStrafing(boolean strafing)
-	{
+	
+	public void setStrafing(boolean strafing) {
 		this.strafing = strafing;
+		if (isShielded())
+			this.strafing = true;
 	}
 
 	public boolean isUsingShield()
@@ -337,6 +344,32 @@ public abstract class GameCharacter
 	protected Animation getDownWalkAnimation()
 	{
 		return downWalkAnimation;
+	}
+	
+	public GameCharacter getLastAttacker() {
+		return lastAttacker;
+	}
+	
+	public void setLastAttacker(GameCharacter attacker) {
+		if (attacker != lastAttacker)
+			lastAttackTime = GlobalTimerTask.getCurrentTime();
+		lastAttacker = attacker;
+	}
+	
+	public GameCharacter getRememberedAttacker() {
+		return rememberedAttacker;
+	}
+	
+	public void rememberLastAttacker() {
+		rememberedAttacker = lastAttacker;
+	}
+	
+	public void rememberTarget(GameCharacter target) {
+		rememberedAttacker = target;
+	}
+	
+	public void resetRememberedAttacker() {
+		rememberedAttacker = null;
 	}
 
 	public float getSpeed()
@@ -554,6 +587,8 @@ public abstract class GameCharacter
 	{
 		if (strikeImmunity > 0)
 			return;
+		
+		lastAttacker = weapon.getOwner();
 		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(weapon);
 		if (result)
@@ -573,6 +608,7 @@ public abstract class GameCharacter
 		if (strikeImmunity > 0)
 			return;
 
+		lastAttacker = projectile.getFiredWeapon().getOwner();
 		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(projectile);
 		if (result)
@@ -693,7 +729,13 @@ public abstract class GameCharacter
 				.format("(CharacterToString){name:%s, sprite:%s, facing:%s, moving:%s, stateTime:%lf}",
 						name, sprite, faceDirection, moving, stateTime);
 	}
-
+	
+	public void initiateAttack() {
+		if (weaponSlot == null) return;
+		
+		weaponSlot.attack(getCurrentMap(), getFaceDirection(), getBoundingRectangle());
+	}
+	
 	/**
 	 * Likely insufficient implementation of equip
 	 * 
@@ -867,4 +909,9 @@ public abstract class GameCharacter
 		return false;
 	}
 
+	public Weapon getEquippedMeleeWeapon()
+	{
+		
+		return weaponSlot;
+	}
 }

@@ -15,8 +15,7 @@ public class WalkAction implements Action
 
 	public WalkAction(GameCharacter character, Coordinate targetLocation, Map targetMap)
 	{
-		Rectangle targetLocationRectangle = targetLocation.getCenteredRectangle(
-				2 * Coordinate.EPS, 2 * Coordinate.EPS);
+		Rectangle targetLocationRectangle = targetLocation.getSmallCenteredRectangle();
 		walkAI = new FollowPathAI(character, targetLocationRectangle, targetMap);
 	}
 

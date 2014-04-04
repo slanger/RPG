@@ -107,8 +107,8 @@ public abstract class State implements Serializable
 		return emptyActions;
 	}
 	
-	public void setTransitions(Transition ... transitions) {
-		if (setTransitions)
+	protected void transitionCheck(boolean fromSet, Transition ... transitions) {
+		if (setTransitions && fromSet)
 			throw new RuntimeException("Cannot set the transitions more than once.");
 		if (transitions == null)
 			throw new NullPointerException("Cannot set the transition array to null.");
@@ -116,9 +116,25 @@ public abstract class State implements Serializable
 			if (transitions[i] == null)
 				throw new NullPointerException("Cannot have a null transition: " + i + " " + transitions);
 		}
+	}
+	
+	public void setTransitions(Transition ... transitions) {
+		transitionCheck(true, transitions);
 		this.transitions = new Transition[transitions.length];
 		setTransitions = true;
 		System.arraycopy(transitions, 0, this.transitions, 0, transitions.length);
+	}
+	
+	protected void addTransitions(Transition ... transitions) {
+		transitionCheck(false, transitions);
+		Transition[] temp = new Transition[this.transitions.length + transitions.length];
+		System.arraycopy(this.transitions, 0, temp, 0, this.transitions.length);
+		System.arraycopy(transitions, 0, temp, this.transitions.length, transitions.length);
+		this.transitions = temp;
+	}
+	
+	protected void clearTransitions() {
+		transitions = new Transition[0];
 	}
 	
 	public Transition[] getTransitions() {

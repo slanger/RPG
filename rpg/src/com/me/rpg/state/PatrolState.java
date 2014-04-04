@@ -40,9 +40,9 @@ public class PatrolState extends State {
 			if (dist2 < min) {
 				min = dist2;
 				idx = i;
-				// TODO this is not ideal
 				actions.remove(patrolLoc);
 				patrolLoc = new WalkAction(character, patrol[idx], character.getCurrentMap());
+				actions.add(patrolLoc);
 			}
 		}
 		return super.doGetEntryActions();
@@ -53,9 +53,9 @@ public class PatrolState extends State {
 		if (character.isCenterNear(patrol[idx])) {
 			++idx;
 			idx %= patrol.length;
-			// TODO this is not ideal
 			actions.remove(patrolLoc);
 			patrolLoc = new WalkAction(character, patrol[idx], character.getCurrentMap());
+			actions.add(patrolLoc);
 		}
 		return actions;
 	}

@@ -17,7 +17,8 @@ public class FaceDirectionAction implements Action {
 	
 	@Override
 	public void doAction(float delta) {
-		character.setFaceDirection(targetDirection);
+		if (targetDirection != null)
+			character.setFaceDirection(targetDirection);
 	}
 
 }

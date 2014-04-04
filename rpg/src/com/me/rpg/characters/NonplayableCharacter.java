@@ -44,7 +44,7 @@ public class NonplayableCharacter extends GameCharacter
 
 		// auto attack
 		// attack
-		if (weaponSlot != null && enableAttack)
+		/*if (weaponSlot != null && enableAttack)
 		{
 			weaponSlot.attack(currentMap, getFaceDirection(), getBoundingRectangle());
 			enableAttack = false;
@@ -52,7 +52,7 @@ public class NonplayableCharacter extends GameCharacter
 		else
 		{
 			enableAttack = true;
-		}
+		}*/
 
 		updateTexture();
 	}

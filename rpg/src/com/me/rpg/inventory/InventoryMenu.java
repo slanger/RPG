@@ -15,14 +15,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.PlayableCharacter;
+import com.me.rpg.combat.Equippable;
+import com.me.rpg.combat.MeleeWeapon;
 
 public class InventoryMenu implements Serializable
 {
@@ -33,13 +45,27 @@ public class InventoryMenu implements Serializable
 	
 	private transient Stage stage;
 	
-	private transient BitmapFont dialogueFont;
+	private World world;
+	
+	private transient BitmapFont menuFont;
 	
 	private transient Table mainTable;
-	private transient Table leftPane;
-	private transient Table rightPane;
+	private transient Table topPane;
+	private transient Table bottomPane;
+	private transient Table meleeWeaponRow;
+	private transient Table projWeaponRow;
+	private transient Table shieldRow;
+	private transient Table miscItemRow;
+		
+	private transient ArrayList<Table> meleeWeaponTables;
+	private transient ArrayList<Table> projWeaponTables;
+	private transient ArrayList<Table> shieldTables;
+	private transient ArrayList<Table> miscItemTables;
 	
-	private transient Texture texture;
+	private transient Texture mainTableTexture;
+	private transient Texture testTexture;
+	private transient Texture itemRowTexture;
+	private transient Texture itemSelectionTexture;
 	
 	//inventory 
 	private boolean inMenu = false;
@@ -52,11 +78,12 @@ public class InventoryMenu implements Serializable
 	private int showProjWeaponsIndex;
 	private int showShieldsIndex;
 	private int showMiscItemsIndex;
-
 	
 	private final int NUM_ITEM_ROWS = 4;
+	private final int NUM_ITEMS_DISPLAYED = 8;
 	
-	private ArrayList<String> meleeWeapons;  //first row
+	private ArrayList<Equippable> meleeWeapons;  //first row
+	
 	private ArrayList<String> projWeapons;   //second row
 	private ArrayList<String> shields;       //third row
 	private ArrayList<String> miscItems; 	 //fourth row
@@ -64,12 +91,12 @@ public class InventoryMenu implements Serializable
 	public InventoryMenu()
 	{
 		createTransients();
-		initializeDialogueSystem();
+		initializeInventoryMenu();
 	}
 	
-	public void initializeDialogueSystem()
+	public void initializeInventoryMenu()
 	{
-		
+		inMenu = false;
 		//responses = new ArrayList<String>();
 
 	}
@@ -78,10 +105,39 @@ public class InventoryMenu implements Serializable
 	{
 		// initialize renderer stuff
 		stage = new Stage();
-		dialogueFont = new BitmapFont();
-		inMenu = false;
+		
+		menuFont = new BitmapFont();
+		
 		mainTable = new Table();
-		texture = new Texture(Gdx.files.internal("images/DialogueBackground.png"));
+		topPane = new Table();
+		bottomPane = new Table();
+		meleeWeaponRow = new Table();
+		projWeaponRow = new Table();
+		shieldRow = new Table();
+		miscItemRow = new Table();
+	
+		meleeWeaponTables = new ArrayList<Table>();
+		projWeaponTables = new ArrayList<Table>();
+		shieldTables = new ArrayList<Table>();
+		miscItemTables = new ArrayList<Table>();
+
+		//initialize the 8 tables in each row
+		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
+		{
+			Table temp = new Table();
+			meleeWeaponTables.add(temp);
+			temp = new Table();
+			projWeaponTables.add(temp);
+			temp = new Table();
+			shieldTables.add(temp);
+			temp = new Table();
+			miscItemTables.add(temp);
+		}
+		
+		mainTableTexture = new Texture(Gdx.files.internal("images/inventory_menu_background.png"));
+		testTexture = new Texture(Gdx.files.internal("images/inventory_menu_item_background.png"));
+		itemRowTexture = new Texture(Gdx.files.internal("images/inv_menu_row_background.png"));
+		itemSelectionTexture = new Texture(Gdx.files.internal("images/selected_item.png"));
 	}
 	
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
@@ -92,40 +148,14 @@ public class InventoryMenu implements Serializable
 	
 	public void openInventory(PlayableCharacter player)
 	{
+		this.player = player;
+		meleeWeapons = player.getEquippableItems();
+		
 		inMenu = true;
 		rowSelectionIndex = 0;
 		colSelectionIndex = 0;
 		
-		meleeWeapons = new ArrayList<String>();
-		meleeWeapons.add("item1");
-
-		projWeapons = new ArrayList<String>();
-		projWeapons.add("item1");
-		projWeapons.add("item2");
 		
-		shields = new ArrayList<String>();
-		shields.add("item1");
-		shields.add("item2");
-		shields.add("item1");
-
-		miscItems = new ArrayList<String>();
-	
-//		this.player = player;
-//		this.conversingNPC = conversingNPC;
-//		
-//		for(Node rootNode : rootNodes)
-//		{
-//			if(rootNode.getObjectID().equalsIgnoreCase(conversingNPC.getName()))
-//			{
-//				//npc has dialogue tree
-//				inMenu = true;
-//				currentDialogueNode = rootNode;
-//				rowSelectionIndex = 0;
-//				showIndex = 0;
-//				return true;
-//			}
-//		}
-//		return false;
 	}
 	
 	public void closeInventory()
@@ -137,30 +167,7 @@ public class InventoryMenu implements Serializable
 	{
 		if(key.equals("ENTER"))
 		{		
-			//PERFORM ACTION ON ITEM SELECTED
-			// E.G.   EQUIP BOW, SWORD, SHIELD
-			// USE MISC ITEM
 			
-//			if(currentDialogueNode.getNumChildren() > 0 )
-//			{
-//				currentDialogueNode = currentDialogueNode.getChild(choiceIndex);
-//			}
-//			else
-//			{
-//				inMenu = false;
-//				return true;
-//			}
-//			
-//			//activate trigger for this child
-//			
-//			responses.clear();
-//			npcStatement = currentDialogueNode.getDialogue();
-//			for(int i = 0; i < currentDialogueNode.getNumChildren(); i++)
-//			{
-//				responses.add(currentDialogueNode.getChild(i).getDialogue());
-//			}
-//			choiceIndex = 0;
-//			showIndex = 0;
 		}
 		else if(key.equals("UP"))
 		{
@@ -168,7 +175,6 @@ public class InventoryMenu implements Serializable
 			{
 				rowSelectionIndex--;
 				colSelectionIndex = 0;
-				//if(rowSelectionIndex > 1 && (showIndex > 0)) showIndex--;
 			}
 			
 		}
@@ -179,30 +185,18 @@ public class InventoryMenu implements Serializable
 				rowSelectionIndex++;
 				colSelectionIndex = 0;
 			}
-//			if(rowSelectionIndex < currentDialogueNode.getNumChildren()-1) 
-//			{
-//				rowSelectionIndex++;
-//				if((rowSelectionIndex > 2) && (showIndex < currentDialogueNode.getNumChildren()-3))
-//				{
-//					showIndex++;
-//				}
-//					
-//			}
 		}
 		else if(key.equals("RIGHT"))
 		{
 			colSelectionIndex ++;
-			
 		}
 		else if(key.equals("LEFT"))
 		{
-		
 			if(colSelectionIndex > 0)
 			{
 				colSelectionIndex --;			
 			}
 		}
-		
 		
 		System.out.println("current row: "+ rowSelectionIndex);
 		System.out.println("current col: "+colSelectionIndex);
@@ -213,96 +207,136 @@ public class InventoryMenu implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
-		mainTable.setFillParent(true);
+		Sprite bowWeapon = player.getEquippedMeleeWeapon().getItemSpriteUp();
+		Sprite meleeWeapon = player.getEquippedWeapon().getItemSpriteUp();
+		
+		//equippedWeaponImage.scale(1.6f);
+		//initialize resources
+		LabelStyle style = new LabelStyle(menuFont, Color.DARK_GRAY);
+		Label label1 = new Label("left pane", style);
+		Label label2 = new Label("right pane",style);
+		Label label3 = new Label("test row", style);
+		//Label label4 = new Label("test2", style);
+
+		//Set up MainTable, contains everything else
 		stage.addActor(mainTable);
+		mainTable.setFillParent(true);
+		mainTable.setBackground(new TextureRegionDrawable(new TextureRegion(mainTableTexture)));
+		mainTable.top().left().pad(10.0f);
 		
-		float desiredY = (camera.viewportHeight);
+		//Top pane will contain selected item, with stats on it
+		topPane.setBackground(new TextureRegionDrawable(new TextureRegion(testTexture)));
+		topPane.pad(10.0f);
+		topPane.add(label1);
+		mainTable.add(topPane).expandX().fill().height(250.0f);
 		
-		float dialoguePositionX = camera.position.x - camera.viewportWidth / 2;
-		float dialoguePositionY = camera.position.y - camera.viewportHeight / 2;
+		mainTable.row();
 		
-		float dialogueWidth = camera.viewportWidth;
-		//float dialogueHeight = (camera.viewportHeight - 8*desiredX);;
-		float dialogueHeight = camera.viewportHeight;
-	
-		LabelStyle style = new LabelStyle(dialogueFont, Color.DARK_GRAY);
-		LabelStyle selectedStyle = new LabelStyle(dialogueFont, Color.BLUE);
-		LabelStyle separatorStyle = new LabelStyle(dialogueFont, Color.DARK_GRAY );
+		//bottom pane will contain the 4 rows of selectable items
+		bottomPane.pad(10.0f);
+		bottomPane.setBackground(new TextureRegionDrawable(new TextureRegion(testTexture)));
+		mainTable.add(bottomPane).expandY().fill();
 		
-	//	Label objectName = new Label(conversingNPC.getName() , style);
-		//Label npcStatement1 = new Label(npcStatement, style);
-		Label separator = new Label("------------------------------------------------------------------"
-				+ "------------------------------------------------", separatorStyle);
+		//adding rowTables
+		
+		meleeWeaponRow.setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+		bottomPane.add(meleeWeaponRow).expandX().fill().pad(10.0f);
+		
+		bottomPane.row();
+		
+		projWeaponRow.setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+		bottomPane.add(projWeaponRow).expandX().fill().pad(10.0f);
+		
+		bottomPane.row();
+		
+		
+		shieldRow.setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+		bottomPane.add(shieldRow).expandX().fill().pad(10.0f);
+		
+		bottomPane.row();
+		
+		
+		miscItemRow.setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+		bottomPane.add(miscItemRow).expandX().fill().pad(10.0f);
+		
+		//Adding items to individual rows
+		
+		//weapon row
+		meleeWeaponRow.left().padLeft(20.0f);
+		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
+		{
+			meleeWeaponRow.add(meleeWeaponTables.get(i)).size(50.0f).pad(10.0f);
+			meleeWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			
+			MeleeWeapon temp = null;
+			if(meleeWeapons.size() > i)
+			{
+				temp = (MeleeWeapon) meleeWeapons.get(i);
+				meleeWeaponTables.get(i).add(new Image(temp.getItemSpriteUp())).expand().fill();
+			}
+			else
+			{
+				
+			}
+			meleeWeaponTables.get(i).debug();
+		}
+		
+		projWeaponRow.left().padLeft(20.0f);
+		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
+		{
+			projWeaponRow.add(projWeaponTables.get(i)).size(50.0f).pad(10.0f);
+			projWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			projWeaponTables.get(i).add(new Image(bowWeapon)).expand().fill();
+			projWeaponTables.get(i).debug();
+		}
+		
+		shieldRow.left().padLeft(20.0f);
+		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
+		{
+			shieldRow.add(shieldTables.get(i)).size(50.0f).pad(10.0f);
+			shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			shieldTables.get(i).add(new Image(bowWeapon)).expand().fill();
+			shieldTables.get(i).debug();
+		}
+		
+		miscItemRow.left().padLeft(20.0f);
+		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
+		{
+			miscItemRow.add(miscItemTables.get(i)).size(50.0f).pad(10.0f);
+			miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			miscItemTables.get(i).add(new Image(bowWeapon)).expand().fill();
+			miscItemTables.get(i).debug();
+		}
 		
 		
 		
-	//	int selectedIndex = rowSelectionIndex - showIndex;
-		
-		Label response1 = new Label("", style);
-		Label response2 = new Label("", style);
-		Label response3 = new Label("", style);
-		
-//		if((currentDialogueNode.getNumChildren()-1) >= showIndex)
-//		{
-//			response1.setText(responses.get(showIndex));
-//		}
-//		if((currentDialogueNode.getNumChildren()-1) >= showIndex+1)
-//		{
-//			response2.setText(responses.get(showIndex+1));
-//
-//		}
-//		if((currentDialogueNode.getNumChildren()-1) >= showIndex+2)
-//		{
-//			response3.setText(responses.get(showIndex+2));
-//		}
-		
-		//response1.setStyle(separatorStyle);
-//		if(selectedIndex == 0)
-//		{
-//			response1.setStyle(selectedStyle);
-//		}
-//		else if(selectedIndex == 1)
-//		{
-//			response2.setStyle(selectedStyle);
-//		}
-//		else
-//		{
-//			response3.setStyle(selectedStyle);
-//		}
-//		
-//		npcStatement1.setWrap(true);
-		
-//		System.out.println("camera position x "+camera.position.x);
-//		System.out.println("camera position y "+camera.position.y);
-//		
-//		System.out.println("dialogue position x: "+dialoguePositionX);
-//		System.out.println("dialogue position y: "+dialoguePositionY);
+		mainTable.debug(); // turn on all debug lines (table, cell, and widget)
+		topPane.debug();
+		bottomPane.debug();
+		meleeWeaponRow.debug();
+		projWeaponRow.debug();
+		shieldRow.debug();
+		miscItemRow.debug();
+
+	    stage.draw();
+	    Table.drawDebug(stage);
 	    
+		mainTable.clear();
+		topPane.clear();
+		bottomPane.clear();
+		meleeWeaponRow.clear();
+		projWeaponRow.clear();
+		shieldRow.clear();
+		miscItemRow.clear();
+
+		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
+		{
+			meleeWeaponTables.get(i).clear();
+			projWeaponTables.get(i).clear();
+			shieldTables.get(i).clear();
+			miscItemTables.get(i).clear();
+		}
 		
-//	    table.setBounds(dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
-//	    
-//	    //table.add(objectName).width(dialogueWidth*0.9f);
-//	    table.row();
-//	   // table.add(npcStatement1).width(dialogueWidth*0.9f);
-//	    table.row();
-//	    table.add(separator).width(dialogueWidth);
-//	    table.row();
-//	    table.add(response1).width(dialogueWidth*0.9f);
-//	    table.row();
-//	    table.add(response2).width(dialogueWidth*0.9f);
-//	    table.row();
-//	    table.add(response3).width(dialogueWidth*0.9f);
-//	    table.row();
-//	    
-//	    //table.setScale(0.5f);
-//	    table.debug();
-//		stage.addActor(table);
-//		
-//	 	batch.draw(texture, dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
-//	
-//		table.draw(batch, 1.0f);
-//		table.clear();
-		//Table.drawDebug(stage);
 	}
 	
 	public boolean getInMenu()
