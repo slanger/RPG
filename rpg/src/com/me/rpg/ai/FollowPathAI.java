@@ -49,15 +49,6 @@ public class FollowPathAI
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(destination, destinationMap));
 		}
-		
-		if (character.getName().equals("NPC3"))
-		{
-			System.out.println("NPC3's path:");
-			for (Waypoint w : path)
-			{
-				System.out.println(w.toString());
-			}
-		}
 	}
 
 	@Override

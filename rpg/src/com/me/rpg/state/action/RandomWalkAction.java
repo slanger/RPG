@@ -23,7 +23,6 @@ public class RandomWalkAction implements Action {
 	}
 	
 	public void stop() {
-		System.out.printf("Called stop");
 		walkAI.stop();
 	}
 	

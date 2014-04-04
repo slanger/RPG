@@ -1,12 +1,16 @@
 package com.me.rpg.maps;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
 
-public class Waypoint implements Comparable<Waypoint>
+public class Waypoint
+	implements Comparable<Waypoint>, Serializable
 {
+
+	private static final long serialVersionUID = 4313230046743309396L;
 
 	public final Rectangle rectangle;
 	public final Map mapLocatedOn;
@@ -26,7 +30,8 @@ public class Waypoint implements Comparable<Waypoint>
 		connectedWarpPointName = null;
 	}
 
-	public Waypoint(Rectangle rectangle, Map mapLocatedOn, String name, String connectedWarpPointName)
+	public Waypoint(Rectangle rectangle, Map mapLocatedOn, String name,
+			String connectedWarpPointName)
 	{
 		this.rectangle = rectangle;
 		this.mapLocatedOn = mapLocatedOn;
@@ -42,7 +47,8 @@ public class Waypoint implements Comparable<Waypoint>
 	@Override
 	public String toString()
 	{
-		return String.format("(%s; %s); isWarpPoint=%s", rectangle.toString(), mapLocatedOn.getMapType().getMapName(), isWarpPoint());
+		return String.format("(%s; %s); isWarpPoint=%s", rectangle.toString(),
+				mapLocatedOn.getMapType().getMapName(), isWarpPoint());
 	}
 
 	// compare distances of the Waypoints
@@ -57,7 +63,10 @@ public class Waypoint implements Comparable<Waypoint>
 	}
 
 	public static class Edge
+		implements Serializable
 	{
+
+		private static final long serialVersionUID = 593353468577188650L;
 
 		public final Waypoint connectedWaypoint;
 		public final float cost;
