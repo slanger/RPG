@@ -30,6 +30,14 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableInputUp = true;
 	private boolean enableInputDown = true;
 
+	// inventory menu keys
+	private boolean enableInputI = true;
+	// private boolean enableInputUp = true;
+	// private boolean enableInputDown = true;
+	private boolean enableInputRight = true;
+	private boolean enableInputLeft = true;
+	private long timeInventoryOpened = 0;
+
 	private PlayerControlledWalkAI walkAI;
 
 	public boolean getEnableControls()
@@ -99,6 +107,47 @@ public class PlayableCharacter extends GameCharacter
 			enableSaving = true;
 		}
 
+		/*
+		 *  INVENTORY MENU
+		 */
+		
+		if(world.getInventoryMenu().getInMenu() == true)
+		{
+			if(Gdx.input.isKeyPressed(Keys.I) && (System.currentTimeMillis() - timeInventoryOpened > 250))
+			{
+				world.getInventoryMenu().closeInventory();
+			}
+			else
+			{
+				handleInventoryMenuInput();
+			}
+			return;
+		}
+		if (Gdx.input.isKeyPressed(Keys.I))
+		{
+			if (enableInputI)
+			{
+				enableInputI = false;
+				if (!world.getInventoryMenu().getInMenu() && (System.currentTimeMillis() - timeInventoryOpened) >= 300)
+				{
+					timeInventoryOpened = System.currentTimeMillis();
+					world.getInventoryMenu().openInventory(this);
+				}
+				else
+				{ // currently in dialogue
+					System.out.println("already in menu");
+				}
+			}
+		}
+		else
+		{
+			enableInputI = true;
+		}
+		
+		/*
+		 *  END INVENTORY MENU
+		 */
+		
 		/*
 		 * DIALOGUE
 		 */
@@ -227,6 +276,78 @@ public class PlayableCharacter extends GameCharacter
 		 */
 	}
 
+	public void handleInventoryMenuInput()
+	{
+		if(Gdx.input.isKeyPressed(Keys.UP))
+		{
+			if(enableInputUp)
+			{
+				enableInputUp = false;
+				if(world.getInventoryMenu().getInMenu())
+				{
+					world.getInventoryMenu().acceptPlayerInput("UP");
+					System.out.println("In Menu:  UP");
+				}
+			}
+		}
+		else
+		{
+			enableInputUp = true;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			if(enableInputDown)
+			{
+				enableInputDown = false;
+				if(world.getInventoryMenu().getInMenu())
+				{
+					world.getInventoryMenu().acceptPlayerInput("DOWN");
+					System.out.println("In Menu:  DOWN");
+				}
+			}
+		}
+		else
+		{
+			enableInputDown = true;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.RIGHT))
+		{
+			if(enableInputRight)
+			{
+				enableInputRight = false;
+				if(world.getInventoryMenu().getInMenu())
+				{
+					world.getInventoryMenu().acceptPlayerInput("RIGHT");
+					System.out.println("In Menu:  RIGHT");
+
+				}
+			}
+		}
+		else
+		{
+			enableInputRight = true;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.LEFT))
+		{
+			if(enableInputLeft)
+			{
+				enableInputLeft = false;
+				if(world.getInventoryMenu().getInMenu())
+				{
+					world.getInventoryMenu().acceptPlayerInput("LEFT");
+					System.out.println("In Menu:  LEFT");
+				}
+			}
+		}
+		else
+		{
+			enableInputLeft = true;
+		}
+	}
+	
 	public void handleDialogueInput()
 	{
 		if (!enableControls)
