@@ -75,7 +75,7 @@ public class RPG
 			ObjectOutputStream saveStream = new ObjectOutputStream(saveFile);
 			saveStream.writeObject(world);
 			saveStream.close();
-			System.out.println("Game saved to " + fileName);
+			world.pushMessage("Game saved to " + fileName);
 		}
 		catch (FileNotFoundException e)
 		{

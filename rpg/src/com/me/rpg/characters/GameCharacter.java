@@ -25,14 +25,14 @@ import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
 import com.me.rpg.reputation.NPCMemory;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.GlobalTimerTask;
 import com.me.rpg.utils.GlobalTimerTask.Time;
 
-public abstract class GameCharacter implements IAttackable, Serializable
+public abstract class GameCharacter
+	implements IAttackable, Serializable
 {
 
 	private static final long serialVersionUID = -5812091877699740886L;
@@ -51,13 +51,16 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	private float stateTime = 0f;
 	private float baseSpeed = 100f;
 	private float speedModifier = 1.0f;
+	private boolean warpEnable = true;
 
 	private transient Sprite sprite;
 	private transient TextureRegion rightIdle, leftIdle, upIdle, downIdle;
-	private transient Animation rightWalkAnimation, leftWalkAnimation, upWalkAnimation,
-			downWalkAnimation;
+	private transient Animation rightWalkAnimation, leftWalkAnimation,
+			upWalkAnimation, downWalkAnimation;
 
 	protected Map currentMap = null;
+	protected Map nextMap = null;
+	protected Coordinate nextLocation = null;
 	protected final World world;
 
 	// Combat stuff
@@ -108,7 +111,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 
 	private void create()
 	{
-		Texture spritesheet = ScreenHandler.manager.get(spritesheetPath, Texture.class);
+		Texture spritesheet = ScreenHandler.manager.get(spritesheetPath,
+				Texture.class);
 		TextureRegion[][] sheet = TextureRegion.split(spritesheet, tileWidth,
 				tileHeight);
 		int columns = sheet[0].length;
@@ -136,7 +140,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		sprite.setRegion(downIdle);
 	}
 
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream inputStream)
+		throws IOException, ClassNotFoundException
 	{
 		inputStream.defaultReadObject();
 		create();
@@ -170,6 +175,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	public void setBottomLeftCorner(Coordinate bottomLeftCorner)
 	{
 		this.bottomLeftCorner = bottomLeftCorner;
+		// update position
+		setPosition(bottomLeftCorner.getX(), bottomLeftCorner.getY());
 	}
 
 	public Coordinate getCenter()
@@ -190,16 +197,20 @@ public abstract class GameCharacter implements IAttackable, Serializable
 
 	public void setCenter(Coordinate center)
 	{
-		this.bottomLeftCorner = new Coordinate(center.getX() - getSpriteWidth()
-				/ 2, center.getY() - getSpriteHeight() / 2);
+		bottomLeftCorner = new Coordinate(center.getX() - getSpriteWidth() / 2,
+				center.getY() - getSpriteHeight() / 2);
+		// update position
+		setPosition(bottomLeftCorner.getX(), bottomLeftCorner.getY());
 	}
-	
-	public boolean isCenterNear(Coordinate target) {
+
+	public boolean isCenterNear(Coordinate target)
+	{
 		Coordinate c = getCenter();
 		return c.isNear(target);
 	}
-	
-	public boolean isNear(Coordinate bottomLeftTarget) {
+
+	public boolean isNear(Coordinate bottomLeftTarget)
+	{
 		return bottomLeftCorner.isNear(bottomLeftTarget);
 	}
 
@@ -225,23 +236,27 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		if (isShielded())
 			this.strafing = true;
 	}
-	
-	public boolean isUsingShield() {
+
+	public boolean isUsingShield()
+	{
 		return shielding;
 	}
-	
-	public void usingShield(boolean shielding) {
+
+	public void usingShield(boolean shielding)
+	{
 		if (shieldSlot == null)
 			throw new RuntimeException("There's no shield equipped!");
 		this.shielding = shielding;
 		setStrafing(shielding);
 	}
-	
-	public boolean isShielded() {
+
+	public boolean isShielded()
+	{
 		return shieldSlot != null && shielding && !isAttacking();
 	}
-	
-	public Direction getFaceDirection() {
+
+	public Direction getFaceDirection()
+	{
 		return faceDirection;
 	}
 
@@ -258,6 +273,16 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	public void setMoving(boolean moving)
 	{
 		this.moving = moving;
+	}
+
+	public boolean warpEnable()
+	{
+		return warpEnable;
+	}
+
+	public void setWarpEnable(boolean warpEnable)
+	{
+		this.warpEnable = warpEnable;
 	}
 
 	protected float getStateTime()
@@ -353,14 +378,17 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			return baseSpeed * speedModifier;
 		return baseSpeed * 0.6f * speedModifier;
 	}
-	
-	public float getSpeedModifier() {
+
+	public float getSpeedModifier()
+	{
 		return speedModifier;
 	}
-	
-	public void setSpeedModifier(float modifier) {
+
+	public void setSpeedModifier(float modifier)
+	{
 		if (modifier < 0)
-			throw new RuntimeException("Can't have a negative speed modifier: " + modifier);
+			throw new RuntimeException("Can't have a negative speed modifier: "
+					+ modifier);
 		speedModifier = modifier;
 	}
 
@@ -393,12 +421,14 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	{
 		this.currentMap = currentMap;
 	}
-	
-	public Weapon getEquippedWeapon() {
+
+	public Weapon getEquippedWeapon()
+	{
 		return weaponSlot;
 	}
-	
-	public boolean isAttacking() {
+
+	public boolean isAttacking()
+	{
 		return weaponSlot == null ? false : weaponSlot.isAttacking();
 	}
 
@@ -407,9 +437,9 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		return world;
 	}
 
-	public abstract void moveToOtherMap(MapType mapType, Coordinate newLocation);
+	public abstract void moveToOtherMap(Map newMap, Rectangle newLocation);
 
-	public abstract void warpToOtherMap(MapType mapType, Coordinate newLocation);
+	public abstract void warpToOtherMap(Map newMap, Rectangle newLocation);
 
 	public void render(SpriteBatch batch)
 	{
@@ -423,17 +453,21 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			float alpha = (float) Math.abs(Math.cos(strikeImmunity * 16));
 			sprite.setColor(c.r, c.g, c.b, alpha);
 		}
-		
-		// if we are facing up and using shield, draw shield before character sprite
-		if (isShielded() && faceDirection.equals(Direction.UP)) {
+
+		// if we are facing up and using shield, draw shield before character
+		// sprite
+		if (isShielded() && faceDirection.equals(Direction.UP))
+		{
 			shieldSlot.render(getBoundingRectangle(), faceDirection, batch);
 		}
-		
+
 		// draw sprite
 		sprite.draw(batch);
-		
-		// if we are shielding and not facing up, then draw shield after character sprite
-		if (isShielded() && !faceDirection.equals(Direction.UP)){
+
+		// if we are shielding and not facing up, then draw shield after
+		// character sprite
+		if (isShielded() && !faceDirection.equals(Direction.UP))
+		{
 			shieldSlot.render(getBoundingRectangle(), faceDirection, batch);
 		}
 
@@ -455,7 +489,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	{
 	}
 
-	public final void update(float deltaTime, Map currentMap)
+	public final void update(float deltaTime)
 	{
 		addToStateTime(deltaTime);
 
@@ -473,13 +507,13 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		if (weaponSlot != null)
 			weaponSlot.update(deltaTime);
 
-		doUpdate(deltaTime, currentMap);
+		doUpdate(deltaTime);
 
 		// update position
 		setPosition(getBottomLeftX(), getBottomLeftY());
 	}
 
-	protected abstract void doUpdate(float deltaTime, Map currentMap);
+	protected abstract void doUpdate(float deltaTime);
 
 	protected void updateTexture()
 	{
@@ -510,14 +544,15 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		}
 	}
 
-	public void addedToMap(Map map)
+	public void addedToMap(Map newMap, Coordinate newLocation)
 	{
-		currentMap = map;
+		currentMap = newMap;
+		setBottomLeftCorner(newLocation);
 	}
 
-	public void removedFromMap(Map map)
+	public void removedFromMap()
 	{
-		currentMap = null;
+		nextMap.addCharacterToMap(this, nextLocation);
 	}
 
 	public void acceptPush(GameCharacter pushingCharacter)
@@ -537,7 +572,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			setBottomLeftCorner(newCoordinate);
 		}
 	}
-	
+
 	protected Rectangle getHitboxInFrontOfCharacter()
 	{
 		float width = getSpriteWidth();
@@ -563,7 +598,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		if (!name.equals("Player"))
 		{
 			world.getReputationSystem().addNewEvent("Attacked", "test group",
-					this, bottomLeftCorner,null);
+					this, bottomLeftCorner, null);
 		}
 	}
 
@@ -583,7 +618,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		if (!name.equals("Player"))
 		{
 			world.getReputationSystem().addNewEvent("Attacked", "test group",
-					this, bottomLeftCorner,null);
+					this, bottomLeftCorner, null);
 		}
 	}
 
@@ -598,27 +633,37 @@ public abstract class GameCharacter implements IAttackable, Serializable
 				health);
 		setHealth(health);
 	}
-	
-	private boolean attemptShieldBlock(Weapon weapon) {
-		if (isShielded() && weapon.getLastDirection().equals(faceDirection.opposite())) {
+
+	private boolean attemptShieldBlock(Weapon weapon)
+	{
+		if (isShielded()
+				&& weapon.getLastDirection().equals(faceDirection.opposite()))
+		{
 			// only allow shield to block if you are facing the attack
 			shieldSlot.receiveAttack(weapon);
 			return true;
 		}
 		return false;
 	}
-	
-	private boolean attemptShieldBlock(Projectile projectile) {
-		if (isShielded() && projectile.getFiredDirection().equals(faceDirection.opposite())) {
+
+	private boolean attemptShieldBlock(Projectile projectile)
+	{
+		if (isShielded()
+				&& projectile.getFiredDirection().equals(
+						faceDirection.opposite()))
+		{
 			shieldSlot.receiveAttack(projectile);
 			return true;
 		}
 		return false;
 	}
-	
-	private void inflictEffects(StatusEffect[] effects) {
-		for(StatusEffect effect: effects) {
-			if(!isImmune(effect)) {
+
+	private void inflictEffects(StatusEffect[] effects)
+	{
+		for (StatusEffect effect : effects)
+		{
+			if (!isImmune(effect))
+			{
 				inflictEffect(effect);
 			}
 		}
@@ -735,18 +780,21 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		Rectangle r = bottomLeftCorner.getBottomLeftRectangle(width, height);
 		Vector2 center = new Vector2();
 		r.getCenter(center);
-		// TODO: Looks unnatural/bad when arrow disappears "before" it hits (because character has clear pixels)
+		// TODO: Looks unnatural/bad when arrow disappears "before" it hits
+		// (because character has clear pixels)
 		// This is just a hack to make it look better, needs a better fix
 		int widthReduction = 8;
 		int heightReduction = 8;
-		r.setWidth(r.getWidth()-widthReduction);
-		r.setHeight(r.getHeight()-heightReduction);
+		r.setWidth(r.getWidth() - widthReduction);
+		r.setHeight(r.getHeight() - heightReduction);
 		r.setCenter(center);
 		return r;
 	}
-	
-	public boolean equipShield(Shield s) {
-		if (shieldSlot != null) {
+
+	public boolean equipShield(Shield s)
+	{
+		if (shieldSlot != null)
+		{
 			unequipShield();
 			shieldSlot = null;
 		}
@@ -775,85 +823,86 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	{
 		return sightDistance;
 	}
-	
+
 	public float getHearingRadius()
 	{
 		return hearingRadius;
 	}
-	
-	public boolean checkCoordinateInVision(Coordinate c) {
+
+	public boolean checkCoordinateInVision(Coordinate c)
+	{
 		return checkCoordinateInVision(c.getX(), c.getY());
 	}
-	
+
 	public boolean checkCoordinateInVision(float x, float y)
 	{
 		float tempX = getCenterX();
 		float tempY = getCenterY();
 		float visionFieldPoints[] = new float[8];
-		
-		if(faceDirection.name().equalsIgnoreCase("up"))
+
+		if (faceDirection == Direction.UP)
 		{
-			visionFieldPoints[0] = tempX; //x value of point centered on NPC
-			visionFieldPoints[1] = tempY; //y value of point centered on NPC
-			visionFieldPoints[2] = tempX - 0.8f*(sightDistance); 
-			visionFieldPoints[3] = tempY + 0.8f*(sightDistance);
+			visionFieldPoints[0] = tempX; // x value of point centered on NPC
+			visionFieldPoints[1] = tempY; // y value of point centered on NPC
+			visionFieldPoints[2] = tempX - 0.8f * (sightDistance);
+			visionFieldPoints[3] = tempY + 0.8f * (sightDistance);
 			visionFieldPoints[4] = tempX;
 			visionFieldPoints[5] = tempY + sightDistance;
-			visionFieldPoints[6] = tempX +  0.8f*(sightDistance);
-			visionFieldPoints[7] = tempY +  0.8f*(sightDistance); 
+			visionFieldPoints[6] = tempX + 0.8f * (sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f * (sightDistance);
 		}
-		else if(faceDirection.name().equalsIgnoreCase("down"))
+		else if (faceDirection == Direction.DOWN)
 		{
-			visionFieldPoints[0] = tempX; //x value of point centered on NPC
-			visionFieldPoints[1] = tempY; //y value of point centered on NPC
-			visionFieldPoints[2] = tempX -  0.8f*(sightDistance); 
-			visionFieldPoints[3] = tempY -  0.8f*(sightDistance);
+			visionFieldPoints[0] = tempX; // x value of point centered on NPC
+			visionFieldPoints[1] = tempY; // y value of point centered on NPC
+			visionFieldPoints[2] = tempX - 0.8f * (sightDistance);
+			visionFieldPoints[3] = tempY - 0.8f * (sightDistance);
 			visionFieldPoints[4] = tempX;
 			visionFieldPoints[5] = tempY - sightDistance;
-			visionFieldPoints[6] = tempX +  0.8f*(sightDistance);
-			visionFieldPoints[7] = tempY -  0.8f*(sightDistance); 
+			visionFieldPoints[6] = tempX + 0.8f * (sightDistance);
+			visionFieldPoints[7] = tempY - 0.8f * (sightDistance);
 		}
-		else if(faceDirection.name().equalsIgnoreCase("left"))
+		else if (faceDirection == Direction.LEFT)
 		{
-			visionFieldPoints[0] = tempX; //x value of point centered on NPC
-			visionFieldPoints[1] = tempY; //y value of point centered on NPC
-			visionFieldPoints[2] = tempX -  0.8f*(sightDistance); 
-			visionFieldPoints[3] = tempY - 0.8f*(sightDistance);
+			visionFieldPoints[0] = tempX; // x value of point centered on NPC
+			visionFieldPoints[1] = tempY; // y value of point centered on NPC
+			visionFieldPoints[2] = tempX - 0.8f * (sightDistance);
+			visionFieldPoints[3] = tempY - 0.8f * (sightDistance);
 			visionFieldPoints[4] = tempX - sightDistance;
 			visionFieldPoints[5] = tempY;
-			visionFieldPoints[6] = tempX - 0.8f*(sightDistance);
-			visionFieldPoints[7] = tempY + 0.8f*(sightDistance); 
+			visionFieldPoints[6] = tempX - 0.8f * (sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f * (sightDistance);
 		}
-		else //facing right
-		{
-			visionFieldPoints[0] = tempX; //x value of point centered on NPC
-			visionFieldPoints[1] = tempY; //y value of point centered on NPC
-			visionFieldPoints[2] = tempX + 0.8f*(sightDistance); 
-			visionFieldPoints[3] = tempY - 0.8f*(sightDistance);
+		else
+		{// facing right
+			visionFieldPoints[0] = tempX; // x value of point centered on NPC
+			visionFieldPoints[1] = tempY; // y value of point centered on NPC
+			visionFieldPoints[2] = tempX + 0.8f * (sightDistance);
+			visionFieldPoints[3] = tempY - 0.8f * (sightDistance);
 			visionFieldPoints[4] = tempX + sightDistance;
 			visionFieldPoints[5] = tempY;
-			visionFieldPoints[6] = tempX + 0.8f*(sightDistance);
-			visionFieldPoints[7] = tempY + 0.8f*(sightDistance); 
+			visionFieldPoints[6] = tempX + 0.8f * (sightDistance);
+			visionFieldPoints[7] = tempY + 0.8f * (sightDistance);
 		}
-		
+
 		Polygon visionCone = new Polygon(visionFieldPoints);
-		if(visionCone.contains(x,y))
+		if (visionCone.contains(x, y))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
-	
-	public boolean checkCoordinateWithinHearing(Coordinate c) {
+
+	public boolean checkCoordinateWithinHearing(Coordinate c)
+	{
 		return checkCoordinateWithinHearing(c.getX(), c.getY());
 	}
-	
+
 	public boolean checkCoordinateWithinHearing(float x, float y)
 	{
-		Circle circle = new Circle(getCenterX(),
-				getCenterY(), hearingRadius);
-		if(circle.contains(x, y))
+		Circle circle = new Circle(getCenterX(), getCenterY(), hearingRadius);
+		if (circle.contains(x, y))
 		{
 			return true;
 		}

@@ -3,11 +3,11 @@ package com.me.rpg.characters;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
 import com.me.rpg.utils.Coordinate;
 
 public class PlayableCharacter extends GameCharacter
@@ -24,20 +24,22 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enablePushing = true;
 
 	// dialogue keys
-	private boolean enableInputE = true;  //for initiating dialogue with character, selecting response option
+	private boolean enableInputE = true; // for initiating dialogue with
+											// character, selecting response
+											// option
 	private boolean enableInputUp = true;
 	private boolean enableInputDown = true;
-	
-	//inventory menu keys
+
+	// inventory menu keys
 	private boolean enableInputI = true;
-	//private boolean enableInputUp = true;
-	//private boolean enableInputDown = true;
+	// private boolean enableInputUp = true;
+	// private boolean enableInputDown = true;
 	private boolean enableInputRight = true;
 	private boolean enableInputLeft = true;
 	private long timeInventoryOpened = 0;
-	
+
 	private PlayerControlledWalkAI walkAI;
-	
+
 	public boolean getEnableControls()
 	{
 		return enableControls;
@@ -59,7 +61,7 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	@Override
-	public void doUpdate(float deltaTime, Map currentMap)
+	public void doUpdate(float deltaTime)
 	{
 		setMoving(false);
 
@@ -150,11 +152,11 @@ public class PlayableCharacter extends GameCharacter
 		 * DIALOGUE
 		 */
 
-		if(world.getDialogueSystem().getInDialogue()) 
+		if (world.getDialogueSystem().getInDialogue())
 		{
 			return;
 		}
-		
+
 		if (Gdx.input.isKeyPressed(Keys.E))
 		{
 			boolean dialogueEnded = false;
@@ -164,8 +166,8 @@ public class PlayableCharacter extends GameCharacter
 				if (!world.getDialogueSystem().getInDialogue())
 				{
 					initiateDialogue();
-					if(world.getDialogueSystem().getInDialogue())
-					{						
+					if (world.getDialogueSystem().getInDialogue())
+					{
 						dialogueEnded = advanceDialogue("ENTER");
 					}
 				}
@@ -173,7 +175,8 @@ public class PlayableCharacter extends GameCharacter
 				{ // currently in dialogue
 					dialogueEnded = advanceDialogue("ENTER");
 				}
-				if(dialogueEnded == true) world.setUpdateEnable(true);
+				if (dialogueEnded == true)
+					world.setUpdateEnable(true);
 			}
 		}
 		else
@@ -183,17 +186,17 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 * END DIALOGUE
 		 */
-		
-		if(world.getDialogueSystem().getInDialogue() == true)
+
+		if (world.getDialogueSystem().getInDialogue() == true)
 		{
 			return;
 		}
-		
+
 		/*
 		 * MOVEMENT
 		 */
 
-		walkAI.update(deltaTime, currentMap);
+		walkAI.update(deltaTime);
 
 		/*
 		 * END MOVEMENT
@@ -230,7 +233,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if (weaponSlot != null && enableAttack)
 			{
-				weaponSlot.attack(currentMap, getFaceDirection(), getBoundingRectangle());
+				weaponSlot.attack(currentMap, getFaceDirection(),
+						getBoundingRectangle());
 				enableAttack = false;
 			}
 		}
@@ -363,8 +367,8 @@ public class PlayableCharacter extends GameCharacter
 				if (!world.getDialogueSystem().getInDialogue())
 				{
 					initiateDialogue();
-					if(world.getDialogueSystem().getInDialogue())
-					{						
+					if (world.getDialogueSystem().getInDialogue())
+					{
 						dialogueEnded = advanceDialogue("ENTER");
 					}
 				}
@@ -372,19 +376,20 @@ public class PlayableCharacter extends GameCharacter
 				{ // currently in dialogue
 					dialogueEnded = advanceDialogue("ENTER");
 				}
-				if(dialogueEnded == true) world.setUpdateEnable(true);
+				if (dialogueEnded == true)
+					world.setUpdateEnable(true);
 			}
 		}
 		else
 		{
 			enableInputE = true;
 		}
-		if(Gdx.input.isKeyPressed(Keys.UP))
+		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
-			if(enableInputUp)
+			if (enableInputUp)
 			{
 				enableInputUp = false;
-				if(world.getDialogueSystem().getInDialogue())
+				if (world.getDialogueSystem().getInDialogue())
 				{
 					advanceDialogue("UP");
 				}
@@ -394,10 +399,10 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputUp = true;
 		}
-		
+
 		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			if(enableInputDown == true)
+			if (enableInputDown == true)
 			{
 				enableInputDown = false;
 				if (world.getDialogueSystem().getInDialogue())
@@ -410,13 +415,12 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputDown = true;
 		}
-		
+
 		/*
 		 * END DIALOGUE
 		 */
-		
+
 	}
-	
 
 	private void doPush()
 	{
@@ -438,7 +442,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			DialogueSystem dialogueSystem = world.getDialogueSystem();
 			boolean foundDialogue = dialogueSystem.startConversation(this, c);
-			if(foundDialogue){
+			if (foundDialogue)
+			{
 				c.setFaceDirection(this.getFaceDirection().opposite());
 				world.setUpdateEnable(false);
 			}
@@ -452,20 +457,102 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	private boolean advanceDialogue(String key)
-	{	
+	{
 		return world.getDialogueSystem().advanceDialogue(key);
 	}
 
 	@Override
-	public void moveToOtherMap(MapType mapType, Coordinate newLocation)
+	public void removedFromMap()
 	{
-		world.movePlayerToOtherMap(mapType, newLocation);
+		nextMap.addFocusedCharacterToMap(this, nextLocation);
 	}
 
 	@Override
-	public void warpToOtherMap(MapType mapType, Coordinate newLocation)
+	public void moveToOtherMap(Map newMap, Rectangle newLocation)
 	{
-		world.warpPlayerToOtherMap(mapType, newLocation);
+		currentMap.close();
+		setWarpEnable(false);
+		nextMap = newMap;
+		Vector2 center = newLocation.getCenter(new Vector2());
+		nextLocation = new Coordinate(center.x - getSpriteWidth() / 2f, center.y - getSpriteHeight() / 2f);
+		currentMap.removeCharacterFromMap(this);
+	}
+
+	@Override
+	public void warpToOtherMap(Map newMap, Rectangle newLocation)
+	{
+		moveToOtherMap(newMap, newLocation);
+
+		/* TODO
+		currentMap.close();
+		world.setUpdateEnable(false);
+		warping = true;
+		warpingAlpha = 0f;
+		world.warpSound.play();
+		setWarpEnable(false);
+		Vector2 center = newLocation.getCenter(new Vector2());
+		Coordinate warpLocation = new Coordinate(center.x - getSpriteWidth() / 2, center.y - getSpriteHeight() / 2);
+
+		world.getTimer().scheduleTask(new Timer.Task()
+		{
+
+			private static final long serialVersionUID = -4094471058413909756L;
+
+			@Override
+			public void run()
+			{
+				warpingAlpha += 0.1f;
+				if (warpingAlpha > 1f)
+				{
+					warpingAlpha = 1f;
+					this.cancel();
+				}
+			}
+
+		}, 0f, 0.1f);
+
+		timer.scheduleTask(new Timer.Task()
+		{
+
+			private static final long serialVersionUID = 8348680306281141956L;
+
+			@Override
+			public void run()
+			{
+				currentMap.removeCharacterFromMap(player);
+				newMap.addFocusedCharacterToMap(player, newLocation);
+
+				timer.scheduleTask(new Timer.Task()
+				{
+
+					private static final long serialVersionUID = -1100673244597339611L;
+
+					@Override
+					public void run()
+					{
+						warpingAlpha -= 0.1f;
+					}
+
+				}, 0f, 0.1f, 10);
+
+				timer.scheduleTask(new Timer.Task()
+				{
+
+					private static final long serialVersionUID = 4263563367493321895L;
+
+					@Override
+					public void run()
+					{
+						updateEnable = true;
+						warping = false;
+						newMap.open();
+					}
+
+				}, 1.0f);
+			}
+
+		}, 3.0f);
+		*/
 	}
 
 }

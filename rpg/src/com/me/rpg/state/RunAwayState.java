@@ -6,57 +6,65 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.ModifySpeedAction;
 import com.me.rpg.state.action.WalkAction;
-import com.me.rpg.state.transition.IntCondition;
-import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.Coordinate;
 
-public class RunAwayState extends State {
-	
+public class RunAwayState extends State
+{
+
+	private static final long serialVersionUID = 1133256009260084236L;
+
 	private float lastSeen = 0f;
-	private WalkAction action;
 	private ModifySpeedAction speedAction;
-	private ArrayList<Action> actions;
 	private ArrayList<Action> entryExitActions;
-	
-	public RunAwayState(HierarchicalState parent, GameCharacter character) {
+
+	public RunAwayState(HierarchicalState parent, GameCharacter character)
+	{
 		super(parent, character);
-		action = new WalkAction(character, new Coordinate());
 		speedAction = new ModifySpeedAction(character, 0.2f);
-		actions = new ArrayList<Action>();
-		actions.add(action);
 		entryExitActions = new ArrayList<Action>();
 		entryExitActions.add(speedAction);
 	}
-	
-	protected ArrayList<Action> doGetEntryActions() {
+
+	protected ArrayList<Action> doGetEntryActions()
+	{
 		return entryExitActions;
 	}
-	
-	protected ArrayList<Action> doGetExitActions() {
+
+	protected ArrayList<Action> doGetExitActions()
+	{
 		return entryExitActions;
 	}
-	
-	protected ArrayList<Action> doGetActions() {
-		ArrayList<GameCharacter> people = character.getCurrentMap().canSeeOrHearCharacters(character);
-		if (people.size() == 0 && lastSeen > 3f) {
+
+	protected ArrayList<Action> doGetActions()
+	{
+		ArrayList<GameCharacter> people = character.getCurrentMap()
+				.canSeeOrHearCharacters(character);
+		if (people.size() == 0 && lastSeen > 3f)
+		{
 			character.setMoving(false);
 			return super.doGetActions();
-		} else if (people.size() == 0) {
-			return actions;
 		}
+		else if (people.size() == 0)
+		{
+			return new ArrayList<Action>();
+		}
+
 		lastSeen = 0f;
 		GameCharacter near = people.get(0);
 		Coordinate pCenter = near.getCenter();
 		Coordinate meCenter = character.getCenter();
-		meCenter.setX(2*meCenter.getX() - pCenter.getX());
-		meCenter.setY(2*meCenter.getY() - pCenter.getY());
-		action.setNewLoc(meCenter);
+		meCenter.setX(2 * meCenter.getX() - pCenter.getX());
+		meCenter.setY(2 * meCenter.getY() - pCenter.getY());
+
+		ArrayList<Action> actions = new ArrayList<Action>();
+		actions.add(new WalkAction(character, meCenter, character.getCurrentMap()));
 		return actions;
 	}
-	
+
 	@Override
-	protected void doUpdate(float delta) {
+	protected void doUpdate(float delta)
+	{
 		lastSeen += delta;
 	}
-	
+
 }

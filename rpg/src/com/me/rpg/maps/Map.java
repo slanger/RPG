@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -41,10 +42,12 @@ public abstract class Map
 	private final String mapTmxPath;
 
 	protected GameCharacter focusedCharacter;
-	protected int mapWidth;
-	protected int mapHeight;
+	protected List<Waypoint> waypoints = null;
+	protected transient int mapWidth, mapHeight;
+	protected transient int tileWidth, tileHeight;
 
 	protected ArrayList<GameCharacter> charactersOnMap = new ArrayList<GameCharacter>();
+	private ArrayList<GameCharacter> charactersToRemove = new ArrayList<GameCharacter>();
 	protected ArrayList<Projectile> flyingProjectiles = new ArrayList<Projectile>();
 	protected ArrayList<Weapon> equippedWeapons = new ArrayList<Weapon>();
 	protected ArrayList<DeadCharacter> corpses = new ArrayList<DeadCharacter>();
@@ -92,14 +95,18 @@ public abstract class Map
 		return charactersOnMap;
 	}
 
-	public RectangleMapObject[] getObjectsOnMap()
-	{
-		return collidables;
-	}
-
 	public Timer getTimer()
 	{
 		return timer;
+	}
+
+	public List<Waypoint> getWaypoints()
+	{
+		if (waypoints == null)
+		{
+			waypoints = createWaypoints();
+		}
+		return waypoints;
 	}
 
 	protected Map(World world, MapType mapType, String mapTmxPath)
@@ -117,26 +124,16 @@ public abstract class Map
 
 		// get map width and height from .tmx file
 		MapProperties mapProperties = tiledMap.getProperties();
-		int tileWidth = (Integer) mapProperties.get("tilewidth");
-		int tileHeight = (Integer) mapProperties.get("tileheight");
+		tileWidth = (Integer) mapProperties.get("tilewidth");
+		tileHeight = (Integer) mapProperties.get("tileheight");
 		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
 		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
 
-		// get collidables
-		MapObjects collidableObjects = getCollidables();
-		collidables = new RectangleMapObject[collidableObjects.getCount()];
-		for (int i = 0; i < collidables.length; i++)
-		{
-			collidables[i] = (RectangleMapObject) collidableObjects.get(i);
-		}
+		// load collidables
+		loadCollidables();
 
-		// get warp points
-		MapObjects warpObjects = getWarpPoints();
-		warpPoints = new RectangleMapObject[warpObjects.getCount()];
-		for (int i = 0; i < warpPoints.length; i++)
-		{
-			warpPoints[i] = (RectangleMapObject) warpObjects.get(i);
-		}
+		// load warp points
+		loadWarpPoints();
 	}
 
 	private void readObject(ObjectInputStream inputStream)
@@ -146,35 +143,26 @@ public abstract class Map
 		setup();
 	}
 
-	protected MapObjects getCollidables()
+	private void loadCollidables()
 	{
 		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
-		return collisionLayer.getObjects();
+		MapObjects collidableObjects = collisionLayer.getObjects();
+		collidables = new RectangleMapObject[collidableObjects.getCount()];
+		for (int i = 0; i < collidables.length; i++)
+		{
+			collidables[i] = (RectangleMapObject) collidableObjects.get(i);
+		}
 	}
 
-	protected MapObjects getSpawnPoints()
-	{
-		MapLayer spawnLayer = tiledMap.getLayers().get("Spawn");
-		return spawnLayer.getObjects();
-	}
-
-	public MapObjects getWalkingBoundaries()
-	{
-		MapLayer walkingBoundariesLayer = tiledMap.getLayers().get(
-				"WalkingBoundaries");
-		return walkingBoundariesLayer.getObjects();
-	}
-
-	protected MapObjects getWarpPoints()
+	private void loadWarpPoints()
 	{
 		MapLayer warpLayer = tiledMap.getLayers().get("Warp");
-		return warpLayer.getObjects();
-	}
-
-	protected MapObjects getWaypoints()
-	{
-		MapLayer waypointsLayer = tiledMap.getLayers().get("Waypoints");
-		return waypointsLayer.getObjects();
+		MapObjects warpObjects = warpLayer.getObjects();
+		warpPoints = new RectangleMapObject[warpObjects.getCount()];
+		for (int i = 0; i < warpPoints.length; i++)
+		{
+			warpPoints[i] = (RectangleMapObject) warpObjects.get(i);
+		}
 	}
 
 	private void cameraPanMovement()
@@ -440,18 +428,194 @@ public abstract class Map
 		}
 
 		// move characters, projectiles
-		Iterator<GameCharacter> iter = charactersOnMap.iterator();
-		while (iter.hasNext())
+		Iterator<GameCharacter> characterIter = charactersOnMap.iterator();
+		while (characterIter.hasNext())
 		{
-			GameCharacter selected = iter.next();
-			selected.update(deltaTime, this);
+			GameCharacter character = characterIter.next();
+			character.update(deltaTime);
 		}
-		Iterator<Projectile> it = flyingProjectiles.iterator();
-		while (it.hasNext())
+
+		// remove characters
+		Iterator<GameCharacter> removeIter = charactersToRemove.iterator();
+		while (removeIter.hasNext())
 		{
-			it.next().update(deltaTime);
+			GameCharacter character = removeIter.next();
+			removeCharacter(character);
+			removeIter.remove();
+		}
+
+		Iterator<Projectile> projectileIter = flyingProjectiles.iterator();
+		while (projectileIter.hasNext())
+		{
+			projectileIter.next().update(deltaTime);
 		}
 	}
+
+	/*
+	 * CREATE WAYPOINTS
+	 */
+
+	private List<Waypoint> createWaypoints()
+	{
+		List<Waypoint> returnWaypoints = new ArrayList<Waypoint>();
+
+		for (RectangleMapObject warpPoint : warpPoints)
+		{
+			Rectangle r = warpPoint.getRectangle();
+			String name = warpPoint.getName();
+			String connectedWarpPointName = (String) warpPoint.getProperties()
+					.get("connected_to");
+			if (checkRectangle(r, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(r, this, name,
+						connectedWarpPointName));
+		}
+
+		for (RectangleMapObject collidable : collidables)
+		{
+			Rectangle r = collidable.getRectangle();
+			float x = r.getX();
+			float y = r.getY();
+			float width = r.getWidth();
+			float height = r.getHeight();
+
+			Rectangle bottomLeft = new Rectangle(x - tileWidth, y - tileHeight,
+					tileWidth, tileHeight);
+			if (checkRectangle(bottomLeft, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(bottomLeft, this));
+
+			Rectangle topLeft = new Rectangle(x - tileWidth, y + height,
+					tileWidth, tileHeight);
+			if (checkRectangle(topLeft, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(topLeft, this));
+
+			Rectangle topRight = new Rectangle(x + width, y + height,
+					tileWidth, tileHeight);
+			if (checkRectangle(topRight, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(topRight, this));
+
+			Rectangle bottomRight = new Rectangle(x + width, y - tileHeight,
+					tileWidth, tileHeight);
+			if (checkRectangle(bottomRight, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(bottomRight, this));
+		}
+
+		createConnections(returnWaypoints);
+
+		return returnWaypoints;
+	}
+
+	private void createConnections(List<Waypoint> waypoints)
+	{
+		final int length = waypoints.size();
+		for (int i = 0; i < length; i++)
+		{
+			Waypoint waypoint = waypoints.get(i);
+			Vector2 waypointCenter = new Vector2();
+			waypoint.rectangle.getCenter(waypointCenter);
+			for (int j = i + 1; j < length; j++)
+			{
+				Waypoint w = waypoints.get(j);
+				Vector2 wCenter = new Vector2();
+				w.rectangle.getCenter(wCenter);
+				if (pointsConnected(waypointCenter, wCenter))
+				{
+					float deltaX = Math.abs(waypointCenter.x - wCenter.x);
+					float deltaY = Math.abs(waypointCenter.y - wCenter.y);
+					float lengthSquared = deltaX * deltaX + deltaY * deltaY;
+					waypoint.connections
+							.add(new Waypoint.Edge(w, lengthSquared));
+					w.connections
+							.add(new Waypoint.Edge(waypoint, lengthSquared));
+				}
+			}
+		}
+	}
+
+	private boolean checkRectangle(Rectangle rectangle,
+			List<Waypoint> waypoints, boolean isWarpPoint)
+	{
+		// check if waypoint is out of bounds
+		if (!isWarpPoint)
+		{
+			if (!checkIfInBounds(rectangle))
+			{
+				return false;
+			}
+		}
+
+		// check if waypoint equals another waypoint we've already added
+		for (Waypoint w : waypoints)
+		{
+			Rectangle r = w.rectangle;
+			if (sameRectangles(rectangle, r))
+			{
+				return false;
+			}
+		}
+
+		// check if waypoint is inside a static collidable
+		for (RectangleMapObject collidable : collidables)
+		{
+			Rectangle r = collidable.getRectangle();
+			if (rectangle.overlaps(r))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean checkIfInBounds(Rectangle r)
+	{
+		if (r.x < 0 || r.x > mapWidth)
+			return false;
+		if (r.y < 0 || r.y > mapHeight)
+			return false;
+		if (r.x + r.width < 0 || r.x + r.width > mapWidth)
+			return false;
+		if (r.y + r.height < 0 || r.y + r.height > mapHeight)
+			return false;
+
+		return true;
+	}
+
+	private boolean sameRectangles(Rectangle r1, Rectangle r2)
+	{
+		return r1.equals(r2);
+	}
+
+	public boolean pointsConnected(Vector2 c1, Vector2 c2)
+	{
+		float deltaX = Math.abs(c1.x - c2.x);
+		float deltaY = Math.abs(c1.y - c2.y);
+		int dx = (c1.x < c2.x) ? 1 : (c2.x < c1.x) ? -1 : 0;
+		int dy = (c1.y < c2.y) ? 1 : (c2.y < c1.y) ? -1 : 0;
+		int n = (int) (Math
+				.sqrt((((double) (deltaX * deltaX + deltaY * deltaY)) / ((double) (tileWidth
+						* tileWidth + tileHeight * tileHeight)))) * 2);
+
+		for (int i = 0; i <= n; i++)
+		{
+			float x = c1.x + i * (deltaX / n) * dx;
+			float y = c1.y + i * (deltaY / n) * dy;
+			Vector2 v = new Vector2(x, y);
+			for (RectangleMapObject collidable : collidables)
+			{
+				Rectangle r = collidable.getRectangle();
+				if (r.contains(v))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/*
+	 * END CREATE WAYPOINTS
+	 */
 
 	/**
 	 * Checks collision with objects and characters on map. Does not check warp
@@ -509,8 +673,7 @@ public abstract class Map
 	 */
 	public boolean checkCollisionWithObjects(Rectangle boundingRectangle)
 	{
-		RectangleMapObject[] objectsOnMap = getObjectsOnMap();
-		for (RectangleMapObject object : objectsOnMap)
+		for (RectangleMapObject object : collidables)
 		{
 			Rectangle r = object.getRectangle();
 			if (r.overlaps(boundingRectangle))
@@ -581,23 +744,17 @@ public abstract class Map
 	}
 
 	/**
-	 * A collision check that only checks warp points. Returns a reference to a
-	 * MapType object if the input hitbox collides with a warp point. Returns
-	 * null otherwise.
+	 * A collision check that only checks warp points. Returns a Waypoint if the
+	 * input hitbox collides with a warp point. Returns null otherwise.
 	 */
-	public MapType checkCollisionWithWarpPoints(Rectangle hitbox,
-			Coordinate warpCoordinate)
+	public Waypoint checkCollisionWithWarpPoints(Rectangle hitbox)
 	{
 		Vector2 centerPoint = hitbox.getCenter(new Vector2());
 		for (RectangleMapObject warpPoint : warpPoints)
 		{
 			if (warpPoint.getRectangle().contains(centerPoint))
 			{
-				String newMapString = warpPoint.getName();
-				Coordinate c = getWarpCoordinate(warpPoint);
-				warpCoordinate.setX(c.getX());
-				warpCoordinate.setY(c.getY());
-				return MapType.getMapType(newMapString);
+				return getWarpWaypoint(warpPoint);
 			}
 		}
 		return null;
@@ -650,15 +807,6 @@ public abstract class Map
 		return chars;
 	}
 
-	private Coordinate getWarpCoordinate(RectangleMapObject warpPoint)
-	{
-		float warpX = Float.parseFloat(warpPoint.getProperties().get("x",
-				String.class));
-		float warpY = Float.parseFloat(warpPoint.getProperties().get("y",
-				String.class));
-		return new Coordinate(warpX, warpY);
-	}
-
 	/*
 	 * ADDING/REMOVING CHARACTERS
 	 */
@@ -671,9 +819,14 @@ public abstract class Map
 					"Character cannot be removed from map - it is not on the map. Data: "
 							+ removeCharacter);
 		}
+		charactersToRemove.add(removeCharacter);
+	}
+
+	private void removeCharacter(GameCharacter removeCharacter)
+	{
 		charactersOnMap.remove(removeCharacter);
-		removeCharacter.removedFromMap(this);
-		if (focusedCharacter.equals(removeCharacter))
+		removeCharacter.removedFromMap();
+		if (focusedCharacter != null && focusedCharacter.equals(removeCharacter))
 		{
 			focusedCharacter = null;
 		}
@@ -696,9 +849,8 @@ public abstract class Map
 							+ " "
 							+ newCharacter + " " + newLocation);
 		}
-		newCharacter.setBottomLeftCorner(newLocation);
 		charactersOnMap.add(newCharacter);
-		newCharacter.addedToMap(this);
+		newCharacter.addedToMap(this, newLocation);
 	}
 
 	public void setFocusedCharacter(GameCharacter newFocus)
@@ -766,6 +918,20 @@ public abstract class Map
 	public GameCharacter getFocusedCharacter()
 	{
 		return focusedCharacter;
+	}
+
+	private Waypoint getWarpWaypoint(RectangleMapObject warpPoint)
+	{
+		String warpPointName = warpPoint.getName();
+		for (Waypoint w : waypoints)
+		{
+			if (w.name.equals(warpPointName))
+			{
+				return w.connectedWarpPoint;
+			}
+		}
+
+		throw new RuntimeException("Could not find warp point");
 	}
 
 }

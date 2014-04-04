@@ -31,33 +31,24 @@
  </layer>
  <objectgroup name="Collision" width="20" height="20">
   <object x="128" y="480" width="128" height="64"/>
-  <object x="608" y="0" width="32" height="320"/>
-  <object x="608" y="384" width="32" height="256"/>
-  <object x="0" y="608" width="640" height="32"/>
-  <object x="0" y="0" width="32" height="640"/>
-  <object x="0" y="0" width="320" height="32"/>
-  <object x="384" y="0" width="256" height="32"/>
- </objectgroup>
- <objectgroup name="Spawn" width="20" height="20">
-  <object name="NPC1" x="512" y="96" width="32" height="32"/>
-  <object name="Player" x="160" y="96" width="32" height="32"/>
-  <object name="NPC2" x="448" y="512" width="32" height="32"/>
- </objectgroup>
- <objectgroup name="WalkingBoundaries" width="20" height="20">
-  <object name="NPC1" x="384" y="32" width="224" height="224"/>
-  <object name="NPC2" x="32" y="384" width="576" height="224"/>
+  <object x="624" y="0" width="16" height="342"/>
+  <object x="624" y="384" width="16" height="256"/>
+  <object x="0" y="624" width="640" height="16"/>
+  <object x="0" y="0" width="16" height="640"/>
+  <object x="0" y="0" width="320" height="16"/>
+  <object x="384" y="0" width="256" height="16"/>
+  <object x="640" y="342" width="16" height="42"/>
+  <object x="320" y="-16" width="64" height="16"/>
  </objectgroup>
  <objectgroup name="Warp" width="20" height="20">
-  <object name="west_town" x="640" y="320" width="32" height="64">
+  <object name="example_east" x="608" y="342" width="32" height="42">
    <properties>
-    <property name="x" value="0"/>
-    <property name="y" value="800"/>
+    <property name="connected_to" value="west_town_west"/>
    </properties>
   </object>
-  <object name="prototype_map" x="320" y="-32" width="64" height="32">
+  <object name="example_north" x="320" y="0" width="64" height="32">
    <properties>
-    <property name="x" value="1248"/>
-    <property name="y" value="1248"/>
+    <property name="connected_to" value="prototype_map"/>
    </properties>
   </object>
  </objectgroup>

@@ -29,7 +29,7 @@ public class RangedWeapon extends Weapon
 		speed = 0.5f;
 		fireRate = 0.2f;
 		range = 250;
-		power = 5;
+		power = 20;
 		setAttacking(false);
 		stateTime = 0f;
 		degreeRotation = 0f;
