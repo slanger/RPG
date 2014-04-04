@@ -9,12 +9,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
+import com.me.rpg.maps.Waypoint;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
-public class PlayerControlledWalkAI implements WalkAI
+public class PlayerControlledWalkAI
+	implements WalkAI
 {
 
 	private static final long serialVersionUID = 2647691917043351571L;
@@ -29,7 +29,7 @@ public class PlayerControlledWalkAI implements WalkAI
 	}
 
 	@Override
-	public void update(float deltaTime, Map currentMap)
+	public void update(float deltaTime)
 	{
 		float spriteWidth = character.getSpriteWidth();
 		float spriteHeight = character.getSpriteHeight();
@@ -60,12 +60,16 @@ public class PlayerControlledWalkAI implements WalkAI
 			dx += DOWN.getDx();
 			dy += DOWN.getDy();
 		}
-		if (Gdx.input.isKeyPressed(Keys.U)){
-			if (strafeEnabler) {
+		if (Gdx.input.isKeyPressed(Keys.U))
+		{
+			if (strafeEnabler)
+			{
 				strafeEnabler = false;
 				character.usingShield(!character.isUsingShield());
 			}
-		} else {
+		}
+		else
+		{
 			strafeEnabler = true;
 		}
 
@@ -95,24 +99,43 @@ public class PlayerControlledWalkAI implements WalkAI
 		if (moving)
 		{
 			// collision detection with objects on map
-			boolean didMove = currentMap.checkCollision(x, y, oldX, oldY, character, newCoordinate);
+			boolean didMove = character.getCurrentMap().checkCollision(x, y,
+					oldX, oldY, character, newCoordinate);
 			moving = didMove;
+			x = newCoordinate.getX();
+			y = newCoordinate.getY();
 
-			if (moving)
+			// check warp point collision
+			if (!character.warpEnable())
 			{
-				// check warp point collision
-				x = newCoordinate.getX();
-				y = newCoordinate.getY();
-				Coordinate warpCoordinate = new Coordinate();
-				MapType newMapType = currentMap.checkCollisionWithWarpPoints(new Rectangle(
-						x, y, spriteWidth, spriteHeight), warpCoordinate);
-				if (newMapType != null)
+				Waypoint warpWaypoint = character.getCurrentMap()
+						.checkCollisionWithWarpPoints(
+								new Rectangle(x, y, spriteWidth, spriteHeight));
+				if (warpWaypoint == null)
 				{
-					// character.getWorld().warpPlayerToOtherMap(newMapType, warpCoordinate);
-					character.getWorld().movePlayerToOtherMap(newMapType, warpCoordinate);
+					// character moved off of warp point, enable warping again
+					character.setWarpEnable(true);
+				}
+			}
+			else
+			{
+				if (didMove)
+				{
+					Waypoint warpWaypoint = character.getCurrentMap()
+							.checkCollisionWithWarpPoints(
+									new Rectangle(x, y, spriteWidth,
+											spriteHeight));
+					if (warpWaypoint != null)
+					{
+						// character.warpToOtherMap(warpWaypoint.mapLocatedOn,
+						// warpWaypoint.rectangle);
+						character.moveToOtherMap(warpWaypoint.mapLocatedOn,
+								warpWaypoint.rectangle);
+					}
 				}
 			}
 		}
+
 		character.setMoving(moving);
 		if (ret != null)
 		{
@@ -124,13 +147,13 @@ public class PlayerControlledWalkAI implements WalkAI
 	@Override
 	public void start()
 	{
-		
+
 	}
 
 	@Override
 	public void stop()
 	{
-		
+
 	}
 
 }
