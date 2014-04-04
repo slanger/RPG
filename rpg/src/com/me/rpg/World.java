@@ -74,10 +74,24 @@ public final class World
 	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
-	public static final String SWORD_PATH = "sword.png";
-	public static final String ARROW_PATH = "arrow.png";
-	public static final String SHIELD_PATH = "shield.png";
+	
 
+	//swords
+	public static final String SWORD_PATH = "sword.png";
+	public static final String EVIL_SWORD_PATH = "evil_sword.png";
+	public static final String HOLY_SWORD_PATH = "holy_sword.png";
+	public static final String BLUE_SWORD_PATH = "blue_sword.png";
+	public static final String SHADOW_SWORD_PATH = "shadow_sword.png";
+
+	//bows
+	public static final String ARROW_PATH = "arrow.png";
+
+	//shields
+	public static final String SHIELD_PATH = "shield.png";
+	
+	//other items
+	
+	
 	public transient OrthographicCamera camera;
 	public transient SpriteBatch batch;
 	private transient ShapeRenderer shapeRenderer;
@@ -405,6 +419,15 @@ public final class World
 				32, 32);
 		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
+		Weapon evilSword = new MeleeWeapon("Evil Sword", EVIL_SWORD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Weapon holySword = new MeleeWeapon("Holy Sword", HOLY_SWORD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Weapon blueSword = new MeleeWeapon("Blue Sword", BLUE_SWORD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Weapon shadowSword = new MeleeWeapon("Shadow Sword", SHADOW_SWORD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+	
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		sword2.addEffect(poison);
@@ -414,6 +437,12 @@ public final class World
 		player.equipShield(shield);
 		npc1.equipWeapon(exampleMap, sword2);
 
+		player.addItemToInventory(sword);
+		player.addItemToInventory(evilSword);
+		player.addItemToInventory(holySword);
+		player.addItemToInventory(blueSword);
+		player.addItemToInventory(shadowSword);
+		
 		// ranged attack test stuff
 		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
@@ -427,7 +456,7 @@ public final class World
 		npc1.equipShield(plainShield);
 		// npc1.usingShield(true);
 	}
-
+	
 	public void render()
 	{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -676,5 +705,4 @@ public final class World
 		this.message = message;
 		startMessageDisplayTime = System.currentTimeMillis();
 	}
-
 }

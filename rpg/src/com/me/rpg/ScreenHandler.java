@@ -56,12 +56,26 @@ public class ScreenHandler extends Game
 		// load textures
 		manager.load(World.PLAYER_TEXTURE_PATH, Texture.class);
 		manager.load(World.NPC_TEXTURE_PATH, Texture.class);
-		manager.load(World.SWORD_PATH, Texture.class);
-		manager.load(World.ARROW_PATH, Texture.class);
+
 		manager.load(Map.GRAVESTONE_PATH, Texture.class);
 		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
+
+		// load sword textures
+		manager.load(World.SWORD_PATH, Texture.class);
+		manager.load(World.EVIL_SWORD_PATH, Texture.class);
+		manager.load(World.HOLY_SWORD_PATH, Texture.class);
+		manager.load(World.BLUE_SWORD_PATH, Texture.class);
+		manager.load(World.SHADOW_SWORD_PATH, Texture.class);
+		
+		//load arrow textures
+		manager.load(World.ARROW_PATH, Texture.class);
+		
+		//load shield textures
 		manager.load(World.SHIELD_PATH, Texture.class);
 
+		//load misc item textures
+		
+		
 		// load sounds and music
 		manager.load(World.WARP_SOUND_PATH, Sound.class);
 		manager.load(PrototypeMap.BACKGROUND_MUSIC_START, Music.class);

@@ -1,11 +1,14 @@
 package com.me.rpg.characters;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
+import com.me.rpg.combat.Equippable;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
@@ -36,8 +39,10 @@ public class PlayableCharacter extends GameCharacter
 	// private boolean enableInputDown = true;
 	private boolean enableInputRight = true;
 	private boolean enableInputLeft = true;
+	
 	private long timeInventoryOpened = 0;
-
+	private ArrayList<Equippable> equippableInventoryItems;
+	
 	private PlayerControlledWalkAI walkAI;
 
 	public boolean getEnableControls()
@@ -56,6 +61,7 @@ public class PlayableCharacter extends GameCharacter
 	{
 		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
 				animationDuration, world);
+		equippableInventoryItems = new ArrayList<Equippable>();
 		npcMemory = null;
 		walkAI = new PlayerControlledWalkAI(this);
 	}
@@ -554,5 +560,19 @@ public class PlayableCharacter extends GameCharacter
 		}, 3.0f);
 		*/
 	}
+	
+	public void addItemToInventory(Equippable item)
+	{
+		equippableInventoryItems.add(item);
+	}
+	
+	public ArrayList<Equippable> getEquippableItems()
+	{
+		return equippableInventoryItems;
+	}
+//	public void addItemToInventory(MiscItem item)
+//	{
+//		
+//	}
 
 }

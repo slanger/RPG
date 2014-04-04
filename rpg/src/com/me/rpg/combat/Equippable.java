@@ -88,6 +88,11 @@ public abstract class Equippable implements Cloneable, Serializable
 		throw new RuntimeException("Invalid direction attempted to retrieve for item: " + direction);
 	}
 	
+	public Sprite getItemSpriteUp()
+	{
+		return spriteUp;
+	}
+	
 	public String getName()
 	{
 		return itemName;

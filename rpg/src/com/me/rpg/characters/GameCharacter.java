@@ -909,4 +909,9 @@ public abstract class GameCharacter
 		return false;
 	}
 
+	public Weapon getEquippedMeleeWeapon()
+	{
+		
+		return weaponSlot;
+	}
 }
