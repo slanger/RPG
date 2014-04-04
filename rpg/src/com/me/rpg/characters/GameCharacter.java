@@ -29,7 +29,8 @@ import com.me.rpg.reputation.NPCMemory;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
-public abstract class GameCharacter implements IAttackable, Serializable
+public abstract class GameCharacter
+	implements IAttackable, Serializable
 {
 
 	private static final long serialVersionUID = -5812091877699740886L;
@@ -48,6 +49,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	private float stateTime = 0f;
 	private float baseSpeed = 100f;
 	private float speedModifier = 1.0f;
+	private boolean warpEnable = true;
 
 	private transient Sprite sprite;
 	private transient TextureRegion rightIdle, leftIdle, upIdle, downIdle;
@@ -55,6 +57,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			upWalkAnimation, downWalkAnimation;
 
 	protected Map currentMap = null;
+	protected Map nextMap = null;
+	protected Coordinate nextLocation = null;
 	protected final World world;
 
 	// Combat stuff
@@ -130,8 +134,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		sprite.setRegion(downIdle);
 	}
 
-	private void readObject(ObjectInputStream inputStream) throws IOException,
-			ClassNotFoundException
+	private void readObject(ObjectInputStream inputStream)
+		throws IOException, ClassNotFoundException
 	{
 		inputStream.defaultReadObject();
 		create();
@@ -264,6 +268,16 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		this.moving = moving;
 	}
 
+	public boolean warpEnable()
+	{
+		return warpEnable;
+	}
+
+	public void setWarpEnable(boolean warpEnable)
+	{
+		this.warpEnable = warpEnable;
+	}
+
 	protected float getStateTime()
 	{
 		return stateTime;
@@ -390,9 +404,9 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		return world;
 	}
 
-	public abstract void moveToOtherMap(Map newMap, Coordinate newLocation);
+	public abstract void moveToOtherMap(Map newMap, Rectangle newLocation);
 
-	public abstract void warpToOtherMap(Map newMap, Coordinate newLocation);
+	public abstract void warpToOtherMap(Map newMap, Rectangle newLocation);
 
 	public void render(SpriteBatch batch)
 	{
@@ -503,9 +517,9 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		setBottomLeftCorner(newLocation);
 	}
 
-	public void removedFromMap(Map map)
+	public void removedFromMap()
 	{
-		currentMap = null;
+		nextMap.addCharacterToMap(this, nextLocation);
 	}
 
 	public void acceptPush(GameCharacter pushingCharacter)
@@ -784,7 +798,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		float tempY = getCenterY();
 		float visionFieldPoints[] = new float[8];
 
-		if (faceDirection.name().equalsIgnoreCase("up"))
+		if (faceDirection == Direction.UP)
 		{
 			visionFieldPoints[0] = tempX; // x value of point centered on NPC
 			visionFieldPoints[1] = tempY; // y value of point centered on NPC
@@ -795,7 +809,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			visionFieldPoints[6] = tempX + 0.8f * (sightDistance);
 			visionFieldPoints[7] = tempY + 0.8f * (sightDistance);
 		}
-		else if (faceDirection.name().equalsIgnoreCase("down"))
+		else if (faceDirection == Direction.DOWN)
 		{
 			visionFieldPoints[0] = tempX; // x value of point centered on NPC
 			visionFieldPoints[1] = tempY; // y value of point centered on NPC
@@ -806,7 +820,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			visionFieldPoints[6] = tempX + 0.8f * (sightDistance);
 			visionFieldPoints[7] = tempY - 0.8f * (sightDistance);
 		}
-		else if (faceDirection.name().equalsIgnoreCase("left"))
+		else if (faceDirection == Direction.LEFT)
 		{
 			visionFieldPoints[0] = tempX; // x value of point centered on NPC
 			visionFieldPoints[1] = tempY; // y value of point centered on NPC
@@ -818,8 +832,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 			visionFieldPoints[7] = tempY + 0.8f * (sightDistance);
 		}
 		else
-		// facing right
-		{
+		{// facing right
 			visionFieldPoints[0] = tempX; // x value of point centered on NPC
 			visionFieldPoints[1] = tempY; // y value of point centered on NPC
 			visionFieldPoints[2] = tempX + 0.8f * (sightDistance);

@@ -35,7 +35,6 @@ import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
-import com.me.rpg.maps.MapType;
 import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.Waypoint;
 import com.me.rpg.maps.WestTownInsideHouse;
@@ -82,7 +81,6 @@ public final class World
 	private final List<Map> maps = new ArrayList<Map>();
 	private final Timer timer = new Timer();
 
-	private Map currentMap;
 	private PlayableCharacter player;
 	public List<Waypoint> waypoints;
 
@@ -96,7 +94,7 @@ public final class World
 
 	private boolean warping = false;
 	private float warpingAlpha;
-	private transient Sound warpSound;
+	public transient Sound warpSound;
 	private transient Sprite whiteScreen;
 
 	private boolean isGameOver = false;
@@ -125,12 +123,7 @@ public final class World
 
 	public Map getCurrentMap()
 	{
-		return currentMap;
-	}
-
-	private void setCurrentMap(Map currentMap)
-	{
-		this.currentMap = currentMap;
+		return player.getCurrentMap();
 	}
 
 	public boolean isGameOver()
@@ -217,6 +210,7 @@ public final class World
 
 	private void initializeWorld()
 	{
+		// create day timer
 		dayTimer.scheduleTask(new Timer.Task()
 		{
 
@@ -237,7 +231,8 @@ public final class World
 		// create reputation system
 		reputationSystem = new ReputationSystem(this);
 
-		// create maps
+		// MAPS SETUP
+
 		Map exampleMap = new ExampleMap(this);
 		maps.add(exampleMap);
 		Map prototypeMap = new PrototypeMap(this);
@@ -246,8 +241,6 @@ public final class World
 		maps.add(westTown);
 		Map westTownInsideHouse = new WestTownInsideHouse(this);
 		maps.add(westTownInsideHouse);
-
-		currentMap = maps.get(MapType.EXAMPLE.getMapIndex());
 
 		// WAYPOINTS SETUP
 
@@ -268,7 +261,8 @@ public final class World
 			for (int j = i + 1; j < length; j++)
 			{
 				Waypoint w = waypoints.get(j);
-				if (w.isWarpPoint() && w.name.equals(waypoint.connectedWarpPointName))
+				if (w.isWarpPoint()
+						&& w.name.equals(waypoint.connectedWarpPointName))
 				{
 					waypoint.connectedWarpPoint = w;
 					w.connectedWarpPoint = waypoint;
@@ -278,32 +272,33 @@ public final class World
 			}
 		}
 
-		// CHARACTER SETUP
+		// CHARACTERS SETUP
 
 		NonplayableCharacter npc1;
 		NonplayableCharacter npc2;
-		final String PLAYER_NAME = "Player";
-		final String NPC1_NAME = "NPC1";
-		final String NPC2_NAME = "NPC2";
+		NonplayableCharacter npc3;
 		final int width = 28;
 		final int height = 28;
 
 		// create characters
-		player = new PlayableCharacter(PLAYER_NAME, PLAYER_TEXTURE_PATH, width,
+		player = new PlayableCharacter("Player", PLAYER_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
 		player.setBaseSpeed(200f);
 
-		npc1 = new NonplayableCharacter(NPC1_NAME, NPC_TEXTURE_PATH, width,
+		npc1 = new NonplayableCharacter("NPC1", NPC_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
-		npc2 = new NonplayableCharacter(NPC2_NAME, NPC_TEXTURE_PATH, width,
+		npc2 = new NonplayableCharacter("NPC2", NPC_TEXTURE_PATH, width,
+				height, 16, 16, 0.15f, this);
+		npc3 = new NonplayableCharacter("NPC3", NPC_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, 192, 544);
 		exampleMap.addCharacterToMap(npc1, 544, 544);
 		exampleMap.addCharacterToMap(npc2, 480, 128);
+		exampleMap.addCharacterToMap(npc3, 32, 32);
 
-		// setup State
+		// state machine for npc1
 		HierarchicalState parent = new HierarchicalState(null, npc1);
 
 		Coordinate[] patrol = new Coordinate[] { new Coordinate(50, 50),
@@ -328,9 +323,10 @@ public final class World
 		patrol0.setTransitions(patrolToFight);
 		fight0.setTransitions(fightToPatrol);
 		parent.setInitialState(patrol0);
+
 		npc1.setStateMachine(parent);
 
-		// StateMachine for npc2
+		// state machine for npc2
 		parent = new HierarchicalState(null, npc2);
 		HierarchicalState subparent = new HierarchicalState(parent, npc2);
 		subparent.setName("subParent");
@@ -346,7 +342,7 @@ public final class World
 		subparent.setInitialState(notAtCen);
 		parent.setInitialState(subparent);
 
-		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500, 100));
+		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500, 100), exampleMap);
 		notAtCen.setActions(walkAction0);
 
 		Condition dist = new DistanceCondition(npc2, exampleMap,
@@ -372,8 +368,49 @@ public final class World
 
 		npc2.setStateMachine(parent);
 
-		// setup weapons
-		genericWeaponSetup(player, npc1, exampleMap);
+		// state machine for npc3
+		parent = new HierarchicalState(null, npc3);
+		CustomState walkToLocationState = new CustomState(parent, npc3);
+		WalkAction walkAction1 = new WalkAction(npc3, new Coordinate(1536, 160), westTown);
+		walkToLocationState.setActions(walkAction1);
+
+		parent.setInitialState(walkToLocationState);
+
+		npc3.setStateMachine(parent);
+
+		// WEAPONS SETUP
+
+		final int weaponWidth = 32;
+		final int weaponHeight = 32;
+
+		// melee attack test stuff
+		Shield shield = new Shield("LameShield", SHIELD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Weapon sword = new MeleeWeapon("LameSword", SWORD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		StatusEffect poison = new Poison(50, 3, 2f);
+		sword.addEffect(poison);
+		sword2.addEffect(poison);
+
+		player.equipWeapon(exampleMap, sword);
+		player.swapWeapon(exampleMap);
+		player.equipShield(shield);
+		npc1.equipWeapon(exampleMap, sword2);
+
+		// ranged attack test stuff
+		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, weaponWidth,
+				weaponHeight, 32, 32);
+		player.equipWeapon(exampleMap, bow);
+		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		bow.equipProjectile(arrow, 1000);
+
+		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, weaponWidth,
+				weaponHeight, 32, 32);
+		npc1.equipShield(plainShield);
+		// npc1.usingShield(true);
 	}
 
 	public void render()
@@ -386,7 +423,7 @@ public final class World
 			return;
 		}
 
-		currentMap.render(camera, batch);
+		getCurrentMap().render(camera, batch);
 
 		temporaryVisionConeTest();
 		temporaryHearingTest();
@@ -461,114 +498,10 @@ public final class World
 		}
 	}
 
-	public void movePlayerToOtherMap(final Map newMap,
+	public void warpPlayerToOtherMap(final Map newMap,
 			final Coordinate newLocation)
 	{
-		currentMap.close();
-		updateEnable = false;
-		movingToAnotherMap = true;
-
-		// cannot remove player from Map until the Map has stopped updating
-		// Exception in thread "LWJGL Application"
-		// java.util.ConcurrentModificationException
-		timer.scheduleTask(new Timer.Task()
-		{
-
-			private static final long serialVersionUID = -8637765287661966185L;
-
-			@Override
-			public void run()
-			{
-				currentMap.removeCharacterFromMap(player);
-				currentMap = newMap;
-				currentMap.addFocusedCharacterToMap(player, newLocation);
-				updateEnable = true;
-				movingToAnotherMap = false;
-				currentMap.open();
-			}
-
-		}, 0.5f);
-	}
-
-	public void warpPlayerToOtherMap(Map newMap, Coordinate newLocation)
-	{
-		currentMap.close();
-		updateEnable = false;
-		warping = true;
-		warpingAlpha = 0f;
-		warpSound.play();
-		timer.scheduleTask(new Timer.Task()
-		{
-
-			private static final long serialVersionUID = -4094471058413909756L;
-
-			@Override
-			public void run()
-			{
-				warpingAlpha += 0.1f;
-				if (warpingAlpha > 1f)
-				{
-					warpingAlpha = 1f;
-					this.cancel();
-				}
-			}
-
-		}, 0f, 0.1f);
-
-		timer.scheduleTask(new WarpToOtherMapTask(newMap, newLocation), 3.0f);
-	}
-
-	private class WarpToOtherMapTask
-		extends Timer.Task
-	{
-
-		private static final long serialVersionUID = -5872915237104152890L;
-
-		private Map newMap;
-		private Coordinate newLocation;
-
-		WarpToOtherMapTask(Map newMap, Coordinate newLocation)
-		{
-			this.newMap = newMap;
-			this.newLocation = newLocation;
-		}
-
-		@Override
-		public void run()
-		{
-			currentMap.removeCharacterFromMap(player);
-			setCurrentMap(newMap);
-			newMap.addFocusedCharacterToMap(player, newLocation);
-
-			timer.scheduleTask(new Timer.Task()
-			{
-
-				private static final long serialVersionUID = -1100673244597339611L;
-
-				@Override
-				public void run()
-				{
-					warpingAlpha -= 0.1f;
-				}
-
-			}, 0f, 0.1f, 10);
-
-			timer.scheduleTask(new Timer.Task()
-			{
-
-				private static final long serialVersionUID = 4263563367493321895L;
-
-				@Override
-				public void run()
-				{
-					updateEnable = true;
-					warping = false;
-					newMap.open();
-				}
-
-			}, 1.0f);
-		}
-
+		
 	}
 
 	@Override
@@ -583,43 +516,7 @@ public final class World
 		}
 	}
 
-	private void genericWeaponSetup(GameCharacter character, GameCharacter npc,
-			Map map)
-	{
-		int width = 32;
-		int height = 32;
-
-		// melee attack test stuff
-		Shield shield = new Shield("LameShield", SHIELD_PATH, width, height,
-				32, 32);
-		Weapon sword = new MeleeWeapon("LameSword", SWORD_PATH, width, height,
-				32, 32);
-		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, width, height,
-				32, 32);
-		StatusEffect poison = new Poison(50, 3, 2f);
-		sword.addEffect(poison);
-		sword2.addEffect(poison);
-
-		player.equipWeapon(map, sword);
-		player.swapWeapon(map);
-		player.equipShield(shield);
-		npc.equipWeapon(map, sword2);
-
-		// ranged attack test stuff
-		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, width,
-				height, 32, 32);
-		player.equipWeapon(map, bow);
-		Projectile arrow = new Projectile("Arrow", ARROW_PATH, width, height,
-				32, 32);
-		bow.equipProjectile(arrow, 1000);
-
-		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, width,
-				height, 32, 32);
-		npc.equipShield(plainShield);
-		// npc.usingShield(true);
-	}
-
-	public void temporaryVisionConeTest()
+	private void temporaryVisionConeTest()
 	{
 		float tempX = 0.0f;
 		float tempY = 0.0f;
@@ -630,7 +527,7 @@ public final class World
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
 
-		ArrayList<GameCharacter> charactersOnMap = currentMap
+		ArrayList<GameCharacter> charactersOnMap = getCurrentMap()
 				.getCharactersOnMap();
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
 		while (iterator1.hasNext())
@@ -642,7 +539,7 @@ public final class World
 				tempDirection = tempCharacter.getFaceDirection();
 				tempX = tempCharacter.getCenterX();
 				tempY = tempCharacter.getCenterY();
-				if (tempDirection.name().equalsIgnoreCase("up"))
+				if (tempDirection == Direction.UP)
 				{
 					visionFieldPoints[0] = tempX; // x value of point centered
 													// on NPC
@@ -655,7 +552,7 @@ public final class World
 					visionFieldPoints[6] = tempX + 0.8f * (tempSightDistance);
 					visionFieldPoints[7] = tempY + 0.8f * (tempSightDistance);
 				}
-				else if (tempDirection.name().equalsIgnoreCase("down"))
+				else if (tempDirection == Direction.DOWN)
 				{
 					visionFieldPoints[0] = tempX; // x value of point centered
 													// on NPC
@@ -668,7 +565,7 @@ public final class World
 					visionFieldPoints[6] = tempX + 0.8f * (tempSightDistance);
 					visionFieldPoints[7] = tempY - 0.8f * (tempSightDistance);
 				}
-				else if (tempDirection.name().equalsIgnoreCase("left"))
+				else if (tempDirection == Direction.LEFT)
 				{
 					visionFieldPoints[0] = tempX; // x value of point centered
 													// on NPC
@@ -682,8 +579,7 @@ public final class World
 					visionFieldPoints[7] = tempY + 0.8f * (tempSightDistance);
 				}
 				else
-				// facing right
-				{
+				{// facing right
 					visionFieldPoints[0] = tempX; // x value of point centered
 													// on NPC
 					visionFieldPoints[1] = tempY; // y value of point centered
@@ -703,7 +599,7 @@ public final class World
 		shapeRenderer.end();
 	}
 
-	public void temporaryHearingTest()
+	private void temporaryHearingTest()
 	{
 		float tempX = 0.0f;
 		float tempY = 0.0f;
@@ -712,7 +608,7 @@ public final class World
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
 
-		ArrayList<GameCharacter> charactersOnMap = currentMap
+		ArrayList<GameCharacter> charactersOnMap = getCurrentMap()
 				.getCharactersOnMap();
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
 		while (iterator1.hasNext())

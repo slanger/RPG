@@ -1,5 +1,7 @@
 package com.me.rpg.characters;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
 import com.me.rpg.maps.Map;
 import com.me.rpg.state.State;
@@ -55,17 +57,26 @@ public class NonplayableCharacter extends GameCharacter
 		updateTexture();
 	}
 
+	/**
+	 * Move NPC to other map "quietly"--without interrupting the player.
+	 */
 	@Override
-	public void moveToOtherMap(Map newMap, Coordinate newLocation)
+	public void moveToOtherMap(Map newMap, Rectangle newLocation)
 	{
-		// TODO move NPC to other map 'quietly'--without interrupting the player
-		
+		setWarpEnable(false);
+		nextMap = newMap;
+		Vector2 center = newLocation.getCenter(new Vector2());
+		nextLocation = new Coordinate(center.x - getSpriteWidth() / 2, center.y - getSpriteHeight() / 2);
+		currentMap.removeCharacterFromMap(this);
 	}
 
+	/**
+	 * Move NPC to other map "quietly"--without interrupting the player.
+	 */
 	@Override
-	public void warpToOtherMap(Map newMap, Coordinate newLocation)
+	public void warpToOtherMap(Map newMap, Rectangle newLocation)
 	{
-		// just use moveToOtherMap(); nothing flashy for NPC
+		// just use moveToOtherMap(). Nothing flashy for NPC
 		moveToOtherMap(newMap, newLocation);
 	}
 

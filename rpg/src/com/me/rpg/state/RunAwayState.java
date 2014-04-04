@@ -57,7 +57,7 @@ public class RunAwayState extends State
 		meCenter.setY(2 * meCenter.getY() - pCenter.getY());
 
 		ArrayList<Action> actions = new ArrayList<Action>();
-		actions.add(new WalkAction(character, meCenter));
+		actions.add(new WalkAction(character, meCenter, character.getCurrentMap()));
 		return actions;
 	}
 

@@ -1,6 +1,7 @@
 package com.me.rpg.ai;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -12,7 +13,8 @@ import com.me.rpg.maps.Waypoint;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 
-public class FollowPathAI implements WalkAI
+public class FollowPathAI
+	implements WalkAI
 {
 
 	private static final long serialVersionUID = -7616245852566751180L;
@@ -38,12 +40,23 @@ public class FollowPathAI implements WalkAI
 		path = makePath(character.getBoundingRectangle(),
 				character.getCurrentMap(), destination, destinationMap);
 
-		// if destination is unreachable (i.e. stuck in a collidable), then do
-		// "dumb" update (no shortest path algorithm)
+		// if destination is unreachable (i.e. stuck in a collidable), then go
+		// directly to destination (hopefully the character will switch its
+		// destination)
 		if (path == null)
 		{
+			System.err.println("Couldn't find a path for character " + character.getName());
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(destination, destinationMap));
+		}
+		
+		if (character.getName().equals("NPC3"))
+		{
+			System.out.println("NPC3's path:");
+			for (Waypoint w : path)
+			{
+				System.out.println(w.toString());
+			}
 		}
 	}
 
@@ -68,7 +81,8 @@ public class FollowPathAI implements WalkAI
 		Waypoint currentWaypoint = new Waypoint(
 				character.getBoundingRectangle(), character.getCurrentMap());
 		Waypoint nextWaypoint = path.get(currentIndex);
-		Vector2 currentCenter = currentWaypoint.rectangle.getCenter(new Vector2());
+		Vector2 currentCenter = currentWaypoint.rectangle
+				.getCenter(new Vector2());
 		Vector2 nextCenter = nextWaypoint.rectangle.getCenter(new Vector2());
 		float xE = (float) (nextCenter.x - currentCenter.x);
 		float yE = (float) (nextCenter.y - currentCenter.y);
@@ -120,8 +134,8 @@ public class FollowPathAI implements WalkAI
 				currentIndex++;
 				Waypoint warpToWaypoint = nextWaypoint.connectedWarpPoint;
 				Map warpMap = warpToWaypoint.mapLocatedOn;
-				Coordinate warpLocation = new Coordinate(warpToWaypoint.rectangle.getPosition(new Vector2()));
-				character.warpToOtherMap(warpMap, warpLocation);
+				Rectangle warpLocation = warpToWaypoint.rectangle;
+				character.moveToOtherMap(warpMap, warpLocation);
 			}
 		}
 	}
@@ -133,8 +147,6 @@ public class FollowPathAI implements WalkAI
 
 		Vector2 sourceCenter = source.getCenter(new Vector2());
 		Vector2 destinationCenter = destination.getCenter(new Vector2());
-		System.out.println("Source: " + sourceCenter + ", destination: "
-				+ destinationCenter);
 
 		// if source and destination are connected, then return a path with just
 		// the destination
@@ -255,6 +267,7 @@ public class FollowPathAI implements WalkAI
 			current = current.previousVertex;
 		}
 		path.add(source);
+		Collections.reverse(path);
 		return path;
 	}
 

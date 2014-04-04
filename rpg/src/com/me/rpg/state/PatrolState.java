@@ -26,7 +26,7 @@ public class PatrolState extends State {
 		}
 		this.patrol = new Coordinate[patrol.length];
 		System.arraycopy(patrol, 0, this.patrol, 0, patrol.length);
-		patrolLoc = new WalkAction(character, patrol[0]);
+		patrolLoc = new WalkAction(character, patrol[0], character.getCurrentMap());
 		actions.add(patrolLoc);
 	}
 	
@@ -42,7 +42,7 @@ public class PatrolState extends State {
 				idx = i;
 				// TODO this is not ideal
 				actions.remove(patrolLoc);
-				patrolLoc = new WalkAction(character, patrol[idx]);
+				patrolLoc = new WalkAction(character, patrol[idx], character.getCurrentMap());
 			}
 		}
 		return super.doGetEntryActions();
@@ -55,7 +55,7 @@ public class PatrolState extends State {
 			idx %= patrol.length;
 			// TODO this is not ideal
 			actions.remove(patrolLoc);
-			patrolLoc = new WalkAction(character, patrol[idx]);
+			patrolLoc = new WalkAction(character, patrol[idx], character.getCurrentMap());
 		}
 		return actions;
 	}

@@ -3,6 +3,7 @@ package com.me.rpg.characters;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
@@ -340,15 +341,97 @@ public class PlayableCharacter extends GameCharacter
 	}
 
 	@Override
-	public void moveToOtherMap(Map newMap, Coordinate newLocation)
+	public void removedFromMap()
 	{
-		world.movePlayerToOtherMap(newMap, newLocation);
+		nextMap.addFocusedCharacterToMap(this, nextLocation);
 	}
 
 	@Override
-	public void warpToOtherMap(Map newMap, Coordinate newLocation)
+	public void moveToOtherMap(Map newMap, Rectangle newLocation)
 	{
-		world.warpPlayerToOtherMap(newMap, newLocation);
+		currentMap.close();
+		setWarpEnable(false);
+		nextMap = newMap;
+		Vector2 center = newLocation.getCenter(new Vector2());
+		nextLocation = new Coordinate(center.x - getSpriteWidth() / 2f, center.y - getSpriteHeight() / 2f);
+		currentMap.removeCharacterFromMap(this);
+	}
+
+	@Override
+	public void warpToOtherMap(Map newMap, Rectangle newLocation)
+	{
+		moveToOtherMap(newMap, newLocation);
+
+		/* TODO
+		currentMap.close();
+		world.setUpdateEnable(false);
+		warping = true;
+		warpingAlpha = 0f;
+		world.warpSound.play();
+		setWarpEnable(false);
+		Vector2 center = newLocation.getCenter(new Vector2());
+		Coordinate warpLocation = new Coordinate(center.x - getSpriteWidth() / 2, center.y - getSpriteHeight() / 2);
+
+		world.getTimer().scheduleTask(new Timer.Task()
+		{
+
+			private static final long serialVersionUID = -4094471058413909756L;
+
+			@Override
+			public void run()
+			{
+				warpingAlpha += 0.1f;
+				if (warpingAlpha > 1f)
+				{
+					warpingAlpha = 1f;
+					this.cancel();
+				}
+			}
+
+		}, 0f, 0.1f);
+
+		timer.scheduleTask(new Timer.Task()
+		{
+
+			private static final long serialVersionUID = 8348680306281141956L;
+
+			@Override
+			public void run()
+			{
+				currentMap.removeCharacterFromMap(player);
+				newMap.addFocusedCharacterToMap(player, newLocation);
+
+				timer.scheduleTask(new Timer.Task()
+				{
+
+					private static final long serialVersionUID = -1100673244597339611L;
+
+					@Override
+					public void run()
+					{
+						warpingAlpha -= 0.1f;
+					}
+
+				}, 0f, 0.1f, 10);
+
+				timer.scheduleTask(new Timer.Task()
+				{
+
+					private static final long serialVersionUID = 4263563367493321895L;
+
+					@Override
+					public void run()
+					{
+						updateEnable = true;
+						warping = false;
+						newMap.open();
+					}
+
+				}, 1.0f);
+			}
+
+		}, 3.0f);
+		*/
 	}
 
 }
