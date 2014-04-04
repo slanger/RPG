@@ -61,6 +61,7 @@ import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
+import com.me.rpg.utils.GlobalTimerTask;
 import com.me.rpg.utils.Timer;
 
 public final class World
@@ -83,7 +84,7 @@ public final class World
 	private transient BitmapFont debugFont;
 	private final List<Map> maps = new ArrayList<Map>();
 	private final Timer timer = new Timer();
-
+	
 	private Map currentMap;
 	private PlayableCharacter player;
 	private int dayCount = 0;
@@ -237,6 +238,9 @@ public final class World
 			}
 
 		}, NUM_SECONDS_PER_DAY, NUM_SECONDS_PER_DAY);
+		
+		// setup global timer
+		timer.scheduleTask(GlobalTimerTask.getInstance(), 1000000000.0f);
 
 		// create reputation system
 		reputationSystem = new ReputationSystem(this);

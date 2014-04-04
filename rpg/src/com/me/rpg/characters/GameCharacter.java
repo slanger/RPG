@@ -29,6 +29,8 @@ import com.me.rpg.maps.MapType;
 import com.me.rpg.reputation.NPCMemory;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
+import com.me.rpg.utils.GlobalTimerTask;
+import com.me.rpg.utils.GlobalTimerTask.Time;
 
 public abstract class GameCharacter implements IAttackable, Serializable
 {
@@ -69,6 +71,10 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	protected int maxHealth;
 	protected float strikeImmunity;
 	protected boolean strafing;
+	
+	protected GameCharacter lastAttacker;
+	protected GameCharacter rememberedAttacker;
+	protected Time lastAttackTime;
 
 	// Reputation Stuff
 	protected NPCMemory npcMemory;
@@ -312,6 +318,24 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	{
 		return downWalkAnimation;
 	}
+	
+	public GameCharacter getLastAttacker() {
+		return lastAttacker;
+	}
+	
+	public void setLastAttacker(GameCharacter attacker) {
+		if (attacker != lastAttacker)
+			lastAttackTime = GlobalTimerTask.getCurrentTime();
+		lastAttacker = attacker;
+	}
+	
+	public GameCharacter getRememberedAttacker() {
+		return rememberedAttacker;
+	}
+	
+	public void rememberLastAttacker() {
+		rememberedAttacker = lastAttacker;
+	}
 
 	public float getSpeed()
 	{
@@ -518,6 +542,8 @@ public abstract class GameCharacter implements IAttackable, Serializable
 	{
 		if (strikeImmunity > 0)
 			return;
+		
+		lastAttacker = weapon.getOwner();
 		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(weapon);
 		if (result)
@@ -537,6 +563,7 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		if (strikeImmunity > 0)
 			return;
 
+		lastAttacker = projectile.getFiredWeapon().getOwner();
 		strikeImmunity = 1.0f;
 		boolean result = attemptShieldBlock(projectile);
 		if (result)
