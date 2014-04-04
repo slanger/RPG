@@ -19,8 +19,10 @@ public class FollowPathAI
 
 	private static final long serialVersionUID = -7616245852566751180L;
 
-	private GameCharacter character;
-	private List<Waypoint> path;
+	private final GameCharacter character;
+	private final List<Waypoint> path;
+	private final boolean isDestinationReachable;
+	private float totalPathDistance = 0;
 	private int currentIndex = 0;
 
 	public FollowPathAI(GameCharacter character, Rectangle destination,
@@ -37,17 +39,29 @@ public class FollowPathAI
 					"Can't have a null destination map for the AI");
 
 		this.character = character;
-		path = makePath(character.getBoundingRectangle(),
-				character.getCurrentMap(), destination, destinationMap);
+
+		Rectangle source = character.getBoundingRectangle();
+		Map sourceMap = character.getCurrentMap();
+		List<Waypoint> shortestPath = makePath(source, sourceMap, destination,
+				destinationMap);
 
 		// if destination is unreachable (i.e. stuck in a collidable), then go
 		// directly to destination (hopefully the character will switch its
 		// destination)
-		if (path == null)
+		if (shortestPath == null)
 		{
 			System.err.println("Couldn't find a path for character " + character.getName());
+			isDestinationReachable = false;
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(destination, destinationMap));
+			Coordinate sourceCenter = new Coordinate(source.getCenter(new Vector2()));
+			Coordinate destinationCenter = new Coordinate(destination.getCenter(new Vector2()));
+			totalPathDistance = sourceCenter.distanceTo(destinationCenter);
+		}
+		else
+		{
+			isDestinationReachable = true;
+			path = shortestPath;
 		}
 	}
 
@@ -131,13 +145,23 @@ public class FollowPathAI
 		}
 	}
 
+	public boolean isDestinationReachable()
+	{
+		return isDestinationReachable;
+	}
+
+	public float getTotalPathDistance()
+	{
+		return totalPathDistance;
+	}
+
 	private List<Waypoint> makePath(Rectangle source, Map sourceMap,
 			Rectangle destination, Map destinationMap)
 	{
 		List<Waypoint> shortestPath;
 
-		Vector2 sourceCenter = source.getCenter(new Vector2());
-		Vector2 destinationCenter = destination.getCenter(new Vector2());
+		Coordinate sourceCenter = new Coordinate(source.getCenter(new Vector2()));
+		Coordinate destinationCenter = new Coordinate(destination.getCenter(new Vector2()));
 
 		// if source and destination are connected, then return a path with just
 		// the destination
@@ -146,6 +170,7 @@ public class FollowPathAI
 		{
 			shortestPath = new ArrayList<Waypoint>();
 			shortestPath.add(new Waypoint(destination, destinationMap));
+			totalPathDistance = sourceCenter.distanceTo(destinationCenter);
 			return shortestPath;
 		}
 
@@ -155,11 +180,11 @@ public class FollowPathAI
 		float lengthSquaredToSource = Float.MAX_VALUE;
 		for (Waypoint w : sourceWaypoints)
 		{
-			Vector2 wCenter = w.rectangle.getCenter(new Vector2());
+			Coordinate wCenter = new Coordinate(w.rectangle.getCenter(new Vector2()));
 			if (sourceMap.pointsConnected(sourceCenter, wCenter))
 			{
-				float deltaX = Math.abs(sourceCenter.x - wCenter.x);
-				float deltaY = Math.abs(sourceCenter.y - wCenter.y);
+				float deltaX = Math.abs(sourceCenter.getX() - wCenter.getX());
+				float deltaY = Math.abs(sourceCenter.getY() - wCenter.getY());
 				float lengthSquared = deltaX * deltaX + deltaY * deltaY;
 				if (closestWaypointToSource == null
 						|| lengthSquared < lengthSquaredToSource)
@@ -179,12 +204,11 @@ public class FollowPathAI
 		float lengthSquaredToDestination = Float.MAX_VALUE;
 		for (Waypoint w : destinationWaypoints)
 		{
-			Vector2 wCenter = new Vector2();
-			w.rectangle.getCenter(wCenter);
+			Coordinate wCenter = new Coordinate(w.rectangle.getCenter(new Vector2()));
 			if (destinationMap.pointsConnected(destinationCenter, wCenter))
 			{
-				float deltaX = Math.abs(destinationCenter.x - wCenter.x);
-				float deltaY = Math.abs(destinationCenter.y - wCenter.y);
+				float deltaX = Math.abs(destinationCenter.getX() - wCenter.getX());
+				float deltaY = Math.abs(destinationCenter.getY() - wCenter.getY());
 				float lengthSquared = deltaX * deltaX + deltaY * deltaY;
 				if (closestWaypointToDestination == null
 						|| lengthSquared < lengthSquaredToDestination)
@@ -250,13 +274,24 @@ public class FollowPathAI
 												// from source
 		}
 
+		// backtracking
 		List<Waypoint> path = new ArrayList<Waypoint>();
 		Waypoint current = destination;
 		while (!current.equals(source))
 		{
+			// add to totalPathDistance
+			for (Waypoint.Edge e : current.connections)
+			{
+				if (e.connectedWaypoint.equals(current.previousVertex))
+				{
+					totalPathDistance += e.cost;
+				}
+			}
+
 			path.add(current);
 			current = current.previousVertex;
 		}
+
 		path.add(source);
 		Collections.reverse(path);
 		return path;

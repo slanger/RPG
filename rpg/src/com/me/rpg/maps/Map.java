@@ -497,6 +497,28 @@ public abstract class Map
 					tileWidth, tileHeight);
 			if (checkRectangle(bottomRight, returnWaypoints, true))
 				returnWaypoints.add(new Waypoint(bottomRight, this));
+
+			/*
+			Coordinate bottomLeft = new Coordinate(x - tileWidth / 2f, y - tileHeight / 2f);
+			Rectangle bottomLeftRectangle = bottomLeft.getSmallCenteredRectangle();
+			if (checkRectangle(bottomLeftRectangle, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(bottomLeftRectangle, this));
+
+			Coordinate topLeft = new Coordinate(x - tileWidth / 2f, y + height + tileHeight / 2f);
+			Rectangle topLeftRectangle = topLeft.getSmallCenteredRectangle();
+			if (checkRectangle(topLeftRectangle, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(topLeftRectangle, this));
+
+			Coordinate topRight = new Coordinate(x + width + tileWidth / 2f, y + height + tileHeight / 2f);
+			Rectangle topRightRectangle = topRight.getSmallCenteredRectangle();
+			if (checkRectangle(topRightRectangle, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(topRightRectangle, this));
+
+			Coordinate bottomRight = new Coordinate(x + width + tileWidth / 2f, y - tileHeight / 2f);
+			Rectangle bottomRightRectangle = bottomRight.getSmallCenteredRectangle();
+			if (checkRectangle(bottomRightRectangle, returnWaypoints, true))
+				returnWaypoints.add(new Waypoint(bottomRightRectangle, this));
+			*/
 		}
 
 		createConnections(returnWaypoints);
@@ -583,6 +605,11 @@ public abstract class Map
 	private boolean sameRectangles(Rectangle r1, Rectangle r2)
 	{
 		return r1.equals(r2);
+	}
+
+	public boolean pointsConnected(Coordinate c1, Coordinate c2)
+	{
+		return pointsConnected(c1.getVector2(), c2.getVector2());
 	}
 
 	public boolean pointsConnected(Vector2 c1, Vector2 c2)

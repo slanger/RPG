@@ -57,6 +57,11 @@ public class Coordinate implements Serializable
 		this.y = y;
 	}
 
+	public Vector2 getVector2()
+	{
+		return new Vector2(x, y);
+	}
+
 	/**
 	 * Prints the coordinate, X first, then Y
 	 */
@@ -76,12 +81,22 @@ public class Coordinate implements Serializable
 		return diff < EPS;
 	}
 	
-	public float distance2(Coordinate target) {
-		return (x-target.x)*(x-target.x) + (y-target.y)*(y-target.y);
+	public float distanceTo(Coordinate target)
+	{
+		float deltaX = x - target.x;
+		float deltaY = y - target.y;
+		return (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+	}
+	
+	public float distance2(Coordinate target)
+	{
+		float deltaX = x - target.x;
+		float deltaY = y - target.y;
+		return (deltaX * deltaX + deltaY * deltaY);
 	}
 	
 	public Rectangle getSmallCenteredRectangle() {
-		return getCenteredRectangle(EPS*2, EPS*2);
+		return getCenteredRectangle(EPS*2f, EPS*2f);
 	}
 	
 	public Rectangle getCenteredRectangle(float width, float height) {
