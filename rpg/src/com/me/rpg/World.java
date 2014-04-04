@@ -456,6 +456,7 @@ public final class World
 		
 		player.addItemToInventory(arrow);
 		player.addItemToInventory(fireArrow);
+		player.setEquippedArrows(fireArrow);
 		
 		bow.equipProjectile(fireArrow, 1000);
 
@@ -761,8 +762,10 @@ public final class World
 		messageQueue.add(0, message);
 	}
 	
-	private class Message
+	private class Message implements Serializable
 	{
+		
+		private static final long serialVersionUID = -2899401714649534910L;
 		private String message;
 		private boolean isErrorMessage;
 		

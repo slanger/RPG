@@ -167,9 +167,32 @@ public class InventoryMenu implements Serializable
 	
 	public boolean acceptPlayerInput(String key) //returns true if dialogue ended
 	{
-		if(key.equals("ENTER"))
+		if(key.equals("E"))
 		{		
-			
+			if(rowSelectionIndex == 0)
+			{
+				if(meleeWeapons.size() > colSelectionIndex)
+				{
+					MeleeWeapon temp = (MeleeWeapon) meleeWeapons.get(colSelectionIndex);
+					player.equipWeapon(player.getCurrentMap(), temp);
+				}
+			}
+			if(rowSelectionIndex == 1)
+			{
+				if(arrows.size() > colSelectionIndex)
+				{
+					Projectile temp = arrows.get(colSelectionIndex);
+					player.setEquippedArrows(temp);
+				}
+			}
+			if(rowSelectionIndex == 2)
+			{
+				
+			}
+			if(rowSelectionIndex == 3)
+			{
+				
+			}
 		}
 		else if(key.equals("UP"))
 		{
@@ -203,6 +226,7 @@ public class InventoryMenu implements Serializable
 		System.out.println("current row: "+ rowSelectionIndex);
 		System.out.println("current col: "+colSelectionIndex);
 		//System.out.println("showIndex: "+showIndex);
+		
 		return false;
 	}
 	
@@ -268,7 +292,15 @@ public class InventoryMenu implements Serializable
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
 			meleeWeaponRow.add(meleeWeaponTables.get(i)).size(50.0f).pad(10.0f);
-			meleeWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			
+			if(rowSelectionIndex == 0 && colSelectionIndex == i)
+			{
+				meleeWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			}
+			else
+			{
+				meleeWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+			}
 			
 			MeleeWeapon temp = null;
 			if(meleeWeapons.size() > i)
@@ -287,7 +319,15 @@ public class InventoryMenu implements Serializable
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
 			arrowsRow.add(arrowTables.get(i)).size(50.0f).pad(10.0f);
-			arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			
+			if(rowSelectionIndex == 1 && colSelectionIndex == i)
+			{
+				arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			}
+			else
+			{
+				arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+			}
 			
 			Projectile temp = null;
 			if(arrows.size() > i)
@@ -305,6 +345,15 @@ public class InventoryMenu implements Serializable
 		shieldRow.left().padLeft(20.0f);
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
+			if(rowSelectionIndex == 2 && colSelectionIndex == i)
+			{
+				shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			}
+			else
+			{
+				shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+			}
+			
 			shieldRow.add(shieldTables.get(i)).size(50.0f).pad(10.0f);
 			shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
 			shieldTables.get(i).add(new Image(bowWeapon)).expand().fill();
@@ -314,6 +363,15 @@ public class InventoryMenu implements Serializable
 		miscItemRow.left().padLeft(20.0f);
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
+			if(rowSelectionIndex == 3 && colSelectionIndex == i)
+			{
+				miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			}
+			else
+			{
+				miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+			}
+			
 			miscItemRow.add(miscItemTables.get(i)).size(50.0f).pad(10.0f);
 			miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
 			miscItemTables.get(i).add(new Image(bowWeapon)).expand().fill();

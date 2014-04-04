@@ -356,6 +356,23 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputLeft = true;
 		}
+		
+		if(Gdx.input.isKeyPressed(Keys.E))
+		{
+			if(enableInputE)
+			{
+				enableInputE = false;
+				if(world.getInventoryMenu().getInMenu())
+				{
+					world.getInventoryMenu().acceptPlayerInput("E");
+					System.out.println("In Menu:  E");
+				}
+			}
+		}
+		else
+		{
+			enableInputE = true;
+		}
 	}
 	
 	public void handleDialogueInput()

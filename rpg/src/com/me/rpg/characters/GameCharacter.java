@@ -21,6 +21,7 @@ import com.me.rpg.ScreenHandler;
 import com.me.rpg.World;
 import com.me.rpg.combat.IAttackable;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
@@ -84,6 +85,8 @@ public abstract class GameCharacter
 	protected float sightDistance;
 	protected float hearingRadius;
 
+	protected Projectile currentEquippedArrows;
+	
 	protected GameCharacter(String name, String spritesheetPath, int width,
 			int height, int tileWidth, int tileHeight, float animationDuration,
 			World world)
@@ -773,6 +776,10 @@ public abstract class GameCharacter
 			return;
 		weaponSlot.tryEquip(this);
 		m.addEquippedWeapon(weaponSlot);
+		if(temp instanceof RangedWeapon)
+		{
+			((RangedWeapon) temp).equipProjectile(getEquippedArrows(), 1000);
+		}
 	}
 
 	public Rectangle getHitBox()
@@ -911,7 +918,24 @@ public abstract class GameCharacter
 
 	public Weapon getEquippedMeleeWeapon()
 	{
-		
 		return weaponSlot;
+	}
+	
+	public Projectile getEquippedArrows()
+	{
+		return currentEquippedArrows;
+	}
+	
+	public void setEquippedArrows(Projectile arrows)
+	{
+		this.currentEquippedArrows = arrows;
+		if(swapWeaponSlot instanceof RangedWeapon)
+		{
+			((RangedWeapon) swapWeaponSlot).equipProjectile(arrows, 1000);
+		}
+		if(weaponSlot instanceof RangedWeapon)
+		{
+			((RangedWeapon) weaponSlot).equipProjectile(arrows, 1000);
+		}
 	}
 }
