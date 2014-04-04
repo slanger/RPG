@@ -1,10 +1,11 @@
-package com.me.rpg.maps;
+package com.me.rpg.utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.me.rpg.maps.Map;
 
 public class Waypoint
 	implements Comparable<Waypoint>, Serializable

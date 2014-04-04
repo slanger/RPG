@@ -28,6 +28,7 @@ import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Timer;
+import com.me.rpg.utils.Waypoint;
 
 public abstract class Map
 	implements Disposable, Serializable

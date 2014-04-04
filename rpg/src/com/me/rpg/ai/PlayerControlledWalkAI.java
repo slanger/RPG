@@ -9,9 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.maps.Waypoint;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
+import com.me.rpg.utils.Waypoint;
 
 public class PlayerControlledWalkAI
 	implements WalkAI

@@ -37,7 +37,6 @@ import com.me.rpg.inventory.InventoryMenu;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
 import com.me.rpg.maps.PrototypeMap;
-import com.me.rpg.maps.Waypoint;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationSystem;
@@ -63,6 +62,7 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.GlobalTimerTask;
 import com.me.rpg.utils.Timer;
+import com.me.rpg.utils.Waypoint;
 
 public final class World
 	implements Disposable, Serializable
