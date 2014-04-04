@@ -5,7 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -121,11 +123,11 @@ public final class World
 	private boolean movingToAnotherMap = false;
 	private boolean updateEnable = true;
 
-	private boolean renderMessage = false;
-	private String message = null;
-	private long startMessageDisplayTime = 0;
+	private long removeMessageTimer = 0;
 	private final long MESSAGE_DISPLAY_SECONDS = 5;
-
+	private ArrayList<Message> messageQueue = new ArrayList<Message>();
+	
+	
 	private transient BitmapFont messageFont;
 	private transient Texture messageTexture;
 
@@ -493,16 +495,9 @@ public final class World
 		}
 		
 		// rendering reputation, and other notifications
-		if (renderMessage)
+		if(messageQueue.size() > 0)
 		{
-			if (((System.currentTimeMillis() - startMessageDisplayTime) / 1000) < MESSAGE_DISPLAY_SECONDS)
-			{
-				renderMessage();
-			}
-			else
-			{
-				renderMessage = false;
-			}
+			renderMessage();
 		}
 
 		if (warping)
@@ -685,30 +680,106 @@ public final class World
 
 	private void renderMessage()
 	{
+		
+		LabelStyle normalStyle = new LabelStyle(messageFont, Color.DARK_GRAY);
+		LabelStyle errorStyle = new LabelStyle(messageFont, Color.RED);
+		
+		if((System.currentTimeMillis() - removeMessageTimer)/1000 > MESSAGE_DISPLAY_SECONDS )
+		{
+			if(messageQueue.size()>0)
+			{
+				messageQueue.remove(messageQueue.size()-1);
+				removeMessageTimer = System.currentTimeMillis();
+			}
+		}
+		while(messageQueue.size() >= 10)
+		{
+			messageQueue.remove(messageQueue.size()-1);
+		}
+		if(messageQueue.size()<1)
+		{
+			return;
+		}
+		
+		//draw the background texture
+		//float messagePositionX = (float) (camera.position.x
+		//		- camera.viewportWidth / 2 + (0.1 * camera.viewportWidth));
+		//float messagePositionY = camera.position.y - camera.viewportHeight / 2;
+		//float messageHeight = 40.0f;
+		float messageWidth = (float) (camera.viewportWidth * 0.9);
 		float messagePositionX = (float) (camera.position.x
-				- camera.viewportWidth / 2 + (0.1 * camera.viewportWidth));
+						- camera.viewportWidth / 2 + (0.05 * camera.viewportWidth));
 		float messagePositionY = camera.position.y - camera.viewportHeight / 2;
-
-		float messageWidth = (float) (camera.viewportWidth * 0.8);
-		float messageHeight = 40.0f;
-
-		LabelStyle style = new LabelStyle(messageFont, Color.DARK_GRAY);
-		Label messageLabel = new Label(message, style);
-		messageLabel.setWrap(true);
-		messageLabel.setBounds(messagePositionX, messagePositionY,
-				messageWidth, messageHeight);
-
+		float messageHeight = 20.0f * (messageQueue.size()+1);
+		
 		batch.draw(messageTexture, messagePositionX, messagePositionY,
 				messageWidth, messageHeight);
-
-		messageLabel.draw(batch, 1.0f);
-		messageLabel.clear();
+		
+		//draw the messages
+		for(int i=0; i<messageQueue.size(); i++)
+		{
+			if(messageQueue.get(i).getIsErrorMessage() == true)
+			{
+				Label messageLabel = new Label(messageQueue.get(i).getMessage(), errorStyle);
+				messageLabel.setWrap(true);
+				
+				messageLabel.setBounds(messagePositionX,(i+1)*20.0f, 0, 0);
+				
+				messageLabel.draw(batch, 1.0f);
+				messageLabel.clear();
+			}
+			else
+			{
+				Label messageLabel = new Label(messageQueue.get(i).getMessage(), normalStyle);
+				messageLabel.setWrap(true);
+				
+				messageLabel.setBounds(messagePositionX, (i+1)*20.0f, 0, 0);
+				
+				messageLabel.draw(batch, 1.0f);
+				messageLabel.clear();
+			}
+		}
 	}
 
-	public void pushMessage(String message)
+	public void pushMessage(String msg)
 	{
-		renderMessage = true;
-		this.message = message;
-		startMessageDisplayTime = System.currentTimeMillis();
+		Message message = new Message(msg, false);
+		if(messageQueue.size()<1)
+		{
+			removeMessageTimer = System.currentTimeMillis();
+		}
+		messageQueue.add(0, message);
+	}
+	
+	public void pushErrorMessage(String msg)
+	{
+		Message message = new Message(msg, true);
+		if(messageQueue.size()<1)
+		{
+			removeMessageTimer = System.currentTimeMillis();
+		}
+		messageQueue.add(0, message);
+	}
+	
+	private class Message
+	{
+		private String message;
+		private boolean isErrorMessage;
+		
+		public Message(String message, boolean isErrorMessage)
+		{
+			this.message = message;
+			this.isErrorMessage = isErrorMessage;
+		}
+		
+		public String getMessage()
+		{
+			return message;
+		}
+		
+		public boolean getIsErrorMessage()
+		{
+			return isErrorMessage;
+		}
 	}
 }
