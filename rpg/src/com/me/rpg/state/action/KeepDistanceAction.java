@@ -2,6 +2,7 @@ package com.me.rpg.state.action;
 
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Direction;
 
 public class KeepDistanceAction implements Action {
 	
@@ -31,6 +32,8 @@ public class KeepDistanceAction implements Action {
 			return;
 		}
 		action.doAction(delta);
+		Direction d = meCenter.getDirection(pCenter);
+		character.setFaceDirection(d);
 	}
 
 }

@@ -220,8 +220,10 @@ public abstract class GameCharacter implements IAttackable, Serializable
 		return strafing;
 	}
 	
-	private void setStrafing(boolean strafing) {
+	public void setStrafing(boolean strafing) {
 		this.strafing = strafing;
+		if (isShielded())
+			this.strafing = true;
 	}
 	
 	public boolean isUsingShield() {

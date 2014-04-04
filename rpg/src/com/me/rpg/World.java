@@ -223,7 +223,7 @@ public final class World
 	}
 
 	private void initializeWorld()
-	{
+	{	
 		dayTimer.scheduleTask(new Timer.Task()
 		{
 
@@ -242,6 +242,7 @@ public final class World
 		}, NUM_SECONDS_PER_DAY, NUM_SECONDS_PER_DAY);
 		
 		// setup global timer
+		GlobalTimerTask.getInstance().cancel();
 		timer.scheduleTask(GlobalTimerTask.getInstance(), 1000000000.0f);
 
 		// create reputation system

@@ -133,6 +133,10 @@ public class HierarchicalState extends State {
 		children.add(state);
 	}
 	
+	protected ArrayList<State> getChildren() {
+		return children;
+	}
+	
 	public String toString() {
 		StringBuilder part = new StringBuilder();
 		for (int i = 0; i < children.size(); ++i) {
