@@ -444,6 +444,8 @@ public final class World
 		Weapon shadowSword = new MeleeWeapon("Shadow Sword", SHADOW_SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
 	
+		shadowSword.addEffect(new Poison(500, 1, 1));
+		
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 		sword2.addEffect(poison);

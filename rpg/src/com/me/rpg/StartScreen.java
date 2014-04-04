@@ -12,17 +12,24 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.me.rpg.combat.MeleeWeapon;
+import com.me.rpg.combat.Projectile;
 
 public class StartScreen implements Screen, InputProcessor
 {
@@ -36,9 +43,10 @@ public class StartScreen implements Screen, InputProcessor
 	private Texture mainScreenTexture;
 	private int width, height;
 	private TextButton buttonPlay, buttonSettings;
-	private BitmapFont white;
+	private BitmapFont menuFont;
 	private Label heading;
 
+	private int selection=0;
 	// CONSTRUCTOR
 	public StartScreen(ScreenHandler screenHandler)
 	{
@@ -52,36 +60,10 @@ public class StartScreen implements Screen, InputProcessor
 				Gdx.files.internal("images/MainScreen_new.png"));
 		stage = new Stage();
 
+		menuFont = new BitmapFont();
 		// INPUT PROCESSOR
 		Gdx.input.setInputProcessor(stage);
-
-		// CREATE ATLAS, TABLE, SKIN
-		atlas = new TextureAtlas("UI/buttons/button.pack");
-		skin = new Skin(atlas);
-		table = new Table(skin);
-		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		white = new BitmapFont(Gdx.files.internal("font/white32.fnt.txt"),
-				false);
-
-		// CREATE BUTTONS, BUTTONSTYLES
-		TextButtonStyle textPlayButtonStyle = new TextButtonStyle();
-		textPlayButtonStyle.up = skin.getDrawable("playUP");
-		textPlayButtonStyle.down = skin.getDrawable("playDOWN");
-		textPlayButtonStyle.pressedOffsetX = 1;
-		textPlayButtonStyle.pressedOffsetY = -1;
-		textPlayButtonStyle.font = white;
-		textPlayButtonStyle.fontColor = Color.BLACK;
-
-		TextButtonStyle textScoreButtonStyle = new TextButtonStyle();
-		textScoreButtonStyle.up = skin.getDrawable("scoreUP");
-		textScoreButtonStyle.down = skin.getDrawable("ScoreDOWN");
-		textScoreButtonStyle.pressedOffsetX = 1;
-		textScoreButtonStyle.pressedOffsetY = -1;
-		textScoreButtonStyle.font = white;
-		textScoreButtonStyle.fontColor = Color.BLACK;
-		buttonPlay = new TextButton("", textPlayButtonStyle);
-		buttonSettings = new TextButton("", textScoreButtonStyle);
-
+		
 		// if Enter is pressed, go to game screen
 		// TODO add more keyboard functionality to start menu
 		stage.addListener(new InputListener()
@@ -92,12 +74,38 @@ public class StartScreen implements Screen, InputProcessor
 			{
 				if (keycode == Keys.ENTER)
 				{
-					stage.removeListener(this);
-					screenHandler.setScreen(new RPG(screenHandler, World.getNewInstance(), 1));
+					//stage.removeListener(this);
+					if(selection == 0) //new game
+					{
+						screenHandler.setScreen(new RPG(screenHandler, World.getNewInstance(), 1));
+					}
+					if(selection == 1) //load save 1
+					{
+						World world = retrieveSaveFile(1);
+						if (world == null)
+							world = World.getNewInstance();
+						screenHandler.setScreen(new RPG(screenHandler, world, 1));
+					}
+					if(selection == 2) //load save 2
+					{
+						//stage.removeListener(this);
+						World world = retrieveSaveFile(2);
+						if (world == null)
+							world = World.getNewInstance();
+						screenHandler.setScreen(new RPG(screenHandler, world, 2));
+					}
+					if(selection == 3) //load save 3
+					{
+						//stage.removeListener(this);
+						World world = retrieveSaveFile(3);
+						if (world == null)
+							world = World.getNewInstance();
+						screenHandler.setScreen(new RPG(screenHandler, world, 3));
+					}
 				}
 				else if (keycode == Keys.NUM_1)
 				{
-					stage.removeListener(this);
+					//stage.removeListener(this);
 					World world = retrieveSaveFile(1);
 					if (world == null)
 						world = World.getNewInstance();
@@ -105,7 +113,7 @@ public class StartScreen implements Screen, InputProcessor
 				}
 				else if (keycode == Keys.NUM_2)
 				{
-					stage.removeListener(this);
+					//stage.removeListener(this);
 					World world = retrieveSaveFile(2);
 					if (world == null)
 						world = World.getNewInstance();
@@ -113,30 +121,29 @@ public class StartScreen implements Screen, InputProcessor
 				}
 				else if (keycode == Keys.NUM_3)
 				{
-					stage.removeListener(this);
+					//stage.removeListener(this);
 					World world = retrieveSaveFile(3);
 					if (world == null)
 						world = World.getNewInstance();
 					screenHandler.setScreen(new RPG(screenHandler, world, 3));
 				}
+				else if (keycode == Keys.UP)
+				{
+					//stage.removeListener(this);
+					if(selection > 0) selection--;
+					System.out.println(selection);
+
+				}
+				else if (keycode == Keys.DOWN)
+				{
+					//stage.removeListener(this);
+					if(selection < 3) selection++;
+					System.out.println(selection);
+				}
 				return true;
 			}
 
 		});
-
-		// PAD MARGINS BUTTONS
-		buttonPlay.pad(20);
-		buttonSettings.pad(20);
-
-		// *****ADD EVERYTHING TO TABLE******
-		table.add(heading).spaceBottom(15).row();
-		table.add(buttonPlay).spaceBottom(15).row();
-		table.add(buttonSettings).spaceBottom(15).row();
-
-		table.debug();
-
-		// ADD TABLE (aka ACTOR) TO STAGE
-		stage.addActor(table);
 	}
 
 	private World retrieveSaveFile(int saveFileId)
@@ -176,11 +183,74 @@ public class StartScreen implements Screen, InputProcessor
 
 		spriteBatch.begin();
 		spriteBatch.draw(mainScreenTexture, 0, 0, width, height);
+	
+
+		
+		//
+		menuFont.setScale(1.6f);
+		LabelStyle normalStyle = new LabelStyle(menuFont, Color.WHITE);
+		LabelStyle selectedStyle = new LabelStyle(menuFont, Color.YELLOW);
+		
+		Label newGameLabel = new Label("New Game", normalStyle);
+		Label save1Label = new Label("Load Save 1", normalStyle);
+		Label save2Label = new Label("Load Save 2", normalStyle);
+		Label save3Label = new Label("Load Save 3", normalStyle);
+
+
+		if(selection == 0)
+		{
+			newGameLabel.setStyle(selectedStyle);
+		}
+		else
+		{
+			newGameLabel.setStyle(normalStyle);
+		}
+		
+		if(selection == 1)
+		{
+			save1Label.setStyle(selectedStyle);
+		}
+		else
+		{
+			save1Label.setStyle(normalStyle);
+		}
+		
+		if(selection == 2)
+		{
+			save2Label.setStyle(selectedStyle);
+		}
+		else
+		{
+			save2Label.setStyle(normalStyle);
+		}
+		
+		if(selection == 3)
+		{
+			save3Label.setStyle(selectedStyle);
+		}
+		else
+		{
+			save3Label.setStyle(normalStyle);
+		}
+		
+		newGameLabel.setBounds(250, 380, 0, 0);
+		save1Label.setBounds(250, 350, 0, 0);
+		save2Label.setBounds(250, 320, 0, 0);
+		save3Label.setBounds(250, 290, 0, 0);
+
+		newGameLabel.draw(spriteBatch, 1.0f);
+		save1Label.draw(spriteBatch, 1.0f);
+		save2Label.draw(spriteBatch, 1.0f);
+		save3Label.draw(spriteBatch, 1.0f);
+		
 		spriteBatch.end();
 
-		// RENDER STAGE
-		stage.act(delta);
-		stage.draw();
+		newGameLabel.clear();
+		save1Label.clear();
+		save2Label.clear();
+		save3Label.clear();
+		
+		//
 	}
 
 	@Override
@@ -219,7 +289,7 @@ public class StartScreen implements Screen, InputProcessor
 		atlas.dispose();
 		spriteBatch.dispose();
 		mainScreenTexture.dispose();
-		white.dispose();
+		menuFont.dispose();
 	}
 
 	@Override
