@@ -328,14 +328,23 @@ public final class World
 		exampleMap.addCharacterToMap(npc3, 32, 32);
 
 		// state machine for npc1
-		HierarchicalState parent = new HierarchicalState(null, npc1);
+		HierarchicalState parent1 = new HierarchicalState(null, npc1);
 
-		Coordinate[] patrol = new Coordinate[] { new Coordinate(50, 50),
-				new Coordinate(300, 50), new Coordinate(300, 300),
-				new Coordinate(50, 300) };
-		PatrolState patrol0 = new PatrolState(parent, npc1, patrol);
+		Coordinate[] patrolCoordinates1 = new Coordinate[] {
+				new Coordinate(50, 50),
+				new Coordinate(300, 50),
+				new Coordinate(300, 300),
+				new Coordinate(50, 300)
+		};
+		Map[] patrolMaps1 = new Map[] {
+				exampleMap,
+				exampleMap,
+				exampleMap,
+				exampleMap
+		};
+		PatrolState patrol1 = new PatrolState(parent1, npc1, patrolCoordinates1, patrolMaps1);
 
-		MeleeFightState fight0 = new MeleeFightState(parent, npc1);
+		MeleeFightState fight1 = new MeleeFightState(parent1, npc1);
 
 		SeePeopleCondition canSee = new SeePeopleCondition(npc1, 0,
 				Comparison.NOTEQUALS);
@@ -348,18 +357,18 @@ public final class World
 		
 		ArrayList<Action> patrolToFightActions = new ArrayList<Action>();
 		patrolToFightActions.add(new RememberNearestPersonAction(npc1, true, true, true));
-		Transition patrolToFight = new Transition(fight0, patrolToFightActions, canSeeOrHear);
-		Transition fightToPatrol = new Transition(patrol0, cannotSeeNorHear);
+		Transition patrolToFight = new Transition(fight1, patrolToFightActions, canSeeOrHear);
+		Transition fightToPatrol = new Transition(patrol1, cannotSeeNorHear);
 
-		patrol0.setTransitions(patrolToFight);
-		fight0.setTransitions(fightToPatrol);
-		parent.setInitialState(patrol0);
+		patrol1.setTransitions(patrolToFight);
+		fight1.setTransitions(fightToPatrol);
+		parent1.setInitialState(patrol1);
 
-		npc1.setStateMachine(parent);
+		npc1.setStateMachine(parent1);
 
 		// state machine for npc2
-		parent = new HierarchicalState(null, npc2);
-		HierarchicalState subparent = new HierarchicalState(parent, npc2);
+		HierarchicalState parent2 = new HierarchicalState(null, npc2);
+		HierarchicalState subparent = new HierarchicalState(parent2, npc2);
 		subparent.setName("subParent");
 		CustomState notAtCen = new CustomState(subparent, npc2);
 		notAtCen.setName("notAtCen");
@@ -367,14 +376,14 @@ public final class World
 		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2,
 				walkingBoundary);
 		randomWalkState.setName("randomWalk");
-		RunAwayState runaway = new RunAwayState(parent, npc2);
+		RunAwayState runaway = new RunAwayState(parent2, npc2);
 		runaway.setName("runaway");
 
 		subparent.setInitialState(notAtCen);
-		parent.setInitialState(subparent);
+		parent2.setInitialState(subparent);
 
-		WalkAction walkAction0 = new WalkAction(npc2, new Coordinate(500, 100), exampleMap);
-		notAtCen.setActions(walkAction0);
+		WalkAction walk2 = new WalkAction(npc2, new Coordinate(500, 100), exampleMap);
+		notAtCen.setActions(walk2);
 
 		Condition dist = new DistanceCondition(npc2, exampleMap,
 				new Coordinate(500, 100));
@@ -397,17 +406,24 @@ public final class World
 		runaway.setTransitions(runToNotAtCen);
 		subparent.setTransitions(subStateToRun);
 
-		npc2.setStateMachine(parent);
+		npc2.setStateMachine(parent2);
 
 		// state machine for npc3
-		parent = new HierarchicalState(null, npc3);
-		CustomState walkToLocationState = new CustomState(parent, npc3);
-		WalkAction walkAction1 = new WalkAction(npc3, new Coordinate(1536, 160), westTown);
-		walkToLocationState.setActions(walkAction1);
+		HierarchicalState parent3 = new HierarchicalState(null, npc3);
 
-		parent.setInitialState(walkToLocationState);
+		Coordinate[] patrolCoordinates3 = new Coordinate[] {
+				new Coordinate(1536, 160),
+				new Coordinate(32, 32)
+				};
+		Map[] patrolMaps3 = new Map[] {
+				westTown,
+				exampleMap
+		};
+		PatrolState patrol3 = new PatrolState(parent3, npc3, patrolCoordinates3, patrolMaps3);
 
-		npc3.setStateMachine(parent);
+		parent3.setInitialState(patrol3);
+
+		npc3.setStateMachine(parent3);
 
 		// WEAPONS SETUP
 

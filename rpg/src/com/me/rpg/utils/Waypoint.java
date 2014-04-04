@@ -25,10 +25,7 @@ public class Waypoint
 
 	public Waypoint(Rectangle rectangle, Map mapLocatedOn)
 	{
-		this.rectangle = rectangle;
-		this.mapLocatedOn = mapLocatedOn;
-		name = null;
-		connectedWarpPointName = null;
+		this(rectangle, mapLocatedOn, null, null);
 	}
 
 	public Waypoint(Rectangle rectangle, Map mapLocatedOn, String name,

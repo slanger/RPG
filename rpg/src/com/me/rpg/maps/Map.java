@@ -101,6 +101,11 @@ public abstract class Map
 		return timer;
 	}
 
+	public String getName()
+	{
+		return mapType.getMapName();
+	}
+
 	public List<Waypoint> getWaypoints()
 	{
 		if (waypoints == null)

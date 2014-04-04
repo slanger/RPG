@@ -50,11 +50,16 @@ public class FollowPathAI
 		// destination)
 		if (shortestPath == null)
 		{
+			System.err.printf(
+					"Could not find path for %s; destination: %s, %s%n",
+					character.getName(), destination, destinationMap.getName());
 			isDestinationReachable = false;
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(destination, destinationMap));
-			Coordinate sourceCenter = new Coordinate(source.getCenter(new Vector2()));
-			Coordinate destinationCenter = new Coordinate(destination.getCenter(new Vector2()));
+			Coordinate sourceCenter = new Coordinate(
+					source.getCenter(new Vector2()));
+			Coordinate destinationCenter = new Coordinate(
+					destination.getCenter(new Vector2()));
 			totalPathDistance = sourceCenter.distanceTo(destinationCenter);
 		}
 		else
@@ -95,42 +100,46 @@ public class FollowPathAI
 		{
 			character.setMoving(false);
 			character.setCenter(new Coordinate(nextCenter));
-			currentIndex++;
-			return;
-		}
-
-		float speed = character.getSpeed();
-		float oldX = character.getBottomLeftX();
-		float oldY = character.getBottomLeftY();
-		float dx = (xE / hE) * speed * deltaTime;
-		float dy = (yE / hE) * speed * deltaTime;
-		dx = (Math.abs(xE) < Math.abs(dx) ? xE : dx);
-		dy = (Math.abs(yE) < Math.abs(dy) ? yE : dy);
-		float x = oldX + dx;
-		float y = oldY + dy;
-
-		Coordinate newCoordinate = new Coordinate();
-		boolean didMove = character.getCurrentMap().checkCollision(x, y, oldX,
-				oldY, character, newCoordinate);
-		x = newCoordinate.getX();
-		y = newCoordinate.getY();
-
-		Direction newDirection;
-		if (Math.abs(yE) >= Math.abs(xE))
-		{
-			newDirection = (yE > 0) ? Direction.UP : Direction.DOWN;
 		}
 		else
 		{
-			newDirection = (xE >= 0) ? Direction.RIGHT : Direction.LEFT;
+			float speed = character.getSpeed();
+			float oldX = character.getBottomLeftX();
+			float oldY = character.getBottomLeftY();
+			float dx = (xE / hE) * speed * deltaTime;
+			float dy = (yE / hE) * speed * deltaTime;
+			dx = (Math.abs(xE) < Math.abs(dx) ? xE : dx);
+			dy = (Math.abs(yE) < Math.abs(dy) ? yE : dy);
+			float x = oldX + dx;
+			float y = oldY + dy;
+
+			Coordinate newCoordinate = new Coordinate();
+			boolean didMove = character.getCurrentMap().checkCollision(x, y,
+					oldX, oldY, character, newCoordinate);
+			x = newCoordinate.getX();
+			y = newCoordinate.getY();
+
+			Direction newDirection;
+			if (Math.abs(yE) >= Math.abs(xE))
+			{
+				newDirection = (yE > 0) ? Direction.UP : Direction.DOWN;
+			}
+			else
+			{
+				newDirection = (xE >= 0) ? Direction.RIGHT : Direction.LEFT;
+			}
+
+			character.setMoving(didMove);
+			character.setMoveDirection(newDirection);
+			character.setBottomLeftCorner(newCoordinate);
 		}
 
-		character.setMoving(didMove);
-		character.setMoveDirection(newDirection);
-		character.setBottomLeftCorner(newCoordinate);
-
-		if (nextWaypoint.rectangle.contains(character.getCenterX(),
-				character.getCenterY()))
+		Vector2 characterCenter = new Vector2(character.getCenterX(),
+				character.getCenterY());
+		Coordinate nextWaypointCenter = new Coordinate(nextCenter);
+		Rectangle nextWaypointRectangle = nextWaypointCenter
+				.getSmallCenteredRectangle();
+		if (nextWaypointRectangle.contains(characterCenter))
 		{
 			currentIndex++;
 			if (nextWaypoint.isWarpPoint())
@@ -159,8 +168,10 @@ public class FollowPathAI
 	{
 		List<Waypoint> shortestPath;
 
-		Coordinate sourceCenter = new Coordinate(source.getCenter(new Vector2()));
-		Coordinate destinationCenter = new Coordinate(destination.getCenter(new Vector2()));
+		Coordinate sourceCenter = new Coordinate(
+				source.getCenter(new Vector2()));
+		Coordinate destinationCenter = new Coordinate(
+				destination.getCenter(new Vector2()));
 
 		// if source and destination are connected, then return a path with just
 		// the destination
@@ -179,7 +190,8 @@ public class FollowPathAI
 		float lengthSquaredToSource = Float.MAX_VALUE;
 		for (Waypoint w : sourceWaypoints)
 		{
-			Coordinate wCenter = new Coordinate(w.rectangle.getCenter(new Vector2()));
+			Coordinate wCenter = new Coordinate(
+					w.rectangle.getCenter(new Vector2()));
 			if (sourceMap.pointsConnected(sourceCenter, wCenter))
 			{
 				float deltaX = Math.abs(sourceCenter.getX() - wCenter.getX());
@@ -203,11 +215,14 @@ public class FollowPathAI
 		float lengthSquaredToDestination = Float.MAX_VALUE;
 		for (Waypoint w : destinationWaypoints)
 		{
-			Coordinate wCenter = new Coordinate(w.rectangle.getCenter(new Vector2()));
+			Coordinate wCenter = new Coordinate(
+					w.rectangle.getCenter(new Vector2()));
 			if (destinationMap.pointsConnected(destinationCenter, wCenter))
 			{
-				float deltaX = Math.abs(destinationCenter.getX() - wCenter.getX());
-				float deltaY = Math.abs(destinationCenter.getY() - wCenter.getY());
+				float deltaX = Math.abs(destinationCenter.getX()
+						- wCenter.getX());
+				float deltaY = Math.abs(destinationCenter.getY()
+						- wCenter.getY());
 				float lengthSquared = deltaX * deltaX + deltaY * deltaY;
 				if (closestWaypointToDestination == null
 						|| lengthSquared < lengthSquaredToDestination)
