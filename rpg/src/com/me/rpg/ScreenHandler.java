@@ -69,7 +69,7 @@ public class ScreenHandler extends Game
 		
 		//load arrow textures
 		manager.load(World.ARROW_PATH, Texture.class);
-		
+		manager.load(World.FIRE_ARROW_PATH, Texture.class);
 		//load shield textures
 		manager.load(World.SHIELD_PATH, Texture.class);
 

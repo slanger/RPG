@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.combat.Equippable;
+import com.me.rpg.combat.Projectile;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
@@ -41,7 +42,9 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableInputLeft = true;
 	
 	private long timeInventoryOpened = 0;
-	private ArrayList<Equippable> equippableInventoryItems;
+	
+	private ArrayList<Equippable> equippablesInInventory;
+	private ArrayList<Projectile> arrowsInInventory;
 	
 	private PlayerControlledWalkAI walkAI;
 
@@ -61,7 +64,8 @@ public class PlayableCharacter extends GameCharacter
 	{
 		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
 				animationDuration, world);
-		equippableInventoryItems = new ArrayList<Equippable>();
+		equippablesInInventory = new ArrayList<Equippable>();
+		arrowsInInventory = new ArrayList<Projectile>();
 		npcMemory = null;
 		walkAI = new PlayerControlledWalkAI(this);
 	}
@@ -563,12 +567,22 @@ public class PlayableCharacter extends GameCharacter
 	
 	public void addItemToInventory(Equippable item)
 	{
-		equippableInventoryItems.add(item);
+		equippablesInInventory.add(item);
+	}
+	
+	public void addItemToInventory(Projectile item)
+	{
+		arrowsInInventory.add(item);
 	}
 	
 	public ArrayList<Equippable> getEquippableItems()
 	{
-		return equippableInventoryItems;
+		return equippablesInInventory;
+	}
+	
+	public ArrayList<Projectile> getArrows()
+	{
+		return arrowsInInventory;
 	}
 //	public void addItemToInventory(MiscItem item)
 //	{

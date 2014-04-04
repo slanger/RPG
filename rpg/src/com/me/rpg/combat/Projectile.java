@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -189,5 +190,10 @@ public class Projectile implements Cloneable, Serializable
 	public Rectangle getSpriteBounds() {
 		// TODO Auto-generated method stub
 		return getWeapon().getBoundingRectangle();
+	}
+
+	public Sprite getItemSpriteUp()
+	{
+		return weaponUp;
 	}
 }

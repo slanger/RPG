@@ -35,6 +35,7 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.PlayableCharacter;
 import com.me.rpg.combat.Equippable;
 import com.me.rpg.combat.MeleeWeapon;
+import com.me.rpg.combat.Projectile;
 
 public class InventoryMenu implements Serializable
 {
@@ -53,12 +54,12 @@ public class InventoryMenu implements Serializable
 	private transient Table topPane;
 	private transient Table bottomPane;
 	private transient Table meleeWeaponRow;
-	private transient Table projWeaponRow;
+	private transient Table arrowsRow;
 	private transient Table shieldRow;
 	private transient Table miscItemRow;
 		
 	private transient ArrayList<Table> meleeWeaponTables;
-	private transient ArrayList<Table> projWeaponTables;
+	private transient ArrayList<Table> arrowTables;
 	private transient ArrayList<Table> shieldTables;
 	private transient ArrayList<Table> miscItemTables;
 	
@@ -83,8 +84,8 @@ public class InventoryMenu implements Serializable
 	private final int NUM_ITEMS_DISPLAYED = 8;
 	
 	private ArrayList<Equippable> meleeWeapons;  //first row
+	private ArrayList<Projectile> arrows;   //second row
 	
-	private ArrayList<String> projWeapons;   //second row
 	private ArrayList<String> shields;       //third row
 	private ArrayList<String> miscItems; 	 //fourth row
 	
@@ -112,12 +113,12 @@ public class InventoryMenu implements Serializable
 		topPane = new Table();
 		bottomPane = new Table();
 		meleeWeaponRow = new Table();
-		projWeaponRow = new Table();
+		arrowsRow = new Table();
 		shieldRow = new Table();
 		miscItemRow = new Table();
 	
 		meleeWeaponTables = new ArrayList<Table>();
-		projWeaponTables = new ArrayList<Table>();
+		arrowTables = new ArrayList<Table>();
 		shieldTables = new ArrayList<Table>();
 		miscItemTables = new ArrayList<Table>();
 
@@ -127,7 +128,7 @@ public class InventoryMenu implements Serializable
 			Table temp = new Table();
 			meleeWeaponTables.add(temp);
 			temp = new Table();
-			projWeaponTables.add(temp);
+			arrowTables.add(temp);
 			temp = new Table();
 			shieldTables.add(temp);
 			temp = new Table();
@@ -150,6 +151,7 @@ public class InventoryMenu implements Serializable
 	{
 		this.player = player;
 		meleeWeapons = player.getEquippableItems();
+		arrows = player.getArrows();
 		
 		inMenu = true;
 		rowSelectionIndex = 0;
@@ -244,8 +246,8 @@ public class InventoryMenu implements Serializable
 		
 		bottomPane.row();
 		
-		projWeaponRow.setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
-		bottomPane.add(projWeaponRow).expandX().fill().pad(10.0f);
+		arrowsRow.setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
+		bottomPane.add(arrowsRow).expandX().fill().pad(10.0f);
 		
 		bottomPane.row();
 		
@@ -281,13 +283,23 @@ public class InventoryMenu implements Serializable
 			meleeWeaponTables.get(i).debug();
 		}
 		
-		projWeaponRow.left().padLeft(20.0f);
+		arrowsRow.left().padLeft(20.0f);
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
-			projWeaponRow.add(projWeaponTables.get(i)).size(50.0f).pad(10.0f);
-			projWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
-			projWeaponTables.get(i).add(new Image(bowWeapon)).expand().fill();
-			projWeaponTables.get(i).debug();
+			arrowsRow.add(arrowTables.get(i)).size(50.0f).pad(10.0f);
+			arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+			
+			Projectile temp = null;
+			if(arrows.size() > i)
+			{
+				temp = arrows.get(i);
+				arrowTables.get(i).add(new Image(temp.getItemSpriteUp())).expand().fill();
+			}
+			else
+			{
+				
+			}
+			arrowTables.get(i).debug();
 		}
 		
 		shieldRow.left().padLeft(20.0f);
@@ -314,7 +326,7 @@ public class InventoryMenu implements Serializable
 		topPane.debug();
 		bottomPane.debug();
 		meleeWeaponRow.debug();
-		projWeaponRow.debug();
+		arrowsRow.debug();
 		shieldRow.debug();
 		miscItemRow.debug();
 
@@ -325,14 +337,14 @@ public class InventoryMenu implements Serializable
 		topPane.clear();
 		bottomPane.clear();
 		meleeWeaponRow.clear();
-		projWeaponRow.clear();
+		arrowsRow.clear();
 		shieldRow.clear();
 		miscItemRow.clear();
 
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
 			meleeWeaponTables.get(i).clear();
-			projWeaponTables.get(i).clear();
+			arrowTables.get(i).clear();
 			shieldTables.get(i).clear();
 			miscItemTables.get(i).clear();
 		}

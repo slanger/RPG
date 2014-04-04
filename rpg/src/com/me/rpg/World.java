@@ -85,7 +85,7 @@ public final class World
 
 	//bows
 	public static final String ARROW_PATH = "arrow.png";
-
+	public static final String FIRE_ARROW_PATH = "fire_arrow.png";
 	//shields
 	public static final String SHIELD_PATH = "shield.png";
 	
@@ -449,7 +449,13 @@ public final class World
 		player.equipWeapon(exampleMap, bow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
 				32, 32);
-		bow.equipProjectile(arrow, 1000);
+		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		
+		player.addItemToInventory(arrow);
+		player.addItemToInventory(fireArrow);
+		
+		bow.equipProjectile(fireArrow, 1000);
 
 		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, weaponWidth,
 				weaponHeight, 32, 32);
