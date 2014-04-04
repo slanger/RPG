@@ -824,6 +824,10 @@ public abstract class GameCharacter
 	{
 		return sightDistance;
 	}
+	
+	public void setSightDistance(float sightDist) {
+		sightDistance = sightDist;
+	}
 
 	public float getHearingRadius()
 	{
@@ -908,11 +912,6 @@ public abstract class GameCharacter
 			return true;
 		}
 		return false;
-	}
-
-	public Weapon getEquippedMeleeWeapon()
-	{
-		return weaponSlot;
 	}
 	
 	public Projectile getEquippedArrows()

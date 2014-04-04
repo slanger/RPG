@@ -6,34 +6,35 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.AttackAction;
 import com.me.rpg.state.action.KeepDistanceAction;
-import com.me.rpg.state.action.MeleeMoveTowardAction;
+import com.me.rpg.state.action.RangedMoveTowardAction;
 import com.me.rpg.state.action.SetStrafeAction;
-import com.me.rpg.state.transition.FloatCondition;
 import com.me.rpg.state.transition.AttackerInRangeCondition;
+import com.me.rpg.state.transition.FloatCondition;
 import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
 
-public class MeleeFightState extends ResettingHierarchicalState {
+public class RangedFightState extends ResettingHierarchicalState {
 
-	private static final long serialVersionUID = -6336726027373780434L;
+	
+	private static final long serialVersionUID = 1L;
 
-	public MeleeFightState(HierarchicalState parent, GameCharacter character) {
+	public RangedFightState(HierarchicalState parent, GameCharacter character) {
 		super(parent, character);
 		
-		MFSConfident conf = new MFSConfident(this, character);
+		RFSConfident conf = new RFSConfident(this, character);
 		setInitialState(conf);
 	}
 	
-	private class MFSConfident extends ResettingHierarchicalState {
+	private class RFSConfident extends ResettingHierarchicalState {
 
 		private static final long serialVersionUID = 8500121329510295040L;
 
-		public MFSConfident(HierarchicalState parent, GameCharacter character) {
+		public RFSConfident(HierarchicalState parent, GameCharacter character) {
 			super(parent, character);
 			
-			MFSCanAttack canAtt = new MFSCanAttack(this, character);
+			RFSCanAttack canAtt = new RFSCanAttack(this, character);
 			StandStillState standStill = new StandStillState(this, character, null);
-			MFSCannotAttack cannotAtt = new MFSCannotAttack(this, character);
+			RFSCannotAttack cannotAtt = new RFSCannotAttack(this, character);
 			
 			FloatCondition waitToAttCondition = cannotAtt.getFloatCondition("timeInState", 1f, Comparison.GREATER);
 			Transition toCanAtt = new Transition(canAtt, waitToAttCondition);
@@ -53,25 +54,41 @@ public class MeleeFightState extends ResettingHierarchicalState {
 		}
 	}
 	
-	private class MFSCanAttack extends State {
+	private class RFSCanAttack extends State {
 
 		private static final long serialVersionUID = -9156404073207904722L;
 
+		private ArrayList<Action> entryActions;
 		private ArrayList<Action> actions;
+		private ArrayList<Action> exitActions;
 		
-		public MFSCanAttack(HierarchicalState parent, GameCharacter character) {
+		public RFSCanAttack(HierarchicalState parent, GameCharacter character) {
 			super(parent, character);
 			actions = new ArrayList<Action>();
-			actions.add(new MeleeMoveTowardAction(character));
+			actions.add(new RangedMoveTowardAction(character));
+			
+			entryActions = new ArrayList<Action>();
+			entryActions.add(new SetStrafeAction(character, true));
+			
+			exitActions = new ArrayList<Action>();
+			exitActions.add(new SetStrafeAction(character, false));
+		}
+		
+		public ArrayList<Action> doGetEntryActions() {
+			return entryActions;
 		}
 		
 		public ArrayList<Action> doGetActions() {
 			return actions;
 		}
 		
+		public ArrayList<Action> doGetExitActions() {
+			return exitActions;
+		}
+		
 	}
 	
-	private class MFSCannotAttack extends State {
+	private class RFSCannotAttack extends State {
 
 		private static final long serialVersionUID = 8649088522931762992L;
 
@@ -79,10 +96,10 @@ public class MeleeFightState extends ResettingHierarchicalState {
 		private ArrayList<Action> actions;
 		private ArrayList<Action> exitActions;
 		
-		public MFSCannotAttack(HierarchicalState parent, GameCharacter character) {
+		public RFSCannotAttack(HierarchicalState parent, GameCharacter character) {
 			super(parent, character);
 			actions = new ArrayList<Action>();
-			actions.add(new KeepDistanceAction(character, 100));
+			//actions.add(new KeepDistanceAction(character, 150));
 			
 			entryActions = new ArrayList<Action>();
 			entryActions.add(new SetStrafeAction(character, true));

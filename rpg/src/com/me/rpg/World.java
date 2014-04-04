@@ -44,6 +44,7 @@ import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
 import com.me.rpg.state.RandomWalkState;
+import com.me.rpg.state.RangedFightState;
 import com.me.rpg.state.RunAwayState;
 import com.me.rpg.state.WalkToLocationState;
 import com.me.rpg.state.action.Action;
@@ -304,6 +305,7 @@ public final class World
 		NonplayableCharacter npc1;
 		NonplayableCharacter npc2;
 		NonplayableCharacter npc3;
+		NonplayableCharacter npc4;
 		final int width = 28;
 		final int height = 28;
 
@@ -318,12 +320,15 @@ public final class World
 				height, 16, 16, 0.15f, this);
 		npc3 = new NonplayableCharacter("NPC3", NPC_TEXTURE_PATH, width,
 				height, 16, 16, 0.15f, this);
+		npc4 = new NonplayableCharacter("NPC4", NPC_TEXTURE_PATH, width,
+				height, 16, 16, 0.15f, this);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap, 192, 544));
 		exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
 		exampleMap.addCharacterToMap(npc2, new Location(exampleMap, 480, 128));
 		exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
+		westTown.addCharacterToMap(npc4, new Location(westTown, 1000, 480));
 
 		// state machine for npc1
 		HierarchicalState parent1 = new HierarchicalState(null, npc1);
@@ -407,6 +412,30 @@ public final class World
 		parent3.setInitialState(patrol3);
 
 		npc3.setStateMachine(parent3);
+		
+		// state machine for npc4
+		HierarchicalState parent4 = new HierarchicalState(null, npc4);
+		Rectangle wb4 = new Rectangle(50, 50, 1100, 1100);
+		RandomWalkState rw4 = new RandomWalkState(parent4, npc4, wb4);
+		RangedFightState rfs = new RangedFightState(parent4, npc4);
+		
+		Condition seePeople4 = new SeePeopleCondition(npc4, 0, Comparison.GREATER);
+		Condition hearPeople4 = new HearPeopleCondition(npc4, 0, Comparison.GREATER);
+		Condition or = new OrCondition(seePeople4, hearPeople4);
+		Condition not = new NotCondition(or);
+		
+		ArrayList<Action> toRangeAtkActions = new ArrayList<Action>();
+		toRangeAtkActions.add(new RememberNearestPersonAction(npc4, true, true, true));
+		
+		Transition toRangeAtk = new Transition(rfs, toRangeAtkActions, or);
+		Transition toRandWlk = new Transition(rw4, not);
+		rw4.setTransitions(toRangeAtk);
+		rfs.setTransitions(toRandWlk);
+		
+		parent4.setInitialState(rw4);
+		
+		npc4.setSightDistance(400f);
+		npc4.setStateMachine(parent4);
 
 		// WEAPONS SETUP
 
@@ -446,7 +475,10 @@ public final class World
 		// ranged attack test stuff
 		RangedWeapon bow = new RangedWeapon("Lame Bow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
+		RangedWeapon npcbow = new RangedWeapon("NPCBow", ARROW_PATH, weaponWidth,
+				weaponHeight, 32, 32);
 		player.equipWeapon(exampleMap, bow);
+		npc4.equipWeapon(westTownInsideHouse, npcbow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH, weaponWidth, weaponHeight,
@@ -457,6 +489,7 @@ public final class World
 		player.setEquippedArrows(fireArrow);
 		
 		bow.equipProjectile(fireArrow, 1000);
+		npcbow.equipProjectile(fireArrow, 10000);
 
 		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, weaponWidth,
 				weaponHeight, 32, 32);

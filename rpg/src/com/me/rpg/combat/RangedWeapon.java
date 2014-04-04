@@ -35,6 +35,10 @@ public class RangedWeapon extends Weapon
 		degreeRotation = 0f;
 	}
 	
+	public int getRange() {
+		return (int)(range + equippedAmmo.getSpriteBounds().getWidth());
+	}
+	
 	public void switchStyle() {
 		
 	}
@@ -67,8 +71,8 @@ public class RangedWeapon extends Weapon
 			return; // can't fire with no ammo
 		}
 		--ammoCount;
-		float originX = attackOrigin.getX() + attackOrigin.getWidth()/2 * (direction.getDx() + 1);
-		float originY = attackOrigin.getY() + attackOrigin.getHeight()/2 * (direction.getDy() + 1);
+		float originX = attackOrigin.getX() + attackOrigin.getWidth()/2 * direction.getDx();
+		float originY = attackOrigin.getY() + attackOrigin.getHeight()/2 * direction.getDy();
 		Coordinate origin = new Coordinate(originX, originY);
 		Projectile firedCopy = equippedAmmo.makeAttackingCopy(direction, origin, this);
 		map.addProjectile(firedCopy);

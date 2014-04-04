@@ -229,7 +229,7 @@ public class InventoryMenu implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
-		Sprite bowWeapon = player.getEquippedMeleeWeapon().getItemSpriteUp();
+		Sprite bowWeapon = player.getEquippedWeapon().getItemSpriteUp();
 		Sprite meleeWeapon = player.getEquippedWeapon().getItemSpriteUp();
 		
 		//equippedWeaponImage.scale(1.6f);
