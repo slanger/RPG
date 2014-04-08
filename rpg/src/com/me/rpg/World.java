@@ -490,13 +490,13 @@ public final class World
 				weaponHeight, 32, 32);
 		RangedWeapon npc_bow = new RangedWeapon("NPCBow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
-		player.equipWeapon(exampleMap, bow);
 		npc4.equipWeapon(westTownInsideHouse, npc_bow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		
+		player.addItemToInventory(bow);
 		player.addItemToInventory(arrow);
 		player.addItemToInventory(fireArrow);
 		player.setEquippedArrows(fireArrow);

@@ -11,6 +11,7 @@ import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.combat.Equippable;
 import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
@@ -52,6 +53,7 @@ public class PlayableCharacter extends GameCharacter
 	private ArrayList<Weapon> weaponsInInventory;
 	private ArrayList<Shield> shieldsInInventory;
 	private ArrayList<Projectile> arrowsInInventory;
+	private RangedWeapon rangedWeaponInInventory;
 	//private ArrayList<> miscItemsInInventory;
 	
 	private PlayerControlledWalkAI walkAI;
@@ -685,6 +687,11 @@ public class PlayableCharacter extends GameCharacter
 		shieldsInInventory.add(item);
 	}
 	
+	public void addItemToInventory(RangedWeapon item)
+	{
+		rangedWeaponInInventory = item;
+	}
+	
 	public ArrayList<Weapon> getWeapons()
 	{
 		return weaponsInInventory;
@@ -698,6 +705,11 @@ public class PlayableCharacter extends GameCharacter
 	public ArrayList<Shield> getShields()
 	{
 		return shieldsInInventory;
+	}
+	
+	public RangedWeapon getRangedWeaponInInventory()
+	{
+		return rangedWeaponInInventory;
 	}
 //	public void addItemToInventory(MiscItem item)
 //	{

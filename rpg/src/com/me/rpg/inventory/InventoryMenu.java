@@ -184,6 +184,7 @@ public class InventoryMenu implements Serializable
 			{
 				if(arrows.size() > colSelectionIndex)
 				{
+					player.equipWeapon(player.getCurrentMap(), player.getRangedWeaponInInventory());
 					Projectile temp = arrows.get(colSelectionIndex);
 					player.setEquippedArrows(temp);
 				}
