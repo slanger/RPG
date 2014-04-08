@@ -10,15 +10,19 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
 import com.me.rpg.characters.PlayableCharacter;
+import com.me.rpg.combat.MeleeWeapon;
+import com.me.rpg.combat.Projectile;
 
 public class PauseScreen implements Serializable
 {
@@ -29,9 +33,9 @@ public class PauseScreen implements Serializable
 	private transient BitmapFont menuFont;
 	private transient Texture pauseScreenTexture;
 	private transient Stage stage;
+	private transient Table mainTable;
 	
 	private boolean inPauseMenu = false;
-	private PlayableCharacter player;
 	
 	private int selection;
 	
@@ -56,6 +60,7 @@ public class PauseScreen implements Serializable
 	private void createTransients()
 	{
 		stage = new Stage();
+		mainTable = new Table();
 		menuFont = new BitmapFont();
 		pauseScreenTexture = new Texture(Gdx.files.internal("images/PauseScreen.png"));
 	}
@@ -116,10 +121,6 @@ public class PauseScreen implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
-
-		batch.draw(pauseScreenTexture, 0, 0, camera.viewportWidth, camera.viewportHeight);
-
-		//
 		menuFont.setScale(1.6f);
 		LabelStyle normalStyle = new LabelStyle(menuFont, Color.WHITE);
 		LabelStyle selectedStyle = new LabelStyle(menuFont, Color.YELLOW);
@@ -127,7 +128,7 @@ public class PauseScreen implements Serializable
 		Label resumeLabel = new Label("Resume", normalStyle);
 		Label saveLabel = new Label("Save Game", normalStyle);
 		Label exitLabel = new Label("Exit to main screen",normalStyle);
-
+		
 		if(selection == 0)
 		{
 			resumeLabel.setStyle(selectedStyle);
@@ -154,18 +155,25 @@ public class PauseScreen implements Serializable
 		{
 			exitLabel.setStyle(normalStyle);
 		}
+
+		//Set up MainTable, contains everything else
+		stage.addActor(mainTable);
+		mainTable.setFillParent(true);
+		mainTable.setBackground(new TextureRegionDrawable(new TextureRegion(pauseScreenTexture)));
+		mainTable.pad(10.0f);
 		
-		resumeLabel.setBounds(230, 380, 0, 0);
-		saveLabel.setBounds(230, 350, 0, 0);
-		exitLabel.setBounds(230, 320, 0, 0);
+		mainTable.add(resumeLabel).left();
+		mainTable.row();
+		mainTable.add(saveLabel).left();
+		mainTable.row();
+		mainTable.add(exitLabel).left();
 		
-		resumeLabel.draw(batch, 1.0f);
-		saveLabel.draw(batch, 1.0f);
-		exitLabel.draw(batch, 1.0f);
-		
-		resumeLabel.clear();
-		saveLabel.clear();
-		exitLabel.clear();
+		//mainTable.debug();
+
+	    stage.draw();
+	    //Table.drawDebug(stage);
+	    
+		mainTable.clear();
 	}
 	
 	public boolean getInMenu()

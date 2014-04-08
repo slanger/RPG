@@ -63,7 +63,7 @@ public class StartScreen implements Screen, InputProcessor
 			{
 				if (keycode == Keys.ENTER)
 				{
-					if(System.currentTimeMillis() - timeWait < 1000)
+					if(System.currentTimeMillis() - timeWait < 400)
 					{
 						return true;
 					}
