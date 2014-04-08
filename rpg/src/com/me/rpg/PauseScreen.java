@@ -1,11 +1,8 @@
 package com.me.rpg;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -13,21 +10,15 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
-import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.PlayableCharacter;
-import com.me.rpg.combat.Equippable;
-import com.me.rpg.combat.MeleeWeapon;
-import com.me.rpg.combat.Projectile;
 
 public class PauseScreen implements Serializable
 {
@@ -38,15 +29,15 @@ public class PauseScreen implements Serializable
 	private transient BitmapFont menuFont;
 	private transient Texture pauseScreenTexture;
 	private transient Stage stage;
-	private transient Table mainTable;
 	
 	private boolean inPauseMenu = false;
 	private PlayableCharacter player;
 	
 	private int selection;
 	
-	public PauseScreen()
+	public PauseScreen(World world)
 	{
+		this.world = world;
 		createTransients();
 		initPauseMenu();
 	}
@@ -54,7 +45,6 @@ public class PauseScreen implements Serializable
 	public void initPauseMenu()
 	{
 		inPauseMenu = false;
-		//responses = new ArrayList<String>();
 	}
 	
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
@@ -70,12 +60,9 @@ public class PauseScreen implements Serializable
 		pauseScreenTexture = new Texture(Gdx.files.internal("images/PauseScreen.png"));
 	}
 	
-	
-	
-	public void openPauseMenu(PlayableCharacter player)
+	public void openPauseMenu()
 	{
-		this.player = player;
-		
+		world.setUpdateEnable(false);
 		inPauseMenu = true;
 		selection = 0;
 	}
@@ -83,27 +70,31 @@ public class PauseScreen implements Serializable
 	public void closePauseMenu()
 	{
 		inPauseMenu = false;
+		world.setUpdateEnable(true);
 	}
 	
 	public void acceptPlayerInput(String key) //returns true if dialogue ended
 	{
-		if(key.equals("E"))
+		if(key.equals("ESCAPE"))
+		{
+			closePauseMenu();
+		}
+		
+		else if(key.equals("ENTER"))
 		{		
-			if(selection == 0)
+			if(selection == 0) //resume
 			{
-			
+				closePauseMenu();
 			}
-			if(selection == 1)
+			if(selection == 1) //save
 			{
-				
+				world.setSaveGame(true);
+				closePauseMenu();
 			}
-			if(selection == 2)
+			if(selection == 2) //exit to main menu
 			{
-				
-			}
-			if(selection == 3)
-			{
-				
+				inPauseMenu=false;
+				world.setResetGame(true);
 			}
 		}
 		else if(key.equals("UP"))
@@ -115,7 +106,7 @@ public class PauseScreen implements Serializable
 		}
 		else if(key.equals("DOWN"))
 		{
-			if(selection < 3)
+			if(selection < 2)
 			{
 				selection++;
 			}
@@ -125,56 +116,55 @@ public class PauseScreen implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
+
+		batch.draw(pauseScreenTexture, 0, 0, camera.viewportWidth, camera.viewportHeight);
+
+		//
+		menuFont.setScale(1.6f);
 		LabelStyle normalStyle = new LabelStyle(menuFont, Color.WHITE);
 		LabelStyle selectedStyle = new LabelStyle(menuFont, Color.YELLOW);
 		
-		Label resumeLabel = new Label("Resume Game", normalStyle);
-		Label save1Label = new Label("Save to Slot 1",normalStyle);
-		Label save2Label = new Label("Save to Slot 2", normalStyle);
-		Label save3Label = new Label("Save to Slot 3", normalStyle);
-		Label exitLabel = new Label("Exit Game", normalStyle);
+		Label resumeLabel = new Label("Resume", normalStyle);
+		Label saveLabel = new Label("Save Game", normalStyle);
+		Label exitLabel = new Label("Exit to main screen",normalStyle);
 
-		if(selection == 0) resumeLabel.setStyle(selectedStyle);
-		else resumeLabel.setStyle(normalStyle);
+		if(selection == 0)
+		{
+			resumeLabel.setStyle(selectedStyle);
+		}
+		else
+		{
+			resumeLabel.setStyle(normalStyle);
+		}
 		
-		if(selection == 1) save1Label.setStyle(selectedStyle);
-		else save1Label.setStyle(normalStyle);
-
-		if(selection == 2) save2Label.setStyle(selectedStyle);
-		else save2Label.setStyle(normalStyle);
+		if(selection == 1)
+		{
+			saveLabel.setStyle(selectedStyle);
+		}
+		else
+		{
+			saveLabel.setStyle(normalStyle);
+		}
 		
-		if(selection == 3) save3Label.setStyle(selectedStyle);
-		else save3Label.setStyle(normalStyle);
+		if(selection == 2)
+		{
+			exitLabel.setStyle(selectedStyle);
+		}
+		else
+		{
+			exitLabel.setStyle(normalStyle);
+		}
 		
-		if(selection == 4) exitLabel.setStyle(selectedStyle);
-		else exitLabel.setStyle(normalStyle);
+		resumeLabel.setBounds(230, 380, 0, 0);
+		saveLabel.setBounds(230, 350, 0, 0);
+		exitLabel.setBounds(230, 320, 0, 0);
 		
-		//Set up MainTable, contains everything else
-		stage.addActor(mainTable);
-		mainTable.setFillParent(true);
-		mainTable.setBackground(new TextureRegionDrawable(new TextureRegion(pauseScreenTexture)));
-		//mainTable.top().left().pad(10.0f);
+		resumeLabel.draw(batch, 1.0f);
+		saveLabel.draw(batch, 1.0f);
+		exitLabel.draw(batch, 1.0f);
 		
-		mainTable.add(resumeLabel);
-		mainTable.row();
-		mainTable.add(save1Label);
-		mainTable.row();
-		mainTable.add(save2Label);
-		mainTable.row();
-		mainTable.add(save3Label);
-		mainTable.row();
-		mainTable.add(exitLabel);
-		
-		mainTable.debug(); // turn on all debug lines (table, cell, and widget)
-
-	    stage.draw();
-	    Table.drawDebug(stage);
-	    
-		mainTable.clear();
 		resumeLabel.clear();
-		save1Label.clear();
-		save2Label.clear();
-		save3Label.clear();
+		saveLabel.clear();
 		exitLabel.clear();
 	}
 	

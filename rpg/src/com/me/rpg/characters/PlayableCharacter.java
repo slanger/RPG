@@ -42,6 +42,10 @@ public class PlayableCharacter extends GameCharacter
 	
 	private long timeInventoryOpened = 0;
 	
+	//pause menu keys
+	private boolean enableInputEscape = true;
+		//UP, DOWN, ENTER
+	
 	private ArrayList<Equippable> equippablesInInventory;
 	private ArrayList<Projectile> arrowsInInventory;
 	
@@ -88,6 +92,27 @@ public class PlayableCharacter extends GameCharacter
 			return;
 		}
 
+		// PAUSE MENU
+		if (world.getPauseScreen().getInMenu())
+		{
+			return;
+		}
+
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE))
+		{
+			if (enableInputEscape)
+			{
+				enableInputEscape = false;
+				world.getPauseScreen().openPauseMenu();
+			}
+		}
+		else
+		{
+			enableInputEscape = true;
+		}
+		//END PAUSE
+		
+		
 		// reset the game
 		if (Gdx.input.isKeyPressed(Keys.R))
 		{
@@ -102,19 +127,6 @@ public class PlayableCharacter extends GameCharacter
 			enableReseting = true;
 		}
 
-		// save the game
-		if (Gdx.input.isKeyPressed(Keys.ENTER))
-		{
-			if (enableSaving)
-			{
-				enableSaving = false;
-				world.setSaveGame(true);
-			}
-		}
-		else
-		{
-			enableSaving = true;
-		}
 
 		/*
 		 *  INVENTORY MENU
@@ -283,6 +295,11 @@ public class PlayableCharacter extends GameCharacter
 
 	public void handleInventoryMenuInput()
 	{
+		if(world.getInventoryMenu().getInMenu() == false)
+		{
+			return;
+		}
+		
 		if(Gdx.input.isKeyPressed(Keys.UP))
 		{
 			if(enableInputUp)
@@ -366,6 +383,12 @@ public class PlayableCharacter extends GameCharacter
 	
 	public void handleDialogueInput()
 	{
+		if(world.getDialogueSystem().getInDialogue() == false)
+		{
+			return;
+		}
+		
+		
 		if (!enableControls)
 		{
 			return;
@@ -436,6 +459,78 @@ public class PlayableCharacter extends GameCharacter
 		 * END DIALOGUE
 		 */
 
+	}
+	
+	public void handlePauseMenuInput()
+	{
+		if(world.getPauseScreen().getInMenu() == false)
+		{
+			return;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE))
+		{
+			if(enableInputEscape)
+			{
+				enableInputEscape = false;
+				if(world.getPauseScreen().getInMenu())
+				{
+					world.getPauseScreen().acceptPlayerInput("ESCAPE");
+				}
+			}
+		}
+		else
+		{
+			enableInputEscape = true;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.UP))
+		{
+			if(enableInputUp)
+			{
+				enableInputUp = false;
+				if(world.getPauseScreen().getInMenu())
+				{
+					world.getPauseScreen().acceptPlayerInput("UP");
+				}
+			}
+		}
+		else
+		{
+			enableInputUp = true;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			if(enableInputDown)
+			{
+				enableInputDown = false;
+				if(world.getPauseScreen().getInMenu())
+				{
+					world.getPauseScreen().acceptPlayerInput("DOWN");
+				}
+			}
+		}
+		else
+		{
+			enableInputDown = true;
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.ENTER))
+		{
+			if(enableInputRight)
+			{
+				enableInputRight = false;
+				if(world.getPauseScreen().getInMenu())
+				{
+					world.getPauseScreen().acceptPlayerInput("ENTER");
+				}
+			}
+		}
+		else
+		{
+			enableInputRight = true;
+		}
 	}
 
 	private void doPush()

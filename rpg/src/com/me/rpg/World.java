@@ -110,6 +110,7 @@ public final class World
 
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
 	private final InventoryMenu	inventoryMenu	= new InventoryMenu();
+	private final PauseScreen pauseScreen = new PauseScreen(this);
 	private ReputationSystem reputationSystem;
 
 	private boolean warping = false;
@@ -144,6 +145,11 @@ public final class World
 	public InventoryMenu getInventoryMenu()
 	{
 		return inventoryMenu;
+	}
+	
+	public PauseScreen getPauseScreen()
+	{
+		return pauseScreen;
 	}
 	
 	public Map getCurrentMap()
@@ -520,6 +526,7 @@ public final class World
 		batch.begin();
 
 		// temporary dialogue stuff
+		
 		if (dialogueSystem.getInDialogue())
 		{
 			dialogueSystem.render(batch, camera);
@@ -528,6 +535,11 @@ public final class World
 		if(inventoryMenu.getInMenu())
 		{
 			inventoryMenu.render(batch, camera);
+		}
+		
+		if(pauseScreen.getInMenu())
+		{
+			pauseScreen.render(batch, camera);
 		}
 		
 		// rendering reputation, and other notifications
@@ -571,6 +583,7 @@ public final class World
 		if (!updateEnable)
 		{
 			player.handleDialogueInput();
+			player.handlePauseMenuInput();
 			return;
 		}
 		

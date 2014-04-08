@@ -12,24 +12,15 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.me.rpg.combat.MeleeWeapon;
-import com.me.rpg.combat.Projectile;
 
 public class StartScreen implements Screen, InputProcessor
 {
@@ -63,75 +54,58 @@ public class StartScreen implements Screen, InputProcessor
 		
 		// if Enter is pressed, go to game screen
 		// TODO add more keyboard functionality to start menu
+		
 		stage.addListener(new InputListener()
 		{
-
+			long timeWait = System.currentTimeMillis();
 			@Override
 			public boolean keyUp(InputEvent event, int keycode)
 			{
 				if (keycode == Keys.ENTER)
 				{
-					//stage.removeListener(this);
-					if(selection == 0) //new game
+					if(System.currentTimeMillis() - timeWait < 1000)
 					{
-						screenHandler.setScreen(new RPG(screenHandler, World.getNewInstance(), 1));
+						return true;
 					}
-					if(selection == 1) //load save 1
+					System.out.println("enter pressed");
+
+					if(selection == 0) //play slot 1
 					{
 						World world = retrieveSaveFile(1);
 						if (world == null)
 							world = World.getNewInstance();
 						screenHandler.setScreen(new RPG(screenHandler, world, 1));
+						stage.removeListener(this);
 					}
-					if(selection == 2) //load save 2
+					if(selection == 1) //play slot 2
 					{
 						//stage.removeListener(this);
 						World world = retrieveSaveFile(2);
 						if (world == null)
 							world = World.getNewInstance();
 						screenHandler.setScreen(new RPG(screenHandler, world, 2));
+						stage.removeListener(this);
 					}
-					if(selection == 3) //load save 3
+					if(selection == 2) //Play slot 3
 					{
 						//stage.removeListener(this);
 						World world = retrieveSaveFile(3);
 						if (world == null)
 							world = World.getNewInstance();
 						screenHandler.setScreen(new RPG(screenHandler, world, 3));
+						stage.removeListener(this);
 					}
-				}
-				else if (keycode == Keys.NUM_1)
-				{
-					//stage.removeListener(this);
-					World world = retrieveSaveFile(1);
-					if (world == null)
-						world = World.getNewInstance();
-					screenHandler.setScreen(new RPG(screenHandler, world, 1));
-				}
-				else if (keycode == Keys.NUM_2)
-				{
-					//stage.removeListener(this);
-					World world = retrieveSaveFile(2);
-					if (world == null)
-						world = World.getNewInstance();
-					screenHandler.setScreen(new RPG(screenHandler, world, 2));
-				}
-				else if (keycode == Keys.NUM_3)
-				{
-					//stage.removeListener(this);
-					World world = retrieveSaveFile(3);
-					if (world == null)
-						world = World.getNewInstance();
-					screenHandler.setScreen(new RPG(screenHandler, world, 3));
+					if(selection == 3) //Exit 
+					{
+						Gdx.app.exit();
+					}		
 				}
 				else if (keycode == Keys.UP)
 				{
-					//stage.removeListener(this);
 					if(selection > 0) selection--;
 				}
 				else if (keycode == Keys.DOWN)
 				{
-					//stage.removeListener(this);
 					if(selection < 3) selection++;
 				}
 				return true;
@@ -185,22 +159,13 @@ public class StartScreen implements Screen, InputProcessor
 		LabelStyle normalStyle = new LabelStyle(menuFont, Color.WHITE);
 		LabelStyle selectedStyle = new LabelStyle(menuFont, Color.YELLOW);
 		
-		Label newGameLabel = new Label("New Game", normalStyle);
-		Label save1Label = new Label("Load Save 1", normalStyle);
-		Label save2Label = new Label("Load Save 2", normalStyle);
-		Label save3Label = new Label("Load Save 3", normalStyle);
+		Label save1Label = new Label("Play Save 1", normalStyle);
+		Label save2Label = new Label("Play Save 2", normalStyle);
+		Label save3Label = new Label("Play Save 3", normalStyle);
+		Label exitLabel = new Label("Exit", normalStyle);
 
 
 		if(selection == 0)
-		{
-			newGameLabel.setStyle(selectedStyle);
-		}
-		else
-		{
-			newGameLabel.setStyle(normalStyle);
-		}
-		
-		if(selection == 1)
 		{
 			save1Label.setStyle(selectedStyle);
 		}
@@ -209,7 +174,7 @@ public class StartScreen implements Screen, InputProcessor
 			save1Label.setStyle(normalStyle);
 		}
 		
-		if(selection == 2)
+		if(selection == 1)
 		{
 			save2Label.setStyle(selectedStyle);
 		}
@@ -218,7 +183,7 @@ public class StartScreen implements Screen, InputProcessor
 			save2Label.setStyle(normalStyle);
 		}
 		
-		if(selection == 3)
+		if(selection == 2)
 		{
 			save3Label.setStyle(selectedStyle);
 		}
@@ -227,23 +192,31 @@ public class StartScreen implements Screen, InputProcessor
 			save3Label.setStyle(normalStyle);
 		}
 		
-		newGameLabel.setBounds(250, 380, 0, 0);
-		save1Label.setBounds(250, 350, 0, 0);
-		save2Label.setBounds(250, 320, 0, 0);
-		save3Label.setBounds(250, 290, 0, 0);
+		if(selection == 3)
+		{
+			exitLabel.setStyle(selectedStyle);
+		}
+		else
+		{
+			exitLabel.setStyle(normalStyle);
+		}
+		
+		save1Label.setBounds(250, 380, 0, 0);
+		save2Label.setBounds(250, 350, 0, 0);
+		save3Label.setBounds(250, 320, 0, 0);
+		exitLabel.setBounds(250, 290, 0, 0);
 
-		newGameLabel.draw(spriteBatch, 1.0f);
 		save1Label.draw(spriteBatch, 1.0f);
 		save2Label.draw(spriteBatch, 1.0f);
 		save3Label.draw(spriteBatch, 1.0f);
-		
+		exitLabel.draw(spriteBatch, 1.0f);
+
 		spriteBatch.end();
 
-		newGameLabel.clear();
+		exitLabel.clear();
 		save1Label.clear();
 		save2Label.clear();
 		save3Label.clear();
-		
 		//
 	}
 
