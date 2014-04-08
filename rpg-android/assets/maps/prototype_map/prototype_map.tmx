@@ -35,10 +35,11 @@
   <object x="1136" y="1344" width="64" height="48"/>
  </objectgroup>
  <objectgroup name="Warp" width="160" height="160">
-  <object name="prototype_map" x="1248" y="1248" width="32" height="32">
+  <object x="1248" y="1248" width="32" height="32">
    <properties>
     <property name="connected_to" value="example_north"/>
    </properties>
   </object>
+  <object name="prototype_map" x="1248" y="1280" width="32" height="32"/>
  </objectgroup>
 </map>

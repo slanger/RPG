@@ -590,7 +590,6 @@ public class PlayableCharacter extends GameCharacter
 	public void moveToOtherMap(Location newLocation)
 	{
 		currentLocation.getMap().close();
-		setWarpEnable(false);
 		nextLocation = newLocation;
 		currentLocation.getMap().removeCharacterFromMap(this);
 	}

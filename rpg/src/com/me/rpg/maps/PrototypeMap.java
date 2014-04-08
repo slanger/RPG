@@ -24,9 +24,6 @@ public class PrototypeMap extends Map
 	{
 		super(world, MapType.PROTOTYPE, MAP_TMX_PATH);
 
-		// map setup
-		setup();
-
 		create();
 	}
 

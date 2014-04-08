@@ -52,7 +52,6 @@ public abstract class GameCharacter
 	private float stateTime = 0f;
 	private float baseSpeed = 100f;
 	private float speedModifier = 1.0f;
-	private boolean warpEnable = true;
 
 	private transient Sprite sprite;
 	private transient TextureRegion rightIdle, leftIdle, upIdle, downIdle;
@@ -282,16 +281,6 @@ public abstract class GameCharacter
 	public void setMoving(boolean moving)
 	{
 		this.moving = moving;
-	}
-
-	public boolean warpEnable()
-	{
-		return warpEnable;
-	}
-
-	public void setWarpEnable(boolean warpEnable)
-	{
-		this.warpEnable = warpEnable;
 	}
 
 	protected float getStateTime()

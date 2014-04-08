@@ -15,9 +15,6 @@ public class ExampleMap extends Map
 	public ExampleMap(World world)
 	{
 		super(world, MapType.EXAMPLE, MAP_TMX_PATH);
-
-		// map setup
-		setup();
 	}
 
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException

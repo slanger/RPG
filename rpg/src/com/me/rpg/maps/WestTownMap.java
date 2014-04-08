@@ -15,9 +15,6 @@ public class WestTownMap extends Map
 	public WestTownMap(World world)
 	{
 		super(world, MapType.WEST_TOWN, MAP_TMX_PATH);
-
-		// map setup
-		setup();
 	}
 
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException

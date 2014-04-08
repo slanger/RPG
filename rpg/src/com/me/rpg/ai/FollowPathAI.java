@@ -139,7 +139,7 @@ public class FollowPathAI
 		if (nextWaypointRectangle.contains(characterCenter))
 		{
 			currentIndex++;
-			if (nextWaypoint.isWarpPoint())
+			if (nextWaypoint.isSourceWarpPoint())
 			{
 				currentIndex++;
 				Waypoint warpToWaypoint = nextWaypoint.connectedWarpPoint;

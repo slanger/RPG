@@ -291,20 +291,18 @@ public final class World
 		for (int i = 0; i < length; i++)
 		{
 			Waypoint waypoint = waypoints.get(i);
-			if (!waypoint.isWarpPoint())
+			if (waypoint.isSourceWarpPoint())
 			{
-				continue;
-			}
-			for (int j = i + 1; j < length; j++)
-			{
-				Waypoint w = waypoints.get(j);
-				if (w.isWarpPoint()
-						&& w.name.equals(waypoint.connectedWarpPointName))
+				for (int j = 0; j < length; j++)
 				{
-					waypoint.connectedWarpPoint = w;
-					w.connectedWarpPoint = waypoint;
-					waypoint.connections.add(new Waypoint.Edge(w, 0));
-					w.connections.add(new Waypoint.Edge(waypoint, 0));
+					Waypoint w = waypoints.get(j);
+					if (w.isDestinationWarpPoint()
+							&& w.name.equals(waypoint.connectedWarpPointName))
+					{
+						// warp point edges are directed
+						waypoint.connectedWarpPoint = w;
+						waypoint.connections.add(new Waypoint.Edge(w, 0));
+					}
 				}
 			}
 		}

@@ -106,30 +106,16 @@ public class PlayerControlledWalkAI
 			y = newCoordinate.getY();
 
 			// check warp point collision
-			if (!character.warpEnable())
+			if (didMove)
 			{
 				Waypoint warpWaypoint = character.getCurrentMap()
 						.checkCollisionWithWarpPoints(
-								new Rectangle(x, y, spriteWidth, spriteHeight));
-				if (warpWaypoint == null)
+								new Rectangle(x, y, spriteWidth,
+										spriteHeight));
+				if (warpWaypoint != null)
 				{
-					// character moved off of warp point, enable warping again
-					character.setWarpEnable(true);
-				}
-			}
-			else
-			{
-				if (didMove)
-				{
-					Waypoint warpWaypoint = character.getCurrentMap()
-							.checkCollisionWithWarpPoints(
-									new Rectangle(x, y, spriteWidth,
-											spriteHeight));
-					if (warpWaypoint != null)
-					{
-						// character.warpToOtherMap(warpWaypoint.location);
-						character.moveToOtherMap(warpWaypoint.location);
-					}
+					// character.warpToOtherMap(warpWaypoint.location);
+					character.moveToOtherMap(warpWaypoint.location);
 				}
 			}
 		}

@@ -50,7 +50,6 @@ public class NonplayableCharacter extends GameCharacter
 	@Override
 	public void moveToOtherMap(Location newLocation)
 	{
-		setWarpEnable(false);
 		nextLocation = newLocation;
 		currentLocation.getMap().removeCharacterFromMap(this);
 	}

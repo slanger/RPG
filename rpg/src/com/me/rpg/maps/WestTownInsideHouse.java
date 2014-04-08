@@ -15,9 +15,6 @@ public class WestTownInsideHouse extends Map
 	public WestTownInsideHouse(World world)
 	{
 		super(world, MapType.WEST_TOWN_INSIDE_HOUSE, MAP_TMX_PATH);
-
-		// map setup
-		setup();
 	}
 
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException

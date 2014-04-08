@@ -23,15 +23,29 @@ public class Waypoint
 
 	public Waypoint(Location location)
 	{
-		this(location, null, null);
+		this(location, null, false);
 	}
 
 	public Waypoint(Location location, String name,
-			String connectedWarpPointName)
+			boolean isWarpSource)
 	{
 		this.location = location;
-		this.name = name;
-		this.connectedWarpPointName = connectedWarpPointName;
+
+		if (name == null)
+		{
+			this.name = null;
+			this.connectedWarpPointName = null;
+		}
+		else if (isWarpSource)
+		{
+			this.name = null;
+			this.connectedWarpPointName = name;
+		}
+		else
+		{
+			this.name = name;
+			this.connectedWarpPointName = null;
+		}
 	}
 
 	public Rectangle getRectangle()
@@ -39,9 +53,19 @@ public class Waypoint
 		return location.getArea();
 	}
 
-	public boolean isWarpPoint()
+	public boolean isSourceWarpPoint()
 	{
-		return !(connectedWarpPointName == null);
+		return (connectedWarpPointName != null && name == null);
+	}
+
+	public boolean isDestinationWarpPoint()
+	{
+		return (name != null && connectedWarpPointName == null);
+	}
+
+	private boolean isWarpPoint()
+	{
+		return (isSourceWarpPoint() || isDestinationWarpPoint());
 	}
 
 	public Coordinate getCenter()
