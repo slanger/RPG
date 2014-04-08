@@ -50,6 +50,11 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableInputEscape = true;
 		//UP, DOWN, ENTER
 	
+	//debug menu keys
+	private long timeDebugMenuOpened = 0;
+	private boolean enableInputQ = true;
+		//left right
+	
 	private ArrayList<Weapon> weaponsInInventory;
 	private ArrayList<Shield> shieldsInInventory;
 	private ArrayList<Projectile> arrowsInInventory;
@@ -68,12 +73,12 @@ public class PlayableCharacter extends GameCharacter
 		this.enableControls = enableControls;
 	}
 
-	public PlayableCharacter(String name, String spritesheetPath, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration,
-			World world)
+	public PlayableCharacter(String name, String group, String spritesheetPath,
+			int width, int height, int tileWidth, int tileHeight,
+			float animationDuration, World world)
 	{
-		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
-				animationDuration, world);
+		super(name, group, spritesheetPath, width, height, tileWidth,
+				tileHeight, animationDuration, world);
 		weaponsInInventory = new ArrayList<Weapon>();
 		arrowsInInventory = new ArrayList<Projectile>();
 		shieldsInInventory = new ArrayList<Shield>();
@@ -140,6 +145,19 @@ public class PlayableCharacter extends GameCharacter
 		 *  INVENTORY MENU
 		 */
 		
+		if(world.getReputationDebugMenu().getInMenu() == true)
+		{
+			if(Gdx.input.isKeyPressed(Keys.Q) && (System.currentTimeMillis() - timeDebugMenuOpened > 250))
+			{
+				world.getReputationDebugMenu().closeMenu();
+			}
+			else
+			{
+				//handleReputationDebugMenuInput();
+			}
+			return;
+		}
+		
 		if(world.getInventoryMenu().getInMenu() == true)
 		{
 			if(Gdx.input.isKeyPressed(Keys.I) && (System.currentTimeMillis() - timeInventoryOpened > 250))
@@ -172,6 +190,33 @@ public class PlayableCharacter extends GameCharacter
 		/*
 		 *  END INVENTORY MENU
 		 */
+		
+		/*
+		 *  REP DEBUG MENU
+		 */
+		
+		
+		if (Gdx.input.isKeyPressed(Keys.Q))
+		{
+			if (enableInputQ)
+			{
+				enableInputQ = false;
+				if (!world.getReputationDebugMenu().getInMenu() && (System.currentTimeMillis() - timeDebugMenuOpened) >= 300)
+				{
+					timeDebugMenuOpened = System.currentTimeMillis();
+					world.getReputationDebugMenu().openMenu();
+				}
+			}
+		}
+		else
+		{
+			enableInputQ = true;
+		}
+		
+		/*
+		 *  END REP DEBUG MENU
+		 */
+		
 		
 		/*
 		 * DIALOGUE

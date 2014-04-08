@@ -13,12 +13,12 @@ public class NonplayableCharacter extends GameCharacter
 
 	private State stateMachine;
 
-	public NonplayableCharacter(String name, String spritesheetPath, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration,
-			World world)
+	public NonplayableCharacter(String name, String group, String spritesheetPath,
+			int width, int height, int tileWidth, int tileHeight,
+			float animationDuration, World world)
 	{
-		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
-				animationDuration, world);
+		super(name, group, spritesheetPath, width, height, tileWidth,
+				tileHeight, animationDuration, world);
 
 		stateMachine = null;
 	}

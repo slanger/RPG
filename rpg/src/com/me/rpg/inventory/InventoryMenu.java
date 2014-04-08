@@ -1,14 +1,9 @@
 package com.me.rpg.inventory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -18,24 +13,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
-import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.PlayableCharacter;
-import com.me.rpg.combat.Equippable;
 import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.Weapon;
 
@@ -352,7 +340,7 @@ public class InventoryMenu implements Serializable
 			Projectile temp = null;
 			if(arrows.size() > i)
 			{
-				if(arrows.get(i)==player.getEquippedArrows())
+				if((arrows.get(i)==player.getEquippedArrows()) && (player.getEquippedWeapon() instanceof RangedWeapon))
 				{
 					arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(equippedItemTexture)));
 				}

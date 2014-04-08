@@ -39,6 +39,7 @@ import com.me.rpg.maps.Map;
 import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
+import com.me.rpg.reputation.ReputationDebugMenu;
 import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
@@ -113,6 +114,7 @@ public final class World
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
 	private final InventoryMenu	inventoryMenu	= new InventoryMenu();
 	private final PauseScreen pauseScreen = new PauseScreen(this);
+	private final ReputationDebugMenu reputationDebugMenu = new ReputationDebugMenu(this);
 	private ReputationSystem reputationSystem;
 
 	private boolean warping = false;
@@ -152,6 +154,11 @@ public final class World
 	public PauseScreen getPauseScreen()
 	{
 		return pauseScreen;
+	}
+	
+	public ReputationDebugMenu getReputationDebugMenu()
+	{
+		return reputationDebugMenu;
 	}
 	
 	public Map getCurrentMap()
@@ -317,18 +324,18 @@ public final class World
 		final int height = 28;
 
 		// create characters
-		player = new PlayableCharacter("Player", PLAYER_TEXTURE_PATH, width,
-				height, 16, 16, 0.15f, this);
+		player = new PlayableCharacter("Player", "player_group", PLAYER_TEXTURE_PATH,
+				width, height, 16, 16, 0.15f, this);
 		player.setBaseSpeed(200f);
 
-		npc1 = new NonplayableCharacter("NPC1", NPC_TEXTURE_PATH, width,
-				height, 16, 16, 0.15f, this);
-		npc2 = new NonplayableCharacter("NPC2", NPC_TEXTURE_PATH, width,
-				height, 16, 16, 0.15f, this);
-		npc3 = new NonplayableCharacter("NPC3", NPC_TEXTURE_PATH, width,
-				height, 16, 16, 0.15f, this);
-		npc4 = new NonplayableCharacter("NPC4", NPC_TEXTURE_PATH, width,
-				height, 16, 16, 0.15f, this);
+		npc1 = new NonplayableCharacter("NPC1", "Test_Group", NPC_TEXTURE_PATH,
+				width, height, 16, 16, 0.15f, this);
+		npc2 = new NonplayableCharacter("NPC2", "Test_Group", NPC_TEXTURE_PATH,
+				width, height, 16, 16, 0.15f, this);
+		npc3 = new NonplayableCharacter("NPC3", "Test_Group", NPC_TEXTURE_PATH,
+				width, height, 16, 16, 0.15f, this);
+		npc4 = new NonplayableCharacter("NPC4", "Test_Group", NPC_TEXTURE_PATH,
+				width, height, 16, 16, 0.15f, this);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap, 192, 544));
@@ -557,6 +564,10 @@ public final class World
 			pauseScreen.render(batch, camera);
 		}
 		
+		if(reputationDebugMenu.getInMenu())
+		{
+			reputationDebugMenu.render(batch, camera);
+		}
 		// rendering reputation, and other notifications
 		if(messageQueue.size() > 0)
 		{

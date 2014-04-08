@@ -79,17 +79,21 @@ public abstract class GameCharacter
 	protected Time lastAttackTime;
 
 	// Reputation Stuff
+	protected String group;
+	protected int dispositionValue;
+	protected String viewOfPlayer;
 	protected NPCMemory npcMemory;
 	protected float sightDistance;
 	protected float hearingRadius;
 
 	protected Projectile currentEquippedArrows;
 	
-	protected GameCharacter(String name, String spritesheetPath, int width,
-			int height, int tileWidth, int tileHeight, float animationDuration,
-			World world)
+	protected GameCharacter(String name, String group, String spritesheetPath,
+			int width, int height, int tileWidth, int tileHeight,
+			float animationDuration, World world)
 	{
 		this.name = name;
+		this.group = group;
 		this.spritesheetPath = spritesheetPath;
 		this.width = width;
 		this.height = height;
@@ -107,6 +111,7 @@ public abstract class GameCharacter
 				.getMasterEventList());
 		sightDistance = 225.0f;
 		hearingRadius = 125.0f;
+		initializeReputation();
 		create();
 	}
 
@@ -923,6 +928,38 @@ public abstract class GameCharacter
 		if(weaponSlot instanceof RangedWeapon)
 		{
 			((RangedWeapon) weaponSlot).equipProjectile(arrows, 1000);
+		}
+	}
+	
+	//reputation stuff
+	public void setDispositionValue(int dispositionValue)
+	{
+		this.dispositionValue = dispositionValue;
+		updateViewOfPlayer();
+	}
+	
+	public void updateViewOfPlayer()
+	{
+		if(dispositionValue > 50) viewOfPlayer = "like";
+		else if(dispositionValue < 0) viewOfPlayer = "hate";
+		else viewOfPlayer = "neutral";
+	}
+	
+	public int getDispositionValue()
+	{
+		return dispositionValue;
+	}
+	
+	public String getViewOfPlayer()
+	{
+		return viewOfPlayer;
+	}
+	
+	public void initializeReputation()
+	{
+		if(group.equalsIgnoreCase("Test_Group"))
+		{
+			setDispositionValue(0);
 		}
 	}
 }
