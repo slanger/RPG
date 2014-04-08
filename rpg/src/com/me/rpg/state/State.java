@@ -82,21 +82,15 @@ public abstract class State implements Serializable
 	}
 	
 	public final ArrayList<Action> getActions(float delta) {
-		if (character.getName().equals("NPC4"))
-		System.out.printf("In state: %s\n", toString());
 		timeInState.incrementValue(delta);
 		return doGetActions();
 	}
 	
 	public final ArrayList<Action> getEntryActions() {
-		if (character.getName().equals("NPC4"))
-		System.out.printf("Entering state: %s\n", toString());
 		return doGetEntryActions();
 	}
 	
 	public final ArrayList<Action> getExitActions() {
-		if (character.getName().equals("NPC4"))
-		System.out.printf("Exiting state: %s\n", toString());
 		timeInState.setValue(0f);
 		return doGetExitActions();
 	}

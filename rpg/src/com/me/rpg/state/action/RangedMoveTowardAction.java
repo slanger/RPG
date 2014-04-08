@@ -17,7 +17,6 @@ public class RangedMoveTowardAction implements Action {
 	
 	@Override
 	public void doAction(float delta) {
-		System.err.printf("rangedmovetoward\n");
 		GameCharacter target = character.getRememberedAttacker();
 		if (target == null) return;
 		
@@ -27,15 +26,15 @@ public class RangedMoveTowardAction implements Action {
 		int dx = -1;
 		int dy = -1;
 		if (Math.abs(diff.getX()) > Math.abs(diff.getY())) {
-			dx = 0;
-			dy = (diff.getX() > 0 ? 1 : -1);
-		} else {
-			dx = (diff.getY() > 0 ? 1 : -1);
+			dx = (diff.getX() > 0 ? 1 : -1);
 			dy = 0;
+		} else {
+			dx = 0;
+			dy = (diff.getY() > 0 ? 1 : -1);
 		}
 		Weapon weapon = character.getEquippedWeapon();
 		int range = weapon.getRange();
-		Coordinate desiredLoc = tarCen.translate(range*-dy, range*-dx);
+		Coordinate desiredLoc = tarCen.translate(range*-dx, range*-dy);
 		WalkAI walkai = new FollowPathAI(character, new Location(character.getCurrentMap(), desiredLoc));
 		walkai.update(delta);
 	}
