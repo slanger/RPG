@@ -321,9 +321,9 @@ public final class World
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap, 192, 544));
-		//exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
+		exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
 		exampleMap.addCharacterToMap(npc2, new Location(exampleMap, 480, 128));
-		//exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
+		exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
 
 		// state machine for npc1
 		HierarchicalState parent1 = new HierarchicalState(null, npc1);
