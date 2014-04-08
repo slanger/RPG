@@ -28,14 +28,14 @@ public class RangedMoveTowardAction implements Action {
 		int dy = -1;
 		if (Math.abs(diff.getX()) > Math.abs(diff.getY())) {
 			dx = 0;
-			dy = (diff.getY() > 0 ? 1 : -1);
+			dy = (diff.getX() > 0 ? 1 : -1);
 		} else {
-			dx = (diff.getX() > 0 ? 1 : -1);
+			dx = (diff.getY() > 0 ? 1 : -1);
 			dy = 0;
 		}
 		Weapon weapon = character.getEquippedWeapon();
 		int range = weapon.getRange();
-		Coordinate desiredLoc = tarCen.translate(range*dy, range*dx);
+		Coordinate desiredLoc = tarCen.translate(range*-dy, range*-dx);
 		WalkAI walkai = new FollowPathAI(character, new Location(character.getCurrentMap(), desiredLoc));
 		walkai.update(delta);
 	}

@@ -45,6 +45,8 @@ public class FollowPathAI
 	@Override
 	public void start()
 	{
+		currentIndex = 0;
+
 		Map sourceMap = character.getCurrentMap();
 		Rectangle sourceArea = character.getBoundingRectangle();
 		Location sourceLocation = new Location(sourceMap, sourceArea);

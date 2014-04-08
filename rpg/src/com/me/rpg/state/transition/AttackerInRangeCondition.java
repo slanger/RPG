@@ -17,7 +17,7 @@ public class AttackerInRangeCondition implements Condition {
 	@Override
 	public boolean test() {
 		GameCharacter target = character.getRememberedAttacker();
-		if (target == null) return false;
+		if (target == null || target.isDead()) return false;
 		
 		Coordinate tarCen = target.getCenter();
 		Coordinate meCen = character.getCenter();

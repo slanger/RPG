@@ -56,6 +56,7 @@ import com.me.rpg.state.transition.HearPeopleCondition;
 import com.me.rpg.state.transition.NotCondition;
 import com.me.rpg.state.transition.OrCondition;
 import com.me.rpg.state.transition.SeePeopleCondition;
+import com.me.rpg.state.transition.TargetDeadCondition;
 import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.Coordinate;
@@ -349,11 +350,14 @@ public final class World
 		Condition cannotHear = new NotCondition(canHear);
 		Condition canSeeOrHear = new OrCondition(canSee, canHear);
 		Condition cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
+		
+		Condition enemyDead = new TargetDeadCondition(npc1);
+		Condition or = new OrCondition(cannotSeeNorHear, enemyDead);
 
 		ArrayList<Action> patrolToFightActions = new ArrayList<Action>();
 		patrolToFightActions.add(new RememberNearestPersonAction(npc1, true, true, true));
 		Transition patrolToFight = new Transition(fight1, patrolToFightActions, canSeeOrHear);
-		Transition fightToPatrol = new Transition(patrol1, cannotSeeNorHear);
+		Transition fightToPatrol = new Transition(patrol1, or);
 
 		patrol1.setTransitions(patrolToFight);
 		fight1.setTransitions(fightToPatrol);
@@ -421,13 +425,13 @@ public final class World
 		
 		Condition seePeople4 = new SeePeopleCondition(npc4, 0, Comparison.GREATER);
 		Condition hearPeople4 = new HearPeopleCondition(npc4, 0, Comparison.GREATER);
-		Condition or = new OrCondition(seePeople4, hearPeople4);
-		Condition not = new NotCondition(or);
+		Condition or2 = new OrCondition(seePeople4, hearPeople4);
+		Condition not = new NotCondition(or2);
 		
 		ArrayList<Action> toRangeAtkActions = new ArrayList<Action>();
 		toRangeAtkActions.add(new RememberNearestPersonAction(npc4, true, true, true));
 		
-		Transition toRangeAtk = new Transition(rfs, toRangeAtkActions, or);
+		Transition toRangeAtk = new Transition(rfs, toRangeAtkActions, or2);
 		Transition toRandWlk = new Transition(rw4, not);
 		rw4.setTransitions(toRangeAtk);
 		rfs.setTransitions(toRandWlk);

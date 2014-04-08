@@ -40,7 +40,7 @@ public class RangedFightState extends ResettingHierarchicalState {
 			Transition toCanAtt = new Transition(canAtt, waitToAttCondition);
 			cannotAtt.setTransitions(toCanAtt);
 			
-			FloatCondition waitToCannotCond = standStill.getFloatCondition("timeInState", 1f, Comparison.GREATER);
+			FloatCondition waitToCannotCond = standStill.getFloatCondition("timeInState", 0.3f, Comparison.GREATER);
 			Transition toCannotAtt = new Transition(cannotAtt, waitToCannotCond);
 			standStill.setTransitions(toCannotAtt);
 			
@@ -99,7 +99,7 @@ public class RangedFightState extends ResettingHierarchicalState {
 		public RFSCannotAttack(HierarchicalState parent, GameCharacter character) {
 			super(parent, character);
 			actions = new ArrayList<Action>();
-			//actions.add(new KeepDistanceAction(character, 150));
+			actions.add(new RangedMoveTowardAction(character));
 			
 			entryActions = new ArrayList<Action>();
 			entryActions.add(new SetStrafeAction(character, true));
