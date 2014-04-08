@@ -37,14 +37,11 @@ public class StartScreen implements Screen, InputProcessor
 	private Stage stage;
 	private Skin skin;
 	private TextureAtlas atlas;
-	private Table table;
 	private ScreenHandler screenHandler;
 	private SpriteBatch spriteBatch = new SpriteBatch();
 	private Texture mainScreenTexture;
 	private int width, height;
-	private TextButton buttonPlay, buttonSettings;
 	private BitmapFont menuFont;
-	private Label heading;
 
 	private int selection=0;
 	// CONSTRUCTOR
