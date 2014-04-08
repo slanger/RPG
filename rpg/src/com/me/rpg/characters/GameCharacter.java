@@ -919,6 +919,11 @@ public abstract class GameCharacter
 		return currentEquippedArrows;
 	}
 	
+	public Shield getEquippedShield()
+	{
+		return shieldSlot;
+	}
+	
 	public void setEquippedArrows(Projectile arrows)
 	{
 		this.currentEquippedArrows = arrows;

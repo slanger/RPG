@@ -60,6 +60,9 @@ public class InventoryMenu implements Serializable
 	private transient Table shieldRow;
 	private transient Table miscItemRow;
 		
+	private transient Table topPaneLeft;
+	private transient Table topPaneRight;
+	
 	private transient ArrayList<Table> meleeWeaponTables;
 	private transient ArrayList<Table> arrowTables;
 	private transient ArrayList<Table> shieldTables;
@@ -69,6 +72,7 @@ public class InventoryMenu implements Serializable
 	private transient Texture testTexture;
 	private transient Texture itemRowTexture;
 	private transient Texture itemSelectionTexture;
+	private transient Texture equippedItemTexture;
 	
 	//inventory 
 	private boolean inMenu = false;
@@ -119,6 +123,9 @@ public class InventoryMenu implements Serializable
 		shieldRow = new Table();
 		miscItemRow = new Table();
 	
+		topPaneLeft = new Table();
+		topPaneRight = new Table();
+		
 		meleeWeaponTables = new ArrayList<Table>();
 		arrowTables = new ArrayList<Table>();
 		shieldTables = new ArrayList<Table>();
@@ -141,6 +148,7 @@ public class InventoryMenu implements Serializable
 		testTexture = new Texture(Gdx.files.internal("images/inventory_menu_item_background.png"));
 		itemRowTexture = new Texture(Gdx.files.internal("images/inv_menu_row_background.png"));
 		itemSelectionTexture = new Texture(Gdx.files.internal("images/selected_item.png"));
+		equippedItemTexture = new Texture(Gdx.files.internal("images/equipped_item.png"));
 	}
 	
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
@@ -242,10 +250,6 @@ public class InventoryMenu implements Serializable
 		
 		//equippedWeaponImage.scale(1.6f);
 		//initialize resources
-		LabelStyle style = new LabelStyle(menuFont, Color.DARK_GRAY);
-		Label label1 = new Label("left pane", style);
-		Label label2 = new Label("right pane",style);
-		Label label3 = new Label("test row", style);
 		//Label label4 = new Label("test2", style);
 
 		//Set up MainTable, contains everything else
@@ -255,11 +259,15 @@ public class InventoryMenu implements Serializable
 		mainTable.top().left().pad(10.0f);
 		
 		//Top pane will contain selected item, with stats on it
-		topPane.setBackground(new TextureRegionDrawable(new TextureRegion(testTexture)));
-		topPane.pad(10.0f);
-		topPane.add(label1);
-		mainTable.add(topPane).expandX().fill().height(250.0f);
 		
+		
+		//
+		//TOP PANE STUFF
+		
+		
+		updateTopPane();
+		
+		//BOTTOM PANE STUFF
 		mainTable.row();
 		
 		//bottom pane will contain the 4 rows of selectable items
@@ -309,6 +317,14 @@ public class InventoryMenu implements Serializable
 			MeleeWeapon temp = null;
 			if(meleeWeapons.size() > i)
 			{
+				if(meleeWeapons.get(i)==player.getEquippedWeapon())
+				{
+					meleeWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(equippedItemTexture)));
+				}
+				if(rowSelectionIndex == 0 && colSelectionIndex == i)
+				{
+					meleeWeaponTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+				}
 				temp = (MeleeWeapon) meleeWeapons.get(i);
 				meleeWeaponTables.get(i).add(new Image(temp.getItemSpriteUp())).expand().fill();
 			}
@@ -336,6 +352,14 @@ public class InventoryMenu implements Serializable
 			Projectile temp = null;
 			if(arrows.size() > i)
 			{
+				if(arrows.get(i)==player.getEquippedArrows())
+				{
+					arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(equippedItemTexture)));
+				}
+				if(rowSelectionIndex == 1 && colSelectionIndex == i)
+				{
+					arrowTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+				}
 				temp = arrows.get(i);
 				arrowTables.get(i).add(new Image(temp.getItemSpriteUp())).expand().fill();
 			}
@@ -363,6 +387,14 @@ public class InventoryMenu implements Serializable
 			Shield temp = null;
 			if(shields.size() > i)
 			{
+				if(shields.get(i)==player.getEquippedShield())
+				{
+					shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(equippedItemTexture)));
+				}
+				if(rowSelectionIndex == 2 && colSelectionIndex == i)
+				{
+					shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+				}
 				temp = shields.get(i);
 				shieldTables.get(i).add(new Image(temp.getItemSpriteUp())).expand().fill();
 			}
@@ -395,17 +427,22 @@ public class InventoryMenu implements Serializable
 		
 		mainTable.debug(); // turn on all debug lines (table, cell, and widget)
 		topPane.debug();
+		topPaneRight.debug();
+		topPaneLeft.debug();
 		bottomPane.debug();
 		meleeWeaponRow.debug();
 		arrowsRow.debug();
 		shieldRow.debug();
 		miscItemRow.debug();
 
+		
 	    stage.draw();
-	    Table.drawDebug(stage);
+	    //Table.drawDebug(stage);
 	    
 		mainTable.clear();
 		topPane.clear();
+		topPaneRight.clear();
+		topPaneLeft.clear();
 		bottomPane.clear();
 		meleeWeaponRow.clear();
 		arrowsRow.clear();
@@ -420,6 +457,78 @@ public class InventoryMenu implements Serializable
 			miscItemTables.get(i).clear();
 		}
 		
+	}
+	
+	public void updateTopPane()
+	{
+		String itemName="";
+		String itemType="";
+		String itemDescription = "";
+		
+		LabelStyle style = new LabelStyle(menuFont, Color.WHITE);
+		
+		topPane.setBackground(new TextureRegionDrawable(new TextureRegion(testTexture)));
+		topPane.pad(10.0f);
+		mainTable.add(topPane).height(250.0f).expandX().fill();
+		
+		topPane.add(topPaneLeft).size(100.0f).padRight(100.0f).left();
+		topPane.add(topPaneRight).size(50.0f).pad(10.0f).right();
+		
+		if(rowSelectionIndex == 0)
+		{
+			itemName = "Item Name:   "+"test";
+			itemType = "Item Type:   "+"Sword";
+			itemDescription = "Description: "+"Legendary sword.";
+			
+			Label label1 = new Label(itemName, style);
+			Label label2 = new Label(itemType, style);
+			Label label3 = new Label(itemDescription, style);
+			
+			topPaneLeft.add(new Image(meleeWeapons.get(colSelectionIndex).getItemSpriteUp())).expand().fill();
+			topPaneRight.add(label1).left();
+			topPaneRight.row();
+			topPaneRight.add(label2).left();
+			topPaneRight.row();
+			topPaneRight.add(label3).left();
+		}
+		if(rowSelectionIndex == 1)
+		{
+			itemName = "Item Name:   "+"test";
+			itemType = "Item Type:   "+"Sword";
+			itemDescription = "Description: "+"Legendary sword.";
+			
+			Label label1 = new Label(itemName, style);
+			Label label2 = new Label(itemType, style);
+			Label label3 = new Label(itemDescription, style);
+			
+			topPaneLeft.add(new Image(arrows.get(colSelectionIndex).getItemSpriteUp())).expand().fill();
+			topPaneRight.add(label1).left();
+			topPaneRight.row();
+			topPaneRight.add(label2).left();
+			topPaneRight.row();
+			topPaneRight.add(label3).left();
+		}
+		if(rowSelectionIndex == 2)
+		{
+			itemName = "Item Name:   "+"test";
+			itemType = "Item Type:   "+"Sword";
+			itemDescription = "Description: "+"Legendary sword.";
+			
+			Label label1 = new Label(itemName, style);
+			Label label2 = new Label(itemType, style);
+			Label label3 = new Label(itemDescription, style);
+			
+			topPaneLeft.add(new Image(shields.get(colSelectionIndex).getItemSpriteUp())).expand().fill();
+			topPaneRight.add(label1).left();
+			topPaneRight.row();
+			topPaneRight.add(label2).left();
+			topPaneRight.row();
+			topPaneRight.add(label3).left();
+		}
+		if(rowSelectionIndex == 3)
+		{
+			
+		}
 	}
 	
 	public boolean getInMenu()
