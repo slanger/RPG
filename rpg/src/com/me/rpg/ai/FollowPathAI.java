@@ -55,8 +55,6 @@ public class FollowPathAI
 		// destination)
 		if (shortestPath == null)
 		{
-			// System.err.printf("Could not find path for %s; destination: %s%n",
-			// character.getName(), targetLocation);
 			isDestinationReachable = false;
 			path = new ArrayList<Waypoint>();
 			path.add(new Waypoint(targetLocation));
@@ -199,59 +197,47 @@ public class FollowPathAI
 			return shortestPath;
 		}
 
+		List<Waypoint> worldWaypoints = new ArrayList<Waypoint>(character.getWorld().waypoints);
+		Waypoint sourceWaypoint = new Waypoint(source);
+		Waypoint destinationWaypoint = new Waypoint(destination);
+
 		// find Waypoints that are connected to source
-		List<Waypoint> sourceWaypoints = new ArrayList<Waypoint>();
 		for (Waypoint w : sourceMap.getWaypoints())
 		{
 			Coordinate wCenter = w.getCenter();
 			if (sourceMap.pointsConnected(sourceCenter, wCenter))
 			{
-				sourceWaypoints.add(w);
+				float cost = sourceCenter.distanceTo(wCenter);
+				sourceWaypoint.connections.add(new Waypoint.Edge(w, cost));
+				w.connections.add(new Waypoint.Edge(sourceWaypoint, cost));
 			}
 		}
 
-		if (sourceWaypoints.size() == 0)
+		if (sourceWaypoint.connections.size() == 0)
 			return null;
 
+		worldWaypoints.add(sourceWaypoint);
+
 		// find Waypoints that are connected to destination
-		List<Waypoint> destinationWaypoints = new ArrayList<Waypoint>();
 		for (Waypoint w : destinationMap.getWaypoints())
 		{
 			Coordinate wCenter = w.getCenter();
 			if (destinationMap.pointsConnected(destinationCenter, wCenter))
 			{
-				destinationWaypoints.add(w);
+				float cost = destinationCenter.distanceTo(wCenter);
+				destinationWaypoint.connections.add(new Waypoint.Edge(w, cost));
+				w.connections.add(new Waypoint.Edge(destinationWaypoint, cost));
 			}
 		}
 
-		if (destinationWaypoints.size() == 0)
+		if (destinationWaypoint.connections.size() == 0)
 			return null;
 
+		worldWaypoints.add(destinationWaypoint);
+
 		// use Djikstra's algorithm to create shortest path
-		shortestPath = null;
-		float minimumDistance = Float.MAX_VALUE;
-		List<Waypoint> worldWaypoints = character.getWorld().waypoints;
+		shortestPath = dijkstra(worldWaypoints, sourceWaypoint, destinationWaypoint);
 
-		for (Waypoint wSource : sourceWaypoints)
-		{
-			for (Waypoint wDestination : destinationWaypoints)
-			{
-				List<Waypoint> path = dijkstra(worldWaypoints, wSource,
-						wDestination);
-
-				totalPathDistance += sourceCenter.distanceTo(wSource
-						.getCenter());
-				totalPathDistance += destinationCenter.distanceTo(wDestination
-						.getCenter());
-				if (shortestPath == null || totalPathDistance < minimumDistance)
-				{
-					shortestPath = path;
-					minimumDistance = totalPathDistance;
-				}
-			}
-		}
-
-		shortestPath.add(new Waypoint(destination));
 		return shortestPath;
 	}
 
@@ -319,7 +305,6 @@ public class FollowPathAI
 			current = current.previousVertex;
 		}
 
-		path.add(source);
 		Collections.reverse(path);
 		return path;
 	}
