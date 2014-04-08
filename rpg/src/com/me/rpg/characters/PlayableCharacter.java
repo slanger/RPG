@@ -9,7 +9,10 @@ import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.combat.Equippable;
+import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Location;
 
@@ -46,8 +49,10 @@ public class PlayableCharacter extends GameCharacter
 	private boolean enableInputEscape = true;
 		//UP, DOWN, ENTER
 	
-	private ArrayList<Equippable> equippablesInInventory;
+	private ArrayList<Weapon> weaponsInInventory;
+	private ArrayList<Shield> shieldsInInventory;
 	private ArrayList<Projectile> arrowsInInventory;
+	//private ArrayList<> miscItemsInInventory;
 	
 	private PlayerControlledWalkAI walkAI;
 
@@ -67,8 +72,9 @@ public class PlayableCharacter extends GameCharacter
 	{
 		super(name, spritesheetPath, width, height, tileWidth, tileHeight,
 				animationDuration, world);
-		equippablesInInventory = new ArrayList<Equippable>();
+		weaponsInInventory = new ArrayList<Weapon>();
 		arrowsInInventory = new ArrayList<Projectile>();
+		shieldsInInventory = new ArrayList<Shield>();
 		npcMemory = null;
 		walkAI = new PlayerControlledWalkAI(this);
 	}
@@ -275,18 +281,18 @@ public class PlayableCharacter extends GameCharacter
 		}
 
 		// switch weapon
-		if (Gdx.input.isKeyPressed(Keys.M))
-		{
-			if (enableWeaponSwitch)
-			{
-				swapWeapon(getCurrentMap());
-				enableWeaponSwitch = false;
-			}
-		}
-		else
-		{
-			enableWeaponSwitch = true;
-		}
+//		if (Gdx.input.isKeyPressed(Keys.M))
+//		{
+//			if (enableWeaponSwitch)
+//			{
+//				swapWeapon(getCurrentMap());
+//				enableWeaponSwitch = false;
+//			}
+//		}
+//		else
+//		{
+//			enableWeaponSwitch = true;
+//		}
 
 		/*
 		 * END COMBAT
@@ -664,9 +670,9 @@ public class PlayableCharacter extends GameCharacter
 		*/
 	}
 	
-	public void addItemToInventory(Equippable item)
+	public void addItemToInventory(Weapon item)
 	{
-		equippablesInInventory.add(item);
+		weaponsInInventory.add(item);
 	}
 	
 	public void addItemToInventory(Projectile item)
@@ -674,14 +680,24 @@ public class PlayableCharacter extends GameCharacter
 		arrowsInInventory.add(item);
 	}
 	
-	public ArrayList<Equippable> getEquippableItems()
+	public void addItemToInventory(Shield item)
 	{
-		return equippablesInInventory;
+		shieldsInInventory.add(item);
+	}
+	
+	public ArrayList<Weapon> getWeapons()
+	{
+		return weaponsInInventory;
 	}
 	
 	public ArrayList<Projectile> getArrows()
 	{
 		return arrowsInInventory;
+	}
+	
+	public ArrayList<Shield> getShields()
+	{
+		return shieldsInInventory;
 	}
 //	public void addItemToInventory(MiscItem item)
 //	{

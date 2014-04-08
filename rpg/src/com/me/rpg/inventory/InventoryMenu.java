@@ -36,6 +36,8 @@ import com.me.rpg.characters.PlayableCharacter;
 import com.me.rpg.combat.Equippable;
 import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
+import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.Weapon;
 
 public class InventoryMenu implements Serializable
 {
@@ -83,10 +85,10 @@ public class InventoryMenu implements Serializable
 	private final int NUM_ITEM_ROWS = 4;
 	private final int NUM_ITEMS_DISPLAYED = 8;
 	
-	private ArrayList<Equippable> meleeWeapons;  //first row
+	private ArrayList<Weapon> meleeWeapons;  //first row
 	private ArrayList<Projectile> arrows;   //second row
 	
-	private ArrayList<String> shields;       //third row
+	private ArrayList<Shield> shields;       //third row
 	private ArrayList<String> miscItems; 	 //fourth row
 	
 	public InventoryMenu()
@@ -150,8 +152,9 @@ public class InventoryMenu implements Serializable
 	public void openInventory(PlayableCharacter player)
 	{
 		this.player = player;
-		meleeWeapons = player.getEquippableItems();
+		meleeWeapons = player.getWeapons();
 		arrows = player.getArrows();
+		shields = player.getShields();
 		
 		inMenu = true;
 		rowSelectionIndex = 0;
@@ -187,7 +190,11 @@ public class InventoryMenu implements Serializable
 			}
 			if(rowSelectionIndex == 2)
 			{
-				
+				if(shields.size() > colSelectionIndex)
+				{
+					Shield temp = shields.get(colSelectionIndex);
+					player.equipShield(temp);
+				}
 			}
 			if(rowSelectionIndex == 3)
 			{
@@ -341,6 +348,8 @@ public class InventoryMenu implements Serializable
 		shieldRow.left().padLeft(20.0f);
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
+			shieldRow.add(shieldTables.get(i)).size(50.0f).pad(10.0f);
+			
 			if(rowSelectionIndex == 2 && colSelectionIndex == i)
 			{
 				shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
@@ -350,9 +359,16 @@ public class InventoryMenu implements Serializable
 				shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
 			}
 			
-			shieldRow.add(shieldTables.get(i)).size(50.0f).pad(10.0f);
-			shieldTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
-			shieldTables.get(i).add(new Image(bowWeapon)).expand().fill();
+			Shield temp = null;
+			if(shields.size() > i)
+			{
+				temp = shields.get(i);
+				shieldTables.get(i).add(new Image(temp.getItemSpriteUp())).expand().fill();
+			}
+			else
+			{
+				
+			}
 			shieldTables.get(i).debug();
 		}
 		

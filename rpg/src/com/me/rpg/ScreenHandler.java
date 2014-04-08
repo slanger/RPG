@@ -72,7 +72,8 @@ public class ScreenHandler extends Game
 		manager.load(World.FIRE_ARROW_PATH, Texture.class);
 		//load shield textures
 		manager.load(World.SHIELD_PATH, Texture.class);
-
+		manager.load(World.GRAY_SHIELD_PATH, Texture.class);
+		manager.load(World.SHADOW_SHIELD_PATH, Texture.class);
 		//load misc item textures
 		
 		

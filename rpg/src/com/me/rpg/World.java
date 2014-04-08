@@ -90,7 +90,9 @@ public final class World
 	public static final String FIRE_ARROW_PATH = "fire_arrow.png";
 	//shields
 	public static final String SHIELD_PATH = "shield.png";
-	
+	public static final String SHADOW_SHIELD_PATH = "shadow_shield.png";
+	public static final String GRAY_SHIELD_PATH = "gray_shield.png";
+
 	//other items
 	
 	
@@ -452,8 +454,9 @@ public final class World
 		final int weaponWidth = 32;
 		final int weaponHeight = 32;
 
-		// melee attack test stuff
-		Shield shield = new Shield("Lame Shield", SHIELD_PATH, weaponWidth, weaponHeight,
+// MELEE WEAPONS
+		
+		Weapon npc_sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Weapon sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
@@ -472,9 +475,8 @@ public final class World
 		sword.addEffect(poison);
 
 		player.equipWeapon(exampleMap, sword);
-		player.swapWeapon(exampleMap);
-		player.equipShield(shield);
-		npc1.equipWeapon(exampleMap, sword);
+		//player.swapWeapon(exampleMap);
+		npc1.equipWeapon(exampleMap, npc_sword);
 
 		player.addItemToInventory(sword);
 		player.addItemToInventory(evilSword);
@@ -482,13 +484,14 @@ public final class World
 		player.addItemToInventory(blueSword);
 		player.addItemToInventory(shadowSword);
 		
-		// ranged attack test stuff
+		
+// BOWS/PROJECTILES
 		RangedWeapon bow = new RangedWeapon("Lame Bow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
-		RangedWeapon npcbow = new RangedWeapon("NPCBow", ARROW_PATH, weaponWidth,
+		RangedWeapon npc_bow = new RangedWeapon("NPCBow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
 		player.equipWeapon(exampleMap, bow);
-		npc4.equipWeapon(westTownInsideHouse, npcbow);
+		npc4.equipWeapon(westTownInsideHouse, npc_bow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH, weaponWidth, weaponHeight,
@@ -499,11 +502,25 @@ public final class World
 		player.setEquippedArrows(fireArrow);
 		
 		bow.equipProjectile(fireArrow, 1000);
-		npcbow.equipProjectile(fireArrow, 10000);
+		npc_bow.equipProjectile(fireArrow, 10000);
 
-		Shield plainShield = new Shield("Plain Shield", SHIELD_PATH, weaponWidth,
+//SHIELDS		
+		Shield shield = new Shield("Lame Shield", SHIELD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Shield shadowShield = new Shield("Shadow Shield", SHADOW_SHIELD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Shield grayShield = new Shield("Gray Shield", GRAY_SHIELD_PATH, weaponWidth, weaponHeight,
+				32, 32);
+		Shield npc_shield = new Shield("Plain Shield", SHIELD_PATH, weaponWidth,
 				weaponHeight, 32, 32);
-		npc1.equipShield(plainShield);
+		
+		player.addItemToInventory(shield);
+		player.addItemToInventory(shadowShield);
+		player.addItemToInventory(grayShield);
+		
+		npc1.equipShield(npc_shield);
+		
+		
 		// npc1.usingShield(true);
 	}
 	
@@ -766,7 +783,7 @@ public final class World
 				Label messageLabel = new Label(messageQueue.get(i).getMessage(), errorStyle);
 				messageLabel.setWrap(true);
 				
-				messageLabel.setBounds(messagePositionX,(i+1)*20.0f, 0, 0);
+				messageLabel.setBounds(messagePositionX,messagePositionY + (i+1)*20.0f, 0, 0);
 				
 				messageLabel.draw(batch, 1.0f);
 				messageLabel.clear();
@@ -776,7 +793,7 @@ public final class World
 				Label messageLabel = new Label(messageQueue.get(i).getMessage(), normalStyle);
 				messageLabel.setWrap(true);
 				
-				messageLabel.setBounds(messagePositionX, (i+1)*20.0f, 0, 0);
+				messageLabel.setBounds(messagePositionX,messagePositionY + (i+1)*20.0f, 0, 0);
 				
 				messageLabel.draw(batch, 1.0f);
 				messageLabel.clear();
