@@ -222,11 +222,7 @@ public class InventoryMenu implements Serializable
 				colSelectionIndex --;			
 			}
 		}
-		
-		System.out.println("current row: "+ rowSelectionIndex);
-		System.out.println("current col: "+colSelectionIndex);
-		//System.out.println("showIndex: "+showIndex);
-		
+
 		return false;
 	}
 	

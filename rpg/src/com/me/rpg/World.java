@@ -40,15 +40,14 @@ import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationSystem;
-import com.me.rpg.state.CustomState;
 import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
 import com.me.rpg.state.RandomWalkState;
 import com.me.rpg.state.RunAwayState;
+import com.me.rpg.state.WalkToLocationState;
 import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.RememberNearestPersonAction;
-import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.state.transition.AndCondition;
 import com.me.rpg.state.transition.Condition;
 import com.me.rpg.state.transition.DistanceCondition;
@@ -61,6 +60,7 @@ import com.me.rpg.utils.Comparison;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.GlobalTimerTask;
+import com.me.rpg.utils.Location;
 import com.me.rpg.utils.Timer;
 import com.me.rpg.utils.Waypoint;
 
@@ -320,39 +320,31 @@ public final class World
 				height, 16, 16, 0.15f, this);
 
 		// add characters to map
-		exampleMap.addFocusedCharacterToMap(player, 192, 544);
-		exampleMap.addCharacterToMap(npc1, 544, 544);
-		exampleMap.addCharacterToMap(npc2, 480, 128);
-		exampleMap.addCharacterToMap(npc3, 32, 32);
+		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap, 192, 544));
+		//exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
+		exampleMap.addCharacterToMap(npc2, new Location(exampleMap, 480, 128));
+		//exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
 
 		// state machine for npc1
 		HierarchicalState parent1 = new HierarchicalState(null, npc1);
 
-		Coordinate[] patrolCoordinates1 = new Coordinate[] {
-				new Coordinate(50, 50),
-				new Coordinate(300, 50),
-				new Coordinate(300, 300),
-				new Coordinate(50, 300)
+		Location[] patrolLocations1 = new Location[] {
+				new Location(exampleMap, new Coordinate(50, 50)),
+				new Location(exampleMap, new Coordinate(300, 50)),
+				new Location(exampleMap, new Coordinate(300, 300)),
+				new Location(exampleMap, new Coordinate(50, 300))
 		};
-		Map[] patrolMaps1 = new Map[] {
-				exampleMap,
-				exampleMap,
-				exampleMap,
-				exampleMap
-		};
-		PatrolState patrol1 = new PatrolState(parent1, npc1, patrolCoordinates1, patrolMaps1);
+		PatrolState patrol1 = new PatrolState(parent1, npc1, patrolLocations1);
 
 		MeleeFightState fight1 = new MeleeFightState(parent1, npc1);
 
-		SeePeopleCondition canSee = new SeePeopleCondition(npc1, 0,
-				Comparison.NOTEQUALS);
-		HearPeopleCondition canHear = new HearPeopleCondition(npc1, 0,
-				Comparison.NOTEQUALS);
+		Condition canSee = new SeePeopleCondition(npc1, 0, Comparison.NOTEQUALS);
+		Condition canHear = new HearPeopleCondition(npc1, 0, Comparison.NOTEQUALS);
 		Condition cannotSee = new NotCondition(canSee);
 		Condition cannotHear = new NotCondition(canHear);
 		Condition canSeeOrHear = new OrCondition(canSee, canHear);
 		Condition cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
-		
+
 		ArrayList<Action> patrolToFightActions = new ArrayList<Action>();
 		patrolToFightActions.add(new RememberNearestPersonAction(npc1, true, true, true));
 		Transition patrolToFight = new Transition(fight1, patrolToFightActions, canSeeOrHear);
@@ -368,7 +360,7 @@ public final class World
 		HierarchicalState parent2 = new HierarchicalState(null, npc2);
 		HierarchicalState subparent = new HierarchicalState(parent2, npc2);
 		subparent.setName("subParent");
-		CustomState notAtCen = new CustomState(subparent, npc2);
+		WalkToLocationState notAtCen = new WalkToLocationState(subparent, npc2, new Location(exampleMap, 500, 100));
 		notAtCen.setName("notAtCen");
 		Rectangle walkingBoundary = new Rectangle(32, 32, 576, 224);
 		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2,
@@ -380,24 +372,21 @@ public final class World
 		subparent.setInitialState(notAtCen);
 		parent2.setInitialState(subparent);
 
-		WalkAction walk2 = new WalkAction(npc2, new Coordinate(500, 100), exampleMap);
-		notAtCen.setActions(walk2);
-
 		Condition dist = new DistanceCondition(npc2, exampleMap,
 				new Coordinate(500, 100));
 		Transition notCenToRandom = new Transition(randomWalkState, dist);
 
-		canSee = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
-		canHear = new HearPeopleCondition(npc2, 0, Comparison.NOTEQUALS);
-		cannotSee = new NotCondition(canSee);
-		cannotHear = new NotCondition(canHear);
-		canSeeOrHear = new OrCondition(canSee, canHear);
-		cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
+		Condition canSee2 = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
+		Condition canHear2 = new HearPeopleCondition(npc2, 0, Comparison.NOTEQUALS);
+		Condition cannotSee2 = new NotCondition(canSee2);
+		Condition cannotHear2 = new NotCondition(canHear2);
+		Condition canSeeOrHear2 = new OrCondition(canSee2, canHear2);
+		Condition cannotSeeNorHear2 = new AndCondition(cannotSee2, cannotHear2);
 
 		Condition timer = runaway.getFloatCondition("timeInState", 5f,
 				Comparison.GREATER);
-		Condition and = new AndCondition(cannotSeeNorHear, timer);
-		Transition subStateToRun = new Transition(runaway, canSeeOrHear);
+		Condition and = new AndCondition(cannotSeeNorHear2, timer);
+		Transition subStateToRun = new Transition(runaway, canSeeOrHear2);
 		Transition runToNotAtCen = new Transition(notAtCen, and);
 
 		notAtCen.setTransitions(notCenToRandom);
@@ -409,15 +398,11 @@ public final class World
 		// state machine for npc3
 		HierarchicalState parent3 = new HierarchicalState(null, npc3);
 
-		Coordinate[] patrolCoordinates3 = new Coordinate[] {
-				new Coordinate(1536, 160),
-				new Coordinate(32, 32)
-				};
-		Map[] patrolMaps3 = new Map[] {
-				westTown,
-				exampleMap
+		Location[] patrolLocations3 = new Location[] {
+				new Location(westTown, 1536, 160),
+				new Location(exampleMap, 500, 500)
 		};
-		PatrolState patrol3 = new PatrolState(parent3, npc3, patrolCoordinates3, patrolMaps3);
+		PatrolState patrol3 = new PatrolState(parent3, npc3, patrolLocations3);
 
 		parent3.setInitialState(patrol3);
 
@@ -429,11 +414,9 @@ public final class World
 		final int weaponHeight = 32;
 
 		// melee attack test stuff
-		Shield shield = new Shield("LameShield", SHIELD_PATH, weaponWidth, weaponHeight,
+		Shield shield = new Shield("Lame Shield", SHIELD_PATH, weaponWidth, weaponHeight,
 				32, 32);
-		Weapon sword = new MeleeWeapon("LameSword", SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Weapon sword2 = new MeleeWeapon("Sword2", SWORD_PATH, weaponWidth, weaponHeight,
+		Weapon sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Weapon evilSword = new MeleeWeapon("Evil Sword", EVIL_SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
@@ -448,12 +431,11 @@ public final class World
 		
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
-		sword2.addEffect(poison);
 
 		player.equipWeapon(exampleMap, sword);
 		player.swapWeapon(exampleMap);
 		player.equipShield(shield);
-		npc1.equipWeapon(exampleMap, sword2);
+		npc1.equipWeapon(exampleMap, sword);
 
 		player.addItemToInventory(sword);
 		player.addItemToInventory(evilSword);
@@ -462,7 +444,7 @@ public final class World
 		player.addItemToInventory(shadowSword);
 		
 		// ranged attack test stuff
-		RangedWeapon bow = new RangedWeapon("LameBow", ARROW_PATH, weaponWidth,
+		RangedWeapon bow = new RangedWeapon("Lame Bow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
 		player.equipWeapon(exampleMap, bow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
@@ -563,12 +545,6 @@ public final class World
 			Map map = iter.next();
 			map.update(deltaTime);
 		}
-	}
-
-	public void warpPlayerToOtherMap(final Map newMap,
-			final Coordinate newLocation)
-	{
-		
 	}
 
 	@Override

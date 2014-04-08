@@ -7,6 +7,7 @@ import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.ModifySpeedAction;
 import com.me.rpg.state.action.WalkAction;
 import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Location;
 
 public class RunAwayState extends State
 {
@@ -57,7 +58,8 @@ public class RunAwayState extends State
 		meCenter.setY(2 * meCenter.getY() - pCenter.getY());
 
 		ArrayList<Action> actions = new ArrayList<Action>();
-		actions.add(new WalkAction(character, meCenter, character.getCurrentMap()));
+		Location targetLocation = new Location(character.getCurrentMap(), meCenter);
+		actions.add(new WalkAction(character, targetLocation));
 		return actions;
 	}
 

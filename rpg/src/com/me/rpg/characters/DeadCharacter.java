@@ -11,7 +11,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.ScreenHandler;
 
-public class DeadCharacter implements Serializable
+public class DeadCharacter
+	implements Serializable
 {
 
 	private static final long serialVersionUID = 1544763022077391987L;
@@ -35,12 +36,16 @@ public class DeadCharacter implements Serializable
 
 	private void create()
 	{
-		Texture gravestoneTexture = ScreenHandler.manager.get(gravestoneSpritePath, Texture.class);
-		gravestone = new Sprite(new TextureRegion(gravestoneTexture, 0, 0, 34, 41));
-		gravestone.setPosition(deceased.getBottomLeftX(), deceased.getBottomLeftY());
+		Texture gravestoneTexture = ScreenHandler.manager.get(
+				gravestoneSpritePath, Texture.class);
+		gravestone = new Sprite(new TextureRegion(gravestoneTexture, 0, 0, 34,
+				41));
+		gravestone.setPosition(deceased.getBottomLeftX(),
+				deceased.getBottomLeftY());
 	}
 
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream inputStream)
+		throws IOException, ClassNotFoundException
 	{
 		inputStream.defaultReadObject();
 		create();

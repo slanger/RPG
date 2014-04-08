@@ -5,13 +5,14 @@ import com.me.rpg.ai.WalkAI;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
+import com.me.rpg.utils.Location;
 
 public class MeleeMoveTowardAction implements Action {
 
 	private static final long serialVersionUID = -1027746630531574165L;
 
 	private GameCharacter character;
-	private WalkAI walkai;
+	private WalkAI walkAI;
 	
 	// Assumes that this character has a rememberedTarget, and that the char
 	// is equipped with a melee weapon.
@@ -39,8 +40,9 @@ public class MeleeMoveTowardAction implements Action {
 			}
 		}
 		
-		walkai = new FollowPathAI(character, shiftedTarget[best].getSmallCenteredRectangle(), target.getCurrentMap());
-		walkai.update(delta);
+		Location targetLocation = new Location(target.getCurrentMap(), shiftedTarget[best].getSmallCenteredRectangle());
+		walkAI = new FollowPathAI(character, targetLocation);
+		walkAI.update(delta);
 	}
 
 }

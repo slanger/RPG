@@ -2,11 +2,10 @@ package com.me.rpg.state.action;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.ai.FollowPathAI;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.maps.Map;
-import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Location;
 
 public class AttackMoveAction implements Action {
 
@@ -29,9 +28,8 @@ public class AttackMoveAction implements Action {
 		if (enemy.size() == 0)
 			return;
 		GameCharacter target = enemy.get(0);
-		Coordinate center = target.getCenter();
-		Rectangle cen = new Rectangle(center.getX(), center.getY(), Coordinate.EPS, Coordinate.EPS);
-		walkAI = new FollowPathAI(character, cen, character.getCurrentMap());
+		Location targetLocation = new Location(character.getCurrentMap(), target.getCenter());
+		walkAI = new FollowPathAI(character, targetLocation);
 		walkAI.update(delta);
 	}
 

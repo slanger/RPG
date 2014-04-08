@@ -27,6 +27,7 @@ import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Location;
 import com.me.rpg.utils.Timer;
 import com.me.rpg.utils.Waypoint;
 
@@ -472,7 +473,7 @@ public abstract class Map
 			String connectedWarpPointName = (String) warpPoint.getProperties()
 					.get("connected_to");
 			if (checkRectangle(r, returnWaypoints, true))
-				returnWaypoints.add(new Waypoint(r, this, name,
+				returnWaypoints.add(new Waypoint(new Location(this, r), name,
 						connectedWarpPointName));
 		}
 
@@ -486,23 +487,23 @@ public abstract class Map
 
 			Rectangle bottomLeft = new Rectangle(x - tileWidth, y - tileHeight,
 					tileWidth, tileHeight);
-			if (checkRectangle(bottomLeft, returnWaypoints, true))
-				returnWaypoints.add(new Waypoint(bottomLeft, this));
+			if (checkRectangle(bottomLeft, returnWaypoints, false))
+				returnWaypoints.add(new Waypoint(new Location(this, bottomLeft)));
 
 			Rectangle topLeft = new Rectangle(x - tileWidth, y + height,
 					tileWidth, tileHeight);
-			if (checkRectangle(topLeft, returnWaypoints, true))
-				returnWaypoints.add(new Waypoint(topLeft, this));
+			if (checkRectangle(topLeft, returnWaypoints, false))
+				returnWaypoints.add(new Waypoint(new Location(this, topLeft)));
 
 			Rectangle topRight = new Rectangle(x + width, y + height,
 					tileWidth, tileHeight);
-			if (checkRectangle(topRight, returnWaypoints, true))
-				returnWaypoints.add(new Waypoint(topRight, this));
+			if (checkRectangle(topRight, returnWaypoints, false))
+				returnWaypoints.add(new Waypoint(new Location(this, topRight)));
 
 			Rectangle bottomRight = new Rectangle(x + width, y - tileHeight,
 					tileWidth, tileHeight);
-			if (checkRectangle(bottomRight, returnWaypoints, true))
-				returnWaypoints.add(new Waypoint(bottomRight, this));
+			if (checkRectangle(bottomRight, returnWaypoints, false))
+				returnWaypoints.add(new Waypoint(new Location(this, bottomRight)));
 
 			/*
 			Coordinate bottomLeft = new Coordinate(x - tileWidth / 2f, y - tileHeight / 2f);
@@ -538,11 +539,11 @@ public abstract class Map
 		for (int i = 0; i < length; i++)
 		{
 			Waypoint waypoint = waypoints.get(i);
-			Coordinate waypointCenter = new Coordinate(waypoint.rectangle.getCenter(new Vector2()));
+			Coordinate waypointCenter = waypoint.getCenter();
 			for (int j = i + 1; j < length; j++)
 			{
 				Waypoint w = waypoints.get(j);
-				Coordinate wCenter = new Coordinate(w.rectangle.getCenter(new Vector2()));
+				Coordinate wCenter = w.getCenter();
 				if (pointsConnected(waypointCenter, wCenter))
 				{
 					float distance = waypointCenter.distanceTo(wCenter);
@@ -570,7 +571,7 @@ public abstract class Map
 		// check if waypoint equals another waypoint we've already added
 		for (Waypoint w : waypoints)
 		{
-			Rectangle r = w.rectangle;
+			Rectangle r = w.getRectangle();
 			if (sameRectangles(rectangle, r))
 			{
 				return false;
@@ -862,7 +863,7 @@ public abstract class Map
 	}
 
 	public void addCharacterToMap(GameCharacter newCharacter,
-			Coordinate newLocation)
+			Location newLocation)
 	{
 		if (newLocation == null)
 		{
@@ -879,7 +880,7 @@ public abstract class Map
 							+ newCharacter + " " + newLocation);
 		}
 		charactersOnMap.add(newCharacter);
-		newCharacter.addedToMap(this, newLocation);
+		newCharacter.addedToMap(newLocation);
 	}
 
 	public void setFocusedCharacter(GameCharacter newFocus)
@@ -893,22 +894,8 @@ public abstract class Map
 		focusedCharacter = newFocus;
 	}
 
-	// HELPER METHODS
-
-	public void addCharacterToMap(GameCharacter newCharacter, float x, float y)
-	{
-		Coordinate newLocation = new Coordinate(x, y);
-		addCharacterToMap(newCharacter, newLocation);
-	}
-
 	public void addFocusedCharacterToMap(GameCharacter newFocusedCharacter,
-			float x, float y)
-	{
-		addFocusedCharacterToMap(newFocusedCharacter, new Coordinate(x, y));
-	}
-
-	public void addFocusedCharacterToMap(GameCharacter newFocusedCharacter,
-			Coordinate newLocation)
+			Location newLocation)
 	{
 		addCharacterToMap(newFocusedCharacter, newLocation);
 		setFocusedCharacter(newFocusedCharacter);
@@ -918,7 +905,7 @@ public abstract class Map
 	 * END ADDING/REMOVING CHARACTERS
 	 */
 
-	public boolean isCharacterOnMap(GameCharacter character)
+	private boolean isCharacterOnMap(GameCharacter character)
 	{
 		return charactersOnMap.contains(character);
 	}

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.me.rpg.maps.Map;
 
 public class Waypoint
 	implements Comparable<Waypoint>, Serializable
@@ -13,8 +12,7 @@ public class Waypoint
 
 	private static final long serialVersionUID = 4313230046743309396L;
 
-	public final Rectangle rectangle;
-	public final Map mapLocatedOn;
+	public final Location location;
 	public final String name;
 	public final String connectedWarpPointName;
 	public final List<Edge> connections = new ArrayList<Edge>();
@@ -23,18 +21,22 @@ public class Waypoint
 	public float distanceFromSource;
 	public Waypoint previousVertex;
 
-	public Waypoint(Rectangle rectangle, Map mapLocatedOn)
+	public Waypoint(Location location)
 	{
-		this(rectangle, mapLocatedOn, null, null);
+		this(location, null, null);
 	}
 
-	public Waypoint(Rectangle rectangle, Map mapLocatedOn, String name,
+	public Waypoint(Location location, String name,
 			String connectedWarpPointName)
 	{
-		this.rectangle = rectangle;
-		this.mapLocatedOn = mapLocatedOn;
+		this.location = location;
 		this.name = name;
 		this.connectedWarpPointName = connectedWarpPointName;
+	}
+
+	public Rectangle getRectangle()
+	{
+		return location.getArea();
 	}
 
 	public boolean isWarpPoint()
@@ -42,11 +44,16 @@ public class Waypoint
 		return !(connectedWarpPointName == null);
 	}
 
+	public Coordinate getCenter()
+	{
+		return location.getCenter();
+	}
+
 	@Override
 	public String toString()
 	{
-		return String.format("(%s; %s); isWarpPoint=%s", rectangle.toString(),
-				mapLocatedOn.getMapType().getMapName(), isWarpPoint());
+		return String.format("%s; connections: %s; isWarpPoint=%s", location,
+				connections, isWarpPoint());
 	}
 
 	// compare distances of the Waypoints
@@ -73,6 +80,12 @@ public class Waypoint
 		{
 			this.connectedWaypoint = connectedWaypoint;
 			this.cost = cost;
+		}
+
+		@Override
+		public String toString()
+		{
+			return String.format("(%s, %.2f)", connectedWaypoint.location, cost);
 		}
 
 	}

@@ -127,10 +127,8 @@ public class PlayerControlledWalkAI
 											spriteHeight));
 					if (warpWaypoint != null)
 					{
-						// character.warpToOtherMap(warpWaypoint.mapLocatedOn,
-						// warpWaypoint.rectangle);
-						character.moveToOtherMap(warpWaypoint.mapLocatedOn,
-								warpWaypoint.rectangle);
+						// character.warpToOtherMap(warpWaypoint.location);
+						character.moveToOtherMap(warpWaypoint.location);
 					}
 				}
 			}

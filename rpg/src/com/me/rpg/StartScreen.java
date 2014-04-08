@@ -131,14 +131,11 @@ public class StartScreen implements Screen, InputProcessor
 				{
 					//stage.removeListener(this);
 					if(selection > 0) selection--;
-					System.out.println(selection);
-
 				}
 				else if (keycode == Keys.DOWN)
 				{
 					//stage.removeListener(this);
 					if(selection < 3) selection++;
-					System.out.println(selection);
 				}
 				return true;
 			}

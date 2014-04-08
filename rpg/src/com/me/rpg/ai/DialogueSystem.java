@@ -143,8 +143,6 @@ public class DialogueSystem implements Serializable
 					
 			}
 		}
-		System.out.println("choiceIndex: " +choiceIndex);
-		System.out.println("showIndex: "+showIndex);
 		return false;
 	}
 	
@@ -215,14 +213,7 @@ public class DialogueSystem implements Serializable
 		}
 		
 		npcStatement1.setWrap(true);
-		
-//		System.out.println("camera position x "+camera.position.x);
-//		System.out.println("camera position y "+camera.position.y);
-//		
-//		System.out.println("dialogue position x: "+dialoguePositionX);
-//		System.out.println("dialogue position y: "+dialoguePositionY);
-	    
-		
+
 	    table.setBounds(dialoguePositionX, dialoguePositionY, dialogueWidth, dialogueHeight);
 	    
 	    table.add(objectName).width(dialogueWidth*0.9f);
@@ -369,7 +360,6 @@ public class DialogueSystem implements Serializable
 			for(int i = 0; i < currentNode.getNumChildren(); i++)
 			{
 				Node nextNode = assembleTree(currentNode);
-				// System.out.println("added node "+nextNode.getDialogue()+ " under "+currentNode.getDialogue());
 				currentNode.addChildNode(nextNode);
 			}
 		}

@@ -1,13 +1,10 @@
 package com.me.rpg.characters;
 
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
-import com.me.rpg.maps.Map;
 import com.me.rpg.state.State;
 import com.me.rpg.state.UpdateResult;
 import com.me.rpg.state.action.Action;
-import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Location;
 
 public class NonplayableCharacter extends GameCharacter
 {
@@ -24,6 +21,11 @@ public class NonplayableCharacter extends GameCharacter
 				animationDuration, world);
 
 		stateMachine = null;
+	}
+	
+	public State getStateMachine()
+	{
+		return stateMachine;
 	}
 	
 	public void setStateMachine(State s) {
@@ -46,23 +48,21 @@ public class NonplayableCharacter extends GameCharacter
 	 * Move NPC to other map "quietly"--without interrupting the player.
 	 */
 	@Override
-	public void moveToOtherMap(Map newMap, Rectangle newLocation)
+	public void moveToOtherMap(Location newLocation)
 	{
 		setWarpEnable(false);
-		nextMap = newMap;
-		Vector2 center = newLocation.getCenter(new Vector2());
-		nextLocation = new Coordinate(center.x - getSpriteWidth() / 2, center.y - getSpriteHeight() / 2);
-		currentMap.removeCharacterFromMap(this);
+		nextLocation = newLocation;
+		currentLocation.getMap().removeCharacterFromMap(this);
 	}
 
 	/**
 	 * Move NPC to other map "quietly"--without interrupting the player.
 	 */
 	@Override
-	public void warpToOtherMap(Map newMap, Rectangle newLocation)
+	public void warpToOtherMap(Location newLocation)
 	{
-		// just use moveToOtherMap(). Nothing flashy for NPC
-		moveToOtherMap(newMap, newLocation);
+		// Nothing flashy for NPC--just use moveToOtherMap()
+		moveToOtherMap(newLocation);
 	}
 
 }

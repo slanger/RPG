@@ -31,6 +31,7 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.GlobalTimerTask;
 import com.me.rpg.utils.GlobalTimerTask.Time;
+import com.me.rpg.utils.Location;
 
 public abstract class GameCharacter
 	implements IAttackable, Serializable
@@ -45,7 +46,6 @@ public abstract class GameCharacter
 	private int width, height;
 	private int tileWidth, tileHeight;
 	private float animationDuration;
-	private Coordinate bottomLeftCorner;
 	private Direction moveDirection = Direction.DOWN;
 	private Direction faceDirection = Direction.DOWN;
 	private boolean moving = false;
@@ -59,9 +59,8 @@ public abstract class GameCharacter
 	private transient Animation rightWalkAnimation, leftWalkAnimation,
 			upWalkAnimation, downWalkAnimation;
 
-	protected Map currentMap = null;
-	protected Map nextMap = null;
-	protected Coordinate nextLocation = null;
+	protected Location currentLocation = null;
+	protected Location nextLocation = null;
 	protected final World world;
 
 	// Combat stuff
@@ -160,32 +159,46 @@ public abstract class GameCharacter
 		this.name = name;
 	}
 
+	public Map getCurrentMap()
+	{
+		return currentLocation.getMap();
+	}
+
+	public void setCurrentMap(Map currentMap)
+	{
+		currentLocation.setMap(currentMap);
+	}
+
 	public Coordinate getBottomLeftCorner()
 	{
-		return bottomLeftCorner;
+		return currentLocation.getBottomLeftCorner();
 	}
 
 	public float getBottomLeftX()
 	{
-		return bottomLeftCorner.getX();
+		return getBottomLeftCorner().getX();
 	}
 
 	public float getBottomLeftY()
 	{
-		return bottomLeftCorner.getY();
+		return getBottomLeftCorner().getY();
 	}
 
 	public void setBottomLeftCorner(Coordinate bottomLeftCorner)
 	{
-		this.bottomLeftCorner = bottomLeftCorner;
-		// update position
-		setPosition(bottomLeftCorner.getX(), bottomLeftCorner.getY());
+		currentLocation.setBottomLeftCorner(bottomLeftCorner);
+		// update sprite position
+		setPosition(currentLocation.getBottomLeftCorner());
+	}
+
+	public boolean isNear(Coordinate bottomLeftTarget)
+	{
+		return getBottomLeftCorner().isNear(bottomLeftTarget);
 	}
 
 	public Coordinate getCenter()
 	{
-		return new Coordinate(bottomLeftCorner.getX() + getSpriteWidth() / 2,
-				bottomLeftCorner.getY() + getSpriteHeight() / 2);
+		return currentLocation.getCenter();
 	}
 
 	public float getCenterX()
@@ -200,21 +213,14 @@ public abstract class GameCharacter
 
 	public void setCenter(Coordinate center)
 	{
-		bottomLeftCorner = new Coordinate(center.getX() - getSpriteWidth() / 2,
-				center.getY() - getSpriteHeight() / 2);
-		// update position
-		setPosition(bottomLeftCorner.getX(), bottomLeftCorner.getY());
+		currentLocation.setCenter(center);
+		// update sprite position
+		setPosition(currentLocation.getBottomLeftCorner());
 	}
 
 	public boolean isCenterNear(Coordinate target)
 	{
-		Coordinate c = getCenter();
-		return c.isNear(target);
-	}
-
-	public boolean isNear(Coordinate bottomLeftTarget)
-	{
-		return bottomLeftCorner.isNear(bottomLeftTarget);
+		return getCenter().isNear(target);
 	}
 
 	public Direction getMoveDirection()
@@ -410,19 +416,9 @@ public abstract class GameCharacter
 		return sprite.getHeight();
 	}
 
-	public void setPosition(float x, float y)
+	private void setPosition(Coordinate newPosition)
 	{
-		sprite.setPosition(x, y);
-	}
-
-	public Map getCurrentMap()
-	{
-		return currentMap;
-	}
-
-	public void setCurrentMap(Map currentMap)
-	{
-		this.currentMap = currentMap;
+		sprite.setPosition(newPosition.getX(), newPosition.getY());
 	}
 
 	public Weapon getEquippedWeapon()
@@ -440,9 +436,9 @@ public abstract class GameCharacter
 		return world;
 	}
 
-	public abstract void moveToOtherMap(Map newMap, Rectangle newLocation);
+	public abstract void moveToOtherMap(Location newLocation);
 
-	public abstract void warpToOtherMap(Map newMap, Rectangle newLocation);
+	public abstract void warpToOtherMap(Location newLocation);
 
 	public void render(SpriteBatch batch)
 	{
@@ -511,9 +507,6 @@ public abstract class GameCharacter
 			weaponSlot.update(deltaTime);
 
 		doUpdate(deltaTime);
-
-		// update position
-		setPosition(getBottomLeftX(), getBottomLeftY());
 	}
 
 	protected abstract void doUpdate(float deltaTime);
@@ -547,15 +540,16 @@ public abstract class GameCharacter
 		}
 	}
 
-	public void addedToMap(Map newMap, Coordinate newLocation)
+	public void addedToMap(Location newLocation)
 	{
-		currentMap = newMap;
-		setBottomLeftCorner(newLocation);
+		currentLocation = new Location(newLocation.getMap(), newLocation.getCenter(), width, height);
+		// update sprite position
+		setPosition(newLocation.getBottomLeftCorner());
 	}
 
 	public void removedFromMap()
 	{
-		nextMap.addCharacterToMap(this, nextLocation);
+		nextLocation.getMap().addCharacterToMap(this, nextLocation);
 	}
 
 	public void acceptPush(GameCharacter pushingCharacter)
@@ -601,7 +595,7 @@ public abstract class GameCharacter
 		if (!name.equals("Player"))
 		{
 			world.getReputationSystem().addNewEvent("Attacked", "test group",
-					this, bottomLeftCorner, null);
+					this, getBottomLeftCorner(), null);
 		}
 	}
 
@@ -621,7 +615,7 @@ public abstract class GameCharacter
 		if (!name.equals("Player"))
 		{
 			world.getReputationSystem().addNewEvent("Attacked", "test group",
-					this, bottomLeftCorner, null);
+					this, getBottomLeftCorner(), null);
 		}
 	}
 
@@ -784,7 +778,7 @@ public abstract class GameCharacter
 
 	public Rectangle getHitBox()
 	{
-		Rectangle r = bottomLeftCorner.getBottomLeftRectangle(width, height);
+		Rectangle r = getBottomLeftCorner().getBottomLeftRectangle(width, height);
 		Vector2 center = new Vector2();
 		r.getCenter(center);
 		// TODO: Looks unnatural/bad when arrow disappears "before" it hits

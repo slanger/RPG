@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
+import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.combat.Equippable;
 import com.me.rpg.combat.Projectile;
-import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.maps.Map;
-import com.me.rpg.utils.Coordinate;
+import com.me.rpg.utils.Location;
 
 public class PlayableCharacter extends GameCharacter
 {
@@ -143,10 +142,6 @@ public class PlayableCharacter extends GameCharacter
 					timeInventoryOpened = System.currentTimeMillis();
 					world.getInventoryMenu().openInventory(this);
 				}
-				else
-				{ // currently in dialogue
-					System.out.println("already in menu");
-				}
 			}
 		}
 		else
@@ -243,7 +238,7 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if (weaponSlot != null && enableAttack)
 			{
-				weaponSlot.attack(currentMap, getFaceDirection(),
+				weaponSlot.attack(getCurrentMap(), getFaceDirection(),
 						getBoundingRectangle());
 				enableAttack = false;
 			}
@@ -272,7 +267,7 @@ public class PlayableCharacter extends GameCharacter
 		{
 			if (enableWeaponSwitch)
 			{
-				swapWeapon(currentMap);
+				swapWeapon(getCurrentMap());
 				enableWeaponSwitch = false;
 			}
 		}
@@ -296,7 +291,6 @@ public class PlayableCharacter extends GameCharacter
 				if(world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("UP");
-					System.out.println("In Menu:  UP");
 				}
 			}
 		}
@@ -313,7 +307,6 @@ public class PlayableCharacter extends GameCharacter
 				if(world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("DOWN");
-					System.out.println("In Menu:  DOWN");
 				}
 			}
 		}
@@ -330,8 +323,6 @@ public class PlayableCharacter extends GameCharacter
 				if(world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("RIGHT");
-					System.out.println("In Menu:  RIGHT");
-
 				}
 			}
 		}
@@ -348,7 +339,6 @@ public class PlayableCharacter extends GameCharacter
 				if(world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("LEFT");
-					System.out.println("In Menu:  LEFT");
 				}
 			}
 		}
@@ -365,7 +355,6 @@ public class PlayableCharacter extends GameCharacter
 				if(world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("E");
-					System.out.println("In Menu:  E");
 				}
 			}
 		}
@@ -491,24 +480,22 @@ public class PlayableCharacter extends GameCharacter
 	@Override
 	public void removedFromMap()
 	{
-		nextMap.addFocusedCharacterToMap(this, nextLocation);
+		nextLocation.getMap().addFocusedCharacterToMap(this, nextLocation);
 	}
 
 	@Override
-	public void moveToOtherMap(Map newMap, Rectangle newLocation)
+	public void moveToOtherMap(Location newLocation)
 	{
-		currentMap.close();
+		currentLocation.getMap().close();
 		setWarpEnable(false);
-		nextMap = newMap;
-		Vector2 center = newLocation.getCenter(new Vector2());
-		nextLocation = new Coordinate(center.x - getSpriteWidth() / 2f, center.y - getSpriteHeight() / 2f);
-		currentMap.removeCharacterFromMap(this);
+		nextLocation = newLocation;
+		currentLocation.getMap().removeCharacterFromMap(this);
 	}
 
 	@Override
-	public void warpToOtherMap(Map newMap, Rectangle newLocation)
+	public void warpToOtherMap(Location newLocation)
 	{
-		moveToOtherMap(newMap, newLocation);
+		moveToOtherMap(newLocation);
 
 		/* TODO
 		currentMap.close();
