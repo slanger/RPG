@@ -107,7 +107,7 @@ public abstract class GameCharacter
 		maxHealth = 100;
 		health = getMaxHealth();
 
-		npcMemory = new NPCMemory(world.getReputationSystem()
+		npcMemory = new NPCMemory(this, world.getReputationSystem()
 				.getMasterEventList());
 		sightDistance = 225.0f;
 		hearingRadius = 125.0f;
@@ -935,6 +935,12 @@ public abstract class GameCharacter
 	public void setDispositionValue(int dispositionValue)
 	{
 		this.dispositionValue = dispositionValue;
+		updateViewOfPlayer();
+	}
+	
+	public void updateDispositionValue(int dispositionValue)
+	{
+		this.dispositionValue = this.dispositionValue + dispositionValue;
 		updateViewOfPlayer();
 	}
 	

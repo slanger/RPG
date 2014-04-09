@@ -853,4 +853,14 @@ public final class World
 			return isErrorMessage;
 		}
 	}
+	
+	public ArrayList<GameCharacter> getCharactersInWorld()
+	{
+		ArrayList<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
+		for(Map map : maps)
+		{
+			allGameCharacters.addAll(map.getCharactersOnMap());
+		}
+		return allGameCharacters;
+	}
 }

@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.me.rpg.World;
+import com.me.rpg.characters.GameCharacter;
 
 public class ReputationDebugMenu implements Serializable
 {
@@ -99,7 +100,7 @@ public class ReputationDebugMenu implements Serializable
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
-		
+		ArrayList<GameCharacter> charactersInWorld = world.getCharactersInWorld();
 		//Set up MainTable, contains everything else
 		stage.addActor(mainTable);
 		mainTable.setFillParent(true);
@@ -109,14 +110,26 @@ public class ReputationDebugMenu implements Serializable
 		for(int i=0; i<NUM_ROWS; i++)
 		{
 			LabelStyle style = new LabelStyle(menuFont, Color.WHITE);
-			Label label = new Label("npc info", style);
-			mainTable.add(label);
-			mainTable.row();
+			if(i < charactersInWorld.size())
+			{
+				String name = charactersInWorld.get(i).getName();
+				String dispositionValue = Integer.toString(charactersInWorld.get(i).getDispositionValue());
+				String viewOfPlayer = charactersInWorld.get(i).getViewOfPlayer();
+				
+				Label nameLabel = new Label(name, style);
+				Label dispositionValueLabel = new Label(dispositionValue, style);
+				Label viewOfPlayerLabel = new Label(viewOfPlayer, style);
+		
+				mainTable.add(nameLabel).padRight(10.0f);
+				mainTable.add(dispositionValueLabel).padRight(10.0f);
+				mainTable.add(viewOfPlayerLabel).padRight(10.0f);
+				mainTable.row();
+			}
 		}
 		
 		mainTable.debug(); // turn on all debug lines (table, cell, and widget)
 	    stage.draw();
-	    Table.drawDebug(stage);
+	    //Table.drawDebug(stage);
 	    
 		mainTable.clear();
 	}

@@ -26,6 +26,7 @@ public class ReputationEvent implements Serializable
 		this.eventTemplate = eventTemplate;
 		this.coordinate = coordinate;
 		this.date = date;
+		repImpactMagnitude = -20; //temp placeholder
 	}
 
 	public EventID getEventID()
