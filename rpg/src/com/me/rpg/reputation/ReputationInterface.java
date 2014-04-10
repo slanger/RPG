@@ -1,10 +1,7 @@
 package com.me.rpg.reputation;
 
 import java.util.ArrayList;
-import java.util.Date;
-
 import com.me.rpg.characters.GameCharacter;
-import com.me.rpg.utils.Coordinate;
 
 
 public interface ReputationInterface
@@ -16,9 +13,23 @@ public interface ReputationInterface
 	 */
 	String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2);
 
-	void addNewEvent(String eventType, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred);
+	/**
+	 *  Adds an event of that type (attacked, killed, completed quest, stole, etc)
+	 *  Just specify the eventType (look in the templates in ReputationSystem.java)
+	 */
+	void addNewEvent(String eventType, GameCharacter characterAffected);
 
+	/**
+	 * 
+	 * Returns an arraylist containing all known events 
+	 * 
+	 */
 	ArrayList<ReputationEvent> getMasterEventList();
 	
+	/**
+	 * checks through all the characters, tries to share knowledge if the flag is set, 
+	 * updates times and adjusts priority of events to share/sets flag if priority high enough
+	 */
+	void update();
 	
 }

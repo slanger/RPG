@@ -588,7 +588,7 @@ public abstract class GameCharacter
 		receiveDamage(weapon.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", getGroup(), this, Coordinate.copy(getBottomLeftCorner()), System.currentTimeMillis());
+			world.getReputationInterface().addNewEvent("Attacked", this);
 		}
 	}
 
@@ -607,7 +607,7 @@ public abstract class GameCharacter
 		receiveDamage(projectile.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", getGroup(), this, Coordinate.copy(getBottomLeftCorner()), System.currentTimeMillis());
+			world.getReputationInterface().addNewEvent("Attacked", this);
 		}
 	}
 

@@ -44,9 +44,31 @@ public class ReputationSystem implements Serializable, ReputationInterface
 //		EventTemplateList[5] = new EventTemplate("Completed Hard Quest For", 50);
 	}
 
-	public void initializeGroupRelations()
+	private void initializeGroupRelations()
 	{
 		groupRelations.add(new GroupRelation("villager_group", "villain_group", "hate"));
+	}
+	
+	public void update()
+	{
+		ArrayList<GameCharacter> charactersInWorld = world.getCharactersInWorld();
+		
+		for(GameCharacter temp : charactersInWorld)
+		{
+			if(temp.getGroup()!= "player_group")
+			{
+				
+				
+				//if sharing
+				shareKnowledge(temp);
+			}
+		}
+	}
+	
+	private void shareKnowledge(GameCharacter sharingCharacter)
+	{
+		ArrayList<GameCharacter> receivingCharacters = sharingCharacter.getCurrentMap().canHearCharacters(sharingCharacter);
+
 	}
 	
 	public String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2)
@@ -75,7 +97,12 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		return "neutral";
 	}
 	
-	public void addNewEvent(String eventType, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred) {
+	public void addNewEvent(String eventType, GameCharacter characterAffected) {
+		
+		String groupAffected = characterAffected.getGroup();
+		long timeEventOccurred = System.currentTimeMillis();
+		Coordinate coordinate = Coordinate.copy(characterAffected.getCenter());
+		
 		Iterator<ReputationEvent> iter = MasterEventList.iterator();
 		while (iter.hasNext()) {
 			ReputationEvent tempRepEvent = iter.next();
@@ -109,7 +136,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		}
 	}
 
-	public void CheckForWitnesses(ReputationEvent reputationEvent, Coordinate coordinate) 
+	private void CheckForWitnesses(ReputationEvent reputationEvent, Coordinate coordinate) 
 	{
 		ArrayList<GameCharacter> charactersOnMap = world.getCurrentMap().getCharactersOnMap();
 		
@@ -133,7 +160,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		}
 	}
 	
-	public class EventTemplate implements Serializable
+	private class EventTemplate implements Serializable
 	{
 
 		private static final long serialVersionUID = 2152772298032083532L;
@@ -158,7 +185,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		
 	}
 	
-	public class GroupRelation implements Serializable
+	private class GroupRelation implements Serializable
 	{
 		private static final long serialVersionUID = 4866802809019077495L;
 		
