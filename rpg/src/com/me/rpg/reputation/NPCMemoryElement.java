@@ -9,25 +9,31 @@ public class NPCMemoryElement implements Serializable
 
 	private static final long serialVersionUID = 928305096707093169L;
 
-	private EventID id;
-	private int magnitude;
-	//private time timestamp;
+	private ReputationEvent repEventPointer;
+	private int magnitudeKnownByNPC;
+	private long timeLearnedOfEvent;
 	
 	NPCMemoryElement(ReputationEvent reputationEvent)
 	{
-		id=reputationEvent.getEventID();
-		magnitude=reputationEvent.getMagnitude();
-		//time=reputationEvent.getTime();
+		repEventPointer = reputationEvent;
+		magnitudeKnownByNPC = reputationEvent.getMagnitude();
 	}
 	
-	public EventID getEventID()
+	public ReputationEvent getReputationEventPointer()
 	{
-		return id;
+		return repEventPointer;
 	}
-	public int getMagnitude()
+	
+	public int getMagnitudeKnownByNPC()
 	{
-		return magnitude;
+		return magnitudeKnownByNPC;
 	}
+	
+	public long getTimeLearnedOfEvent()
+	{
+		return timeLearnedOfEvent;
+	}
+	
 	public boolean match(String eventType, int magnitude, String groupAffected, GameCharacter characterAffected)
 	{
 		return false;

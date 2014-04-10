@@ -2,9 +2,10 @@ package com.me.rpg.reputation;
 
 import java.util.ArrayList;
 import com.me.rpg.characters.GameCharacter;
+import java.io.Serializable;
 
 
-public interface ReputationInterface
+public interface ReputationInterface extends Serializable
 {
 	/**
 	 * Returns a string (like, neutral, hate) depending on the relation between the character parameters
@@ -17,7 +18,7 @@ public interface ReputationInterface
 	 *  Adds an event of that type (attacked, killed, completed quest, stole, etc)
 	 *  Just specify the eventType (look in the templates in ReputationSystem.java)
 	 */
-	void addNewEvent(String eventType, GameCharacter characterAffected);
+	void addNewEvent(String eventType, String eventSpecifier, GameCharacter characterAffected);
 
 	/**
 	 * 

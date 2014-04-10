@@ -28,20 +28,21 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		MasterEventList = new ArrayList<ReputationEvent>();
 	}
 
-	public ArrayList<ReputationEvent> getMasterEventList() {
-		return MasterEventList;
-	}
+	
 
 	private void initializeTemplates() {
-		eventTemplateList.add(new EventTemplate("Attacked", 10));
-		eventTemplateList.add(new EventTemplate("Killed", 50));
+		eventTemplateList.add(new EventTemplate("attacked", "small_damage", -10));
+		eventTemplateList.add(new EventTemplate("attacked", "medium_damage", -30));
+		eventTemplateList.add(new EventTemplate("attacked", "large_damage", -50));
+		eventTemplateList.add(new EventTemplate("attacked", "killed", -100));
+		
+		eventTemplateList.add(new EventTemplate("talked_to_npc", "small_bonus", 1));
+		eventTemplateList.add(new EventTemplate("talked_to_npc", "medium_bonus", 3));
+		eventTemplateList.add(new EventTemplate("talked_to_npc", "large_bonus", 5));
 
-//		EventTemplateList[0] = new EventTemplate("Attacked", 10);
-//		EventTemplateList[1] = new EventTemplate("Killed", 50);
-//		EventTemplateList[2] = new EventTemplate("Stole From", 5);
-//		EventTemplateList[3] = new EventTemplate("Completed Easy Quest For", 10);
-//		EventTemplateList[4] = new EventTemplate("Completed Medium Quest For", 30);
-//		EventTemplateList[5] = new EventTemplate("Completed Hard Quest For", 50);
+		eventTemplateList.add(new EventTemplate("completed_quest", "small_bonus", 10));
+		eventTemplateList.add(new EventTemplate("completed_quest", "medium_bonus", 30));
+		eventTemplateList.add(new EventTemplate("completed_quest", "large_bonus", 50));
 	}
 
 	private void initializeGroupRelations()
@@ -68,7 +69,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	private void shareKnowledge(GameCharacter sharingCharacter)
 	{
 		ArrayList<GameCharacter> receivingCharacters = sharingCharacter.getCurrentMap().canHearCharacters(sharingCharacter);
-
+		
 	}
 	
 	public String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2)
@@ -160,17 +161,24 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		}
 	}
 	
+	public ArrayList<ReputationEvent> getMasterEventList()
+	{
+		return MasterEventList;
+	}
+	
 	private class EventTemplate implements Serializable
 	{
 
 		private static final long serialVersionUID = 2152772298032083532L;
 
 		private String eventName; 
+		private String eventSpecifier;
 		private int magnitude;
 		
-		EventTemplate(String eventName, int magnitude)
+		EventTemplate(String eventName, String eventSpecifier, int magnitude)
 		{
 			this.eventName = eventName;
+			this.eventSpecifier = eventSpecifier;
 			this.magnitude = magnitude;
 		}
 
@@ -178,6 +186,11 @@ public class ReputationSystem implements Serializable, ReputationInterface
 			return eventName;
 		}
 
+		public String getEventSpecifier()
+		{
+			return eventSpecifier;
+		}
+		
 		public int getMagnitude()
 		{
 			return magnitude;

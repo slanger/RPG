@@ -588,7 +588,27 @@ public abstract class GameCharacter
 		receiveDamage(weapon.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", this);
+			System.out.println("current health: "+(float)(health/MAX_HEALTH));
+			if((float)(health/MAX_HEALTH) > 0.90)
+			{
+				System.out.println("npc "+getName()+" received a small attack");
+				world.getReputationInterface().addNewEvent("attacked", "small_damage", this);
+			}
+			else if((float)(health/MAX_HEALTH) > 0.5)
+			{
+				System.out.println("npc "+getName()+" received a medium attack");
+				world.getReputationInterface().addNewEvent("attacked", "medium_damage", this);
+			}
+			else if((float)(health/MAX_HEALTH) > 0.25)
+			{
+				System.out.println("npc "+getName()+" received a large attack");
+				world.getReputationInterface().addNewEvent("attacked", "large_damage", this);
+			}
+			else if(health == 0)
+			{
+				System.out.println("npc "+getName()+" was killed!");
+				world.getReputationInterface().addNewEvent("attacked", "killed", this);
+			}
 		}
 	}
 
@@ -607,7 +627,27 @@ public abstract class GameCharacter
 		receiveDamage(projectile.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", this);
+			System.out.println("current health: "+(float)(health/MAX_HEALTH));
+			if((float)(health/MAX_HEALTH) > 0.90)
+			{
+				System.out.println("npc "+getName()+" received a small attack");
+				world.getReputationInterface().addNewEvent("attacked", "small_damage", this);
+			}
+			else if((float)(health/MAX_HEALTH) > 0.5)
+			{
+				System.out.println("npc "+getName()+" received a medium attack");
+				world.getReputationInterface().addNewEvent("attacked", "medium_damage", this);
+			}
+			else if((float)(health/MAX_HEALTH) > 0.25)
+			{
+				System.out.println("npc "+getName()+" received a large attack");
+				world.getReputationInterface().addNewEvent("attacked", "large_damage", this);
+			}
+			else if(health == 0)
+			{
+				System.out.println("npc "+getName()+" was killed!");
+				world.getReputationInterface().addNewEvent("attacked", "killed", this);
+			}
 		}
 	}
 
