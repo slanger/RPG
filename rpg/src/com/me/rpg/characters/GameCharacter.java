@@ -107,7 +107,7 @@ public abstract class GameCharacter
 		maxHealth = 100;
 		health = getMaxHealth();
 
-		npcMemory = new NPCMemory(this, world.getReputationSystem()
+		npcMemory = new NPCMemory(this, world.getReputationInterface()
 				.getMasterEventList());
 		sightDistance = 225.0f;
 		hearingRadius = 125.0f;
@@ -588,7 +588,7 @@ public abstract class GameCharacter
 		receiveDamage(weapon.getPower());
 		if (!name.equals("Player"))
 		{
-			world.getReputationSystem().addNewEvent("Attacked", "test group",
+			world.getReputationInterface().addNewEvent("Attacked", "test group",
 					this, getBottomLeftCorner(), null);
 		}
 	}
@@ -608,7 +608,7 @@ public abstract class GameCharacter
 		receiveDamage(projectile.getPower());
 		if (!name.equals("Player"))
 		{
-			world.getReputationSystem().addNewEvent("Attacked", "test group",
+			world.getReputationInterface().addNewEvent("Attacked", "test group",
 					this, getBottomLeftCorner(), null);
 		}
 	}
@@ -967,5 +967,10 @@ public abstract class GameCharacter
 		{
 			setDispositionValue(0);
 		}
+	}
+	
+	public String getGroup()
+	{
+		return group;
 	}
 }

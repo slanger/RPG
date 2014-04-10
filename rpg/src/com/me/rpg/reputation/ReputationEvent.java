@@ -15,15 +15,11 @@ public class ReputationEvent implements Serializable
 	private Coordinate coordinate;
 	private Date date;
 	private int repImpactMagnitude;
-	private EventTemplate eventTemplate;
 	private int referenceCount;
 
-	public ReputationEvent(String eventType, String groupAffected,
-			GameCharacter characterAffected, EventTemplate eventTemplate,
-			Coordinate coordinate, Date date)
+	public ReputationEvent(String eventType, int magnitude, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, Date date)
 	{
 		id = new EventID(eventType, groupAffected, characterAffected);
-		this.eventTemplate = eventTemplate;
 		this.coordinate = coordinate;
 		this.date = date;
 		repImpactMagnitude = -20; //temp placeholder
@@ -42,11 +38,6 @@ public class ReputationEvent implements Serializable
 	public int getMagnitude()
 	{
 		return repImpactMagnitude;
-	}
-
-	public EventTemplate getEventTemplate()
-	{
-		return eventTemplate;
 	}
 
 	public int incrementReferenceCount()

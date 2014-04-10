@@ -41,6 +41,7 @@ import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationDebugMenu;
 import com.me.rpg.reputation.ReputationSystem;
+import com.me.rpg.reputation.ReputationInterface;
 import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
@@ -115,7 +116,7 @@ public final class World
 	private final InventoryMenu	inventoryMenu	= new InventoryMenu();
 	private final PauseScreen pauseScreen = new PauseScreen(this);
 	private final ReputationDebugMenu reputationDebugMenu = new ReputationDebugMenu(this);
-	private ReputationSystem reputationSystem;
+	private ReputationInterface reputationSystem;
 
 	private boolean warping = false;
 	private float warpingAlpha;
@@ -141,7 +142,7 @@ public final class World
 		return dialogueSystem;
 	}
 
-	public ReputationSystem getReputationSystem()
+	public ReputationInterface getReputationInterface()
 	{
 		return reputationSystem;
 	}
@@ -328,13 +329,13 @@ public final class World
 				width, height, 16, 16, 0.15f, this);
 		player.setBaseSpeed(200f);
 
-		npc1 = new NonplayableCharacter("NPC1", "Test_Group", NPC_TEXTURE_PATH,
+		npc1 = new NonplayableCharacter("NPC1", "villager_group", NPC_TEXTURE_PATH,
 				width, height, 16, 16, 0.15f, this);
-		npc2 = new NonplayableCharacter("NPC2", "Test_Group", NPC_TEXTURE_PATH,
+		npc2 = new NonplayableCharacter("NPC2", "villager_group", NPC_TEXTURE_PATH,
 				width, height, 16, 16, 0.15f, this);
-		npc3 = new NonplayableCharacter("NPC3", "Test_Group", NPC_TEXTURE_PATH,
+		npc3 = new NonplayableCharacter("NPC3", "villain_group", NPC_TEXTURE_PATH,
 				width, height, 16, 16, 0.15f, this);
-		npc4 = new NonplayableCharacter("NPC4", "Test_Group", NPC_TEXTURE_PATH,
+		npc4 = new NonplayableCharacter("NPC4", "villain_group", NPC_TEXTURE_PATH,
 				width, height, 16, 16, 0.15f, this);
 
 		// add characters to map
