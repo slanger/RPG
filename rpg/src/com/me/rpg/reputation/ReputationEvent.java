@@ -13,15 +13,15 @@ public class ReputationEvent implements Serializable
 
 	private EventID id;
 	private Coordinate coordinate;
-	private Date date;
+	private long timeEventOccurred;
 	private int repImpactMagnitude;
 	private int referenceCount;
 
-	public ReputationEvent(String eventType, int magnitude, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, Date date)
+	public ReputationEvent(String eventType, int magnitude, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred)
 	{
 		id = new EventID(eventType, groupAffected, characterAffected);
 		this.coordinate = coordinate;
-		this.date = date;
+		this.timeEventOccurred = timeEventOccurred;
 		repImpactMagnitude = -20; //temp placeholder
 	}
 

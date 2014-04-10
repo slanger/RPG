@@ -69,13 +69,13 @@ public class ReputationSystem implements Serializable, ReputationInterface
 				return temp.getRelation();
 			}
 		}
-		//if player is not involved
-		throw new RuntimeException("Illegal group");
-		// will return like, neutral, or hate
+		
+		//In case groups arent found,   should never happen though
+		System.out.println("ReputationSystem -> getRelationsBetweenCharacters():    Group not found");
+		return "neutral";
 	}
 	
-	public void addNewEvent(String eventType, String groupAffected,
-			GameCharacter characterAffected, Coordinate coordinate, Date date) {
+	public void addNewEvent(String eventType, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred) {
 		Iterator<ReputationEvent> iter = MasterEventList.iterator();
 		while (iter.hasNext()) {
 			ReputationEvent tempRepEvent = iter.next();
@@ -91,7 +91,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 
 		for (int i = 0; i < 6; i++) {
 			if (eventTemplateList.get(i).getEventName().equals(eventType)) {
-				ReputationEvent reputationEvent = new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, date);
+				ReputationEvent reputationEvent = new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeEventOccurred);
 				MasterEventList.add(reputationEvent);
 				System.out.println("Event Added To MasterEventList");
 				world.pushMessage("Event: "+eventType+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
@@ -109,17 +109,10 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		}
 	}
 
-	public void CheckForWitnesses(ReputationEvent reputationEvent,
-			Coordinate coordinate) {
-		//this method called from addNewEvent after event has been seen by an npc
-		// for every alerted NPC, increment the reference count for the RepEvent
-
-		// check coordinate of repEvent, check what characters are around,
-		// For each character within radius,
-		// character.getNPCMemory.addNewMemoryElement();
-
-		ArrayList<GameCharacter> charactersOnMap = world.getCurrentMap()
-				.getCharactersOnMap();
+	public void CheckForWitnesses(ReputationEvent reputationEvent, Coordinate coordinate) 
+	{
+		ArrayList<GameCharacter> charactersOnMap = world.getCurrentMap().getCharactersOnMap();
+		
 		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
 		while (iterator1.hasNext()) {
 			GameCharacter tempCharacter = iterator1.next();

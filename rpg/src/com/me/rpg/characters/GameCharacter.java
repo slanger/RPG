@@ -586,10 +586,9 @@ public abstract class GameCharacter
 			return;
 		inflictEffects(weapon.getEffects());
 		receiveDamage(weapon.getPower());
-		if (!name.equals("Player"))
+		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", "test group",
-					this, getBottomLeftCorner(), null);
+			world.getReputationInterface().addNewEvent("Attacked", getGroup(), this, Coordinate.copy(getBottomLeftCorner()), System.currentTimeMillis());
 		}
 	}
 
@@ -606,10 +605,9 @@ public abstract class GameCharacter
 			return;
 		inflictEffects(projectile.getEffects());
 		receiveDamage(projectile.getPower());
-		if (!name.equals("Player"))
+		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", "test group",
-					this, getBottomLeftCorner(), null);
+			world.getReputationInterface().addNewEvent("Attacked", getGroup(), this, Coordinate.copy(getBottomLeftCorner()), System.currentTimeMillis());
 		}
 	}
 

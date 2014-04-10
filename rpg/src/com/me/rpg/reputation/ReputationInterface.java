@@ -16,7 +16,7 @@ public interface ReputationInterface
 	 */
 	String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2);
 
-	void addNewEvent(String eventType, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, Date date);
+	void addNewEvent(String eventType, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred);
 
 	ArrayList<ReputationEvent> getMasterEventList();
 	
