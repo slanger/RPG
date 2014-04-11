@@ -468,8 +468,8 @@ public abstract class Map
 		{
 			GameCharacter character = removeIter.next();
 			removeCharacter(character);
-			removeIter.remove();
 		}
+		charactersToRemove.clear();
 
 		Iterator<Projectile> projectileIter = flyingProjectiles.iterator();
 		while (projectileIter.hasNext())
@@ -867,6 +867,7 @@ public abstract class Map
 
 	private void removeCharacter(GameCharacter removeCharacter)
 	{
+		removeEquippedWeapon(removeCharacter.getEquippedWeapon());
 		charactersOnMap.remove(removeCharacter);
 		removeCharacter.removedFromMap();
 		if (focusedCharacter != null && focusedCharacter.equals(removeCharacter))
@@ -893,6 +894,7 @@ public abstract class Map
 							+ newCharacter + " " + newLocation);
 		}
 		charactersOnMap.add(newCharacter);
+		addEquippedWeapon(newCharacter.getEquippedWeapon());
 		newCharacter.addedToMap(newLocation);
 	}
 
@@ -930,12 +932,14 @@ public abstract class Map
 
 	public void addEquippedWeapon(Weapon w)
 	{
-		equippedWeapons.add(w);
+		if (w != null)
+			equippedWeapons.add(w);
 	}
 
 	public void removeEquippedWeapon(Weapon w)
 	{
-		equippedWeapons.remove(w);
+		if (w != null)
+			equippedWeapons.remove(w);
 	}
 
 	@Override

@@ -76,6 +76,7 @@ public final class World
 	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
+	public static final String RGUARD_TEXTURE_PATH = "ranger_guard.png";
 
 	// swords
 	public static final String SWORD_PATH = "sword.png";
@@ -320,7 +321,7 @@ public final class World
 		npc3 = new NonplayableCharacter("NPC3", "villain_group",
 				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		npc4 = new NonplayableCharacter("NPC4", "villain_group",
-				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap,
@@ -424,6 +425,7 @@ public final class World
 		HierarchicalState parent4 = new HierarchicalState(null, npc4);
 		Rectangle wb4 = new Rectangle(50, 50, 1100, 1100);
 		RandomWalkState rw4 = new RandomWalkState(parent4, npc4, wb4);
+		WalkToLocationState wls = new WalkToLocationState(parent4, npc4, new Location(westTown, new Coordinate(500, 500)));
 		RangedFightState rfs = new RangedFightState(parent4, npc4);
 
 		Condition seePeople4 = new SeePeopleCondition(npc4, 0,
@@ -432,19 +434,26 @@ public final class World
 				Comparison.GREATER);
 		Condition or2 = new OrCondition(seePeople4, hearPeople4);
 		Condition not = new NotCondition(or2);
-
+		Condition dist2 = new DistanceCondition(npc4, westTown, new Coordinate(500,500));
+		Condition or3 = new OrCondition(dist2, wls.getFloatCondition("timeInState", 5f, Comparison.GREATER));
+		
 		ArrayList<Action> toRangeAtkActions = new ArrayList<Action>();
 		toRangeAtkActions.add(new RememberNearestPersonAction(npc4, true, true,
 				true));
 
 		Transition toRangeAtk = new Transition(rfs, toRangeAtkActions, or2);
-		Transition toRandWlk = new Transition(rw4, not);
+		Transition backToRectangle = new Transition(wls, not);
+		Transition toRandWlk = new Transition(rw4, or3);
 		rw4.setTransitions(toRangeAtk);
 		rfs.setTransitions(toRandWlk);
 
+		rfs.setTransitions(backToRectangle);
+		wls.setTransitions(toRandWlk, toRangeAtk);
+		
 		parent4.setInitialState(rw4);
 
 		npc4.setSightDistance(400f);
+		npc4.setBaseSpeed(150f);
 		npc4.setStateMachine(parent4);
 
 		// WEAPONS SETUP
@@ -474,8 +483,9 @@ public final class World
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 
-		player.equipWeapon(exampleMap, sword);
-		npc1.equipWeapon(exampleMap, npc_sword);
+
+		player.equipWeapon(sword);
+		npc1.equipWeapon(npc_sword);
 
 		player.addItemToInventory(sword);
 		player.addItemToInventory(evilSword);
@@ -487,9 +497,9 @@ public final class World
 
 		RangedWeapon bow = new RangedWeapon("Lame Bow", ARROW_PATH,
 				weaponWidth, weaponHeight, 32, 32);
-		RangedWeapon npc_bow = new RangedWeapon("NPCBow", ARROW_PATH,
+		RangedWeapon npc_bow = new RangedWeapon("NPC Bow", ARROW_PATH,
 				weaponWidth, weaponHeight, 32, 32);
-		npc4.equipWeapon(westTownInsideHouse, npc_bow);
+		npc4.equipWeapon(npc_bow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
 		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH,

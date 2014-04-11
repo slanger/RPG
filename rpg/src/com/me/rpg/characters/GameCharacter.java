@@ -728,8 +728,9 @@ public abstract class GameCharacter
 	 * 
 	 * @param sword
 	 */
-	public boolean equipWeapon(Map m, Weapon weapon)
+	public boolean equipWeapon(Weapon weapon)
 	{
+		Map m = getCurrentMap();
 		if (weaponSlot != null)
 		{
 			m.removeEquippedWeapon(weaponSlot);
@@ -746,24 +747,6 @@ public abstract class GameCharacter
 		this.weaponSlot = weapon;
 		m.addEquippedWeapon(weapon);
 		return result;
-	}
-
-	public void swapWeapon(Map m)
-	{
-		m.removeEquippedWeapon(weaponSlot);
-		weaponSlot.unequip();
-
-		Weapon temp = weaponSlot;
-		weaponSlot = swapWeaponSlot;
-		swapWeaponSlot = temp;
-		if (weaponSlot == null)
-			return;
-		weaponSlot.tryEquip(this);
-		m.addEquippedWeapon(weaponSlot);
-		if(temp instanceof RangedWeapon)
-		{
-			((RangedWeapon) temp).equipProjectile(getEquippedArrows(), 1000);
-		}
 	}
 
 	public Rectangle getHitBox()

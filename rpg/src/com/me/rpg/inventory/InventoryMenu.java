@@ -173,14 +173,14 @@ public class InventoryMenu implements Serializable
 				if(meleeWeapons.size() > colSelectionIndex)
 				{
 					MeleeWeapon temp = (MeleeWeapon) meleeWeapons.get(colSelectionIndex);
-					player.equipWeapon(player.getCurrentMap(), temp);
+					player.equipWeapon(temp);
 				}
 			}
 			if(rowSelectionIndex == 1)
 			{
 				if(arrows.size() > colSelectionIndex)
 				{
-					player.equipWeapon(player.getCurrentMap(), player.getRangedWeaponInInventory());
+					player.equipWeapon(player.getRangedWeaponInInventory());
 					Projectile temp = arrows.get(colSelectionIndex);
 					player.setEquippedArrows(temp);
 				}
