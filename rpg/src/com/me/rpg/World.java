@@ -371,8 +371,9 @@ public final class World
 		HierarchicalState parent2 = new HierarchicalState(null, npc2);
 		HierarchicalState subparent = new HierarchicalState(parent2, npc2);
 		subparent.setName("subParent");
+		Coordinate center2 = new Coordinate(500, 100);
 		WalkToLocationState notAtCen = new WalkToLocationState(subparent, npc2,
-				new Location(exampleMap, 500, 100));
+				new Location(exampleMap, center2));
 		notAtCen.setName("notAtCen");
 		Rectangle walkingBoundary = new Rectangle(32, 32, 576, 224);
 		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2,
@@ -384,8 +385,7 @@ public final class World
 		subparent.setInitialState(notAtCen);
 		parent2.setInitialState(subparent);
 
-		Condition dist = new DistanceCondition(npc2, exampleMap,
-				new Coordinate(500, 100));
+		Condition dist = new DistanceCondition(npc2, exampleMap, center2);
 		Transition notCenToRandom = new Transition(randomWalkState, dist);
 
 		Condition canSee2 = new SeePeopleCondition(npc2, 0,
@@ -423,9 +423,10 @@ public final class World
 
 		// state machine for npc4
 		HierarchicalState parent4 = new HierarchicalState(null, npc4);
-		Rectangle wb4 = new Rectangle(50, 50, 1100, 1100);
+		Rectangle wb4 = new Rectangle(1056, 64, 320, 448);
 		RandomWalkState rw4 = new RandomWalkState(parent4, npc4, wb4);
-		WalkToLocationState wls = new WalkToLocationState(parent4, npc4, new Location(westTown, new Coordinate(500, 500)));
+		Coordinate center4 = new Coordinate(1248, 640);
+		WalkToLocationState wls = new WalkToLocationState(parent4, npc4, new Location(westTown, center4));
 		RangedFightState rfs = new RangedFightState(parent4, npc4);
 
 		Condition seePeople4 = new SeePeopleCondition(npc4, 0,
@@ -434,7 +435,7 @@ public final class World
 				Comparison.GREATER);
 		Condition or2 = new OrCondition(seePeople4, hearPeople4);
 		Condition not = new NotCondition(or2);
-		Condition dist2 = new DistanceCondition(npc4, westTown, new Coordinate(500,500));
+		Condition dist2 = new DistanceCondition(npc4, westTown, center4);
 		Condition or3 = new OrCondition(dist2, wls.getFloatCondition("timeInState", 5f, Comparison.GREATER));
 		
 		ArrayList<Action> toRangeAtkActions = new ArrayList<Action>();

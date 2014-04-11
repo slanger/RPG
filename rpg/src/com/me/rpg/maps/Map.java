@@ -552,14 +552,12 @@ public abstract class Map
 			for (int j = i + 1; j < length; j++)
 			{
 				Waypoint w = waypoints.get(j);
-				Coordinate wCenter = w.getCenter();
-				if (pointsConnected(waypointCenter, wCenter))
+				if (waypoint.connectedTo(w))
 				{
+					Coordinate wCenter = w.getCenter();
 					float distance = waypointCenter.distanceTo(wCenter);
-					waypoint.connections
-							.add(new Waypoint.Edge(w, distance));
-					w.connections
-							.add(new Waypoint.Edge(waypoint, distance));
+					waypoint.connections.add(new Waypoint.Edge(w, distance));
+					w.connections.add(new Waypoint.Edge(waypoint, distance));
 				}
 			}
 		}
@@ -619,12 +617,42 @@ public abstract class Map
 		return r1.equals(r2);
 	}
 
-	public boolean pointsConnected(Coordinate c1, Coordinate c2)
+	public boolean rectanglesConnected(Rectangle r1, Rectangle r2)
 	{
-		return pointsConnected(c1.getVector2(), c2.getVector2());
+		// check centers
+		Vector2 center1 = r1.getCenter(new Vector2());
+		Vector2 center2 = r2.getCenter(new Vector2());
+		if (!pointsConnected(center1, center2))
+			return false;
+
+		// check bottom left corners
+		Vector2 bottomLeft1 = new Vector2(r1.x, r1.y);
+		Vector2 bottomLeft2 = new Vector2(r2.x, r2.y);
+		if (!pointsConnected(bottomLeft1, bottomLeft2))
+			return false;
+
+		// check top left corners
+		Vector2 topLeft1 = new Vector2(r1.x, r1.y + r1.height);
+		Vector2 topLeft2 = new Vector2(r2.x, r2.y + r2.height);
+		if (!pointsConnected(topLeft1, topLeft2))
+			return false;
+
+		// check top right corners
+		Vector2 topRight1 = new Vector2(r1.x + r1.width, r1.y + r1.height);
+		Vector2 topRight2 = new Vector2(r2.x + r2.width, r2.y + r2.height);
+		if (!pointsConnected(topRight1, topRight2))
+			return false;
+
+		// check top right corners
+		Vector2 bottomRight1 = new Vector2(r1.x + r1.width, r1.y);
+		Vector2 bottomRight2 = new Vector2(r2.x + r2.width, r2.y);
+		if (!pointsConnected(bottomRight1, bottomRight2))
+			return false;
+
+		return true;
 	}
 
-	public boolean pointsConnected(Vector2 c1, Vector2 c2)
+	private boolean pointsConnected(Vector2 c1, Vector2 c2)
 	{
 		float deltaX = Math.abs(c1.x - c2.x);
 		float deltaY = Math.abs(c1.y - c2.y);
@@ -642,7 +670,7 @@ public abstract class Map
 			for (RectangleMapObject collidable : collidables)
 			{
 				Rectangle r = collidable.getRectangle();
-				if (r.contains(v))
+				if (rectangleContainsPoint(r, v))
 				{
 					return false;
 				}
@@ -650,6 +678,11 @@ public abstract class Map
 		}
 
 		return true;
+	}
+
+	private boolean rectangleContainsPoint(Rectangle r, Vector2 v)
+	{
+		return r.x < v.x && r.x + r.width > v.x && r.y < v.y && r.y + r.height > v.y;
 	}
 
 	/*

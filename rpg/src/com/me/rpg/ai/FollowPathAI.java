@@ -173,26 +173,26 @@ public class FollowPathAI
 	private List<Waypoint> makePath(Location source, Location destination)
 	{
 		// if destination is off the map, then return null
-		Map destinationMap = destination.getMap();
-		if (destinationMap.isRectangleOutOfBounds(destination.getArea()))
+		if (destination.isOutOfBounds())
 			return null;
 
 		List<Waypoint> shortestPath;
 
-		Map sourceMap = source.getMap();
 		Coordinate sourceCenter = source.getCenter();
 		Coordinate destinationCenter = destination.getCenter();
 
 		// if source and destination are connected, then return a path with just
 		// the destination
-		if (sourceMap.equals(destinationMap)
-				&& sourceMap.pointsConnected(sourceCenter, destinationCenter))
+		if (source.connectedTo(destination))
 		{
 			shortestPath = new ArrayList<Waypoint>();
 			shortestPath.add(new Waypoint(destination));
 			totalPathDistance = sourceCenter.distanceTo(destinationCenter);
 			return shortestPath;
 		}
+
+		Map sourceMap = source.getMap();
+		Map destinationMap = destination.getMap();
 
 		List<Waypoint> worldWaypoints = new ArrayList<Waypoint>(character.getWorld().waypoints);
 		Waypoint sourceWaypoint = new Waypoint(source);
@@ -201,9 +201,9 @@ public class FollowPathAI
 		// find Waypoints that are connected to source
 		for (Waypoint w : sourceMap.getWaypoints())
 		{
-			Coordinate wCenter = w.getCenter();
-			if (sourceMap.pointsConnected(sourceCenter, wCenter))
+			if (sourceWaypoint.connectedTo(w))
 			{
+				Coordinate wCenter = w.getCenter();
 				float cost = sourceCenter.distanceTo(wCenter);
 				sourceWaypoint.connections.add(new Waypoint.Edge(w, cost));
 				w.connections.add(new Waypoint.Edge(sourceWaypoint, cost));
@@ -218,9 +218,9 @@ public class FollowPathAI
 		// find Waypoints that are connected to destination
 		for (Waypoint w : destinationMap.getWaypoints())
 		{
-			Coordinate wCenter = w.getCenter();
-			if (destinationMap.pointsConnected(destinationCenter, wCenter))
+			if (destinationWaypoint.connectedTo(w))
 			{
+				Coordinate wCenter = w.getCenter();
 				float cost = destinationCenter.distanceTo(wCenter);
 				destinationWaypoint.connections.add(new Waypoint.Edge(w, cost));
 				w.connections.add(new Waypoint.Edge(destinationWaypoint, cost));

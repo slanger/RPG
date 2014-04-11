@@ -73,6 +73,11 @@ public class Waypoint
 		return location.getCenter();
 	}
 
+	public boolean connectedTo(Waypoint other)
+	{
+		return location.connectedTo(other.location);
+	}
+
 	@Override
 	public String toString()
 	{

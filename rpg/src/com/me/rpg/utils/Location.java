@@ -61,6 +61,16 @@ public class Location
 		area = center.getCenteredRectangle(area.width, area.height);
 	}
 
+	public boolean connectedTo(Location other)
+	{
+		return (map.equals(other.map) && map.rectanglesConnected(area, other.area));
+	}
+
+	public boolean isOutOfBounds()
+	{
+		return map.isRectangleOutOfBounds(area);
+	}
+
 	public Location(Map map, float centerX, float centerY)
 	{
 		this(map, new Coordinate(centerX, centerY));
