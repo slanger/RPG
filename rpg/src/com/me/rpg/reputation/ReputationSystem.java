@@ -69,7 +69,6 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	private void shareKnowledge(GameCharacter sharingCharacter)
 	{
 		ArrayList<GameCharacter> receivingCharacters = sharingCharacter.getCurrentMap().canHearCharacters(sharingCharacter);
-		
 	}
 	
 	public String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2)
@@ -98,31 +97,39 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		return "neutral";
 	}
 	
-	public void addNewEvent(String eventType, GameCharacter characterAffected) {
+	public void addNewEvent(String eventType, String eventSpecifier, GameCharacter characterAffected) {
 		
 		String groupAffected = characterAffected.getGroup();
 		long timeEventOccurred = System.currentTimeMillis();
 		Coordinate coordinate = Coordinate.copy(characterAffected.getCenter());
 		
 		Iterator<ReputationEvent> iter = MasterEventList.iterator();
-		while (iter.hasNext()) {
+		while (iter.hasNext())
+		{
 			ReputationEvent tempRepEvent = iter.next();
-			if (tempRepEvent.getEventID().getEventType().equals(eventType)
-					&& tempRepEvent.getEventID().getGroupAffected()
-							.equals(groupAffected)
-					&& tempRepEvent.getEventID().getCharacterAffected()
-							.equals(characterAffected)) {
-				System.out.println("Event already exists");
-				return;
+			
+			if (tempRepEvent.getEventType().equals(eventType) && tempRepEvent.getCharacterAffected()==characterAffected)
+			{
+				//separate events by times.  E.G. if same event type happens to same character,
+				//but event occurs 30 seconds after first, then create a new event
+				if((timeEventOccurred - tempRepEvent.getTimeEventOccurred()) < 30000)
+				{
+					System.out.println("Event already exists");
+					updateExistingEvent();
+					return;
+				}
 			}
 		}
 
-		for (int i = 0; i < 6; i++) {
-			if (eventTemplateList.get(i).getEventName().equals(eventType)) {
+		//event does not exist, create it
+		for (int i = 0; i < eventTemplateList.size(); i++) {
+			if (eventTemplateList.get(i).getEventName().equalsIgnoreCase(eventType) && 
+					eventTemplateList.get(i).getEventSpecifier().equalsIgnoreCase(eventSpecifier)) 
+			{
 				ReputationEvent reputationEvent = new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeEventOccurred);
 				MasterEventList.add(reputationEvent);
 				System.out.println("Event Added To MasterEventList");
-				world.pushMessage("Event: "+eventType+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
+				world.pushMessage("Event: "+eventType+"	Magnitude: "+eventTemplateList.get(i).getMagnitude()+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
 						"  Location: "+(int)coordinate.getX()+", "+(int)coordinate.getY());
 				int masterListIndex = MasterEventList.indexOf(reputationEvent);
 				if (masterListIndex >= 0) {
@@ -135,6 +142,16 @@ public class ReputationSystem implements Serializable, ReputationInterface
 			}
 
 		}
+	}
+	
+	private void updateExistingEvent()
+	{
+		
+	}
+	
+	private void addNewEventHelper()
+	{
+		
 	}
 
 	private void CheckForWitnesses(ReputationEvent reputationEvent, Coordinate coordinate) 

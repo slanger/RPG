@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.me.rpg.characters.GameCharacter;
 
-public class NPCMemoryElement implements Serializable
+public class RememberedEvent implements Serializable
 {
 
 	private static final long serialVersionUID = 928305096707093169L;
@@ -13,7 +13,7 @@ public class NPCMemoryElement implements Serializable
 	private int magnitudeKnownByNPC;
 	private long timeLearnedOfEvent;
 	
-	NPCMemoryElement(ReputationEvent reputationEvent)
+	RememberedEvent(ReputationEvent reputationEvent)
 	{
 		repEventPointer = reputationEvent;
 		magnitudeKnownByNPC = reputationEvent.getMagnitude();

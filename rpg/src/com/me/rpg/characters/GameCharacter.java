@@ -588,18 +588,19 @@ public abstract class GameCharacter
 		receiveDamage(weapon.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			System.out.println("current health: "+(float)(health/MAX_HEALTH));
-			if((float)(health/MAX_HEALTH) > 0.90)
+			float fractionHealthRemaining = (float)health/(float)MAX_HEALTH;
+			System.out.println("current health: "+fractionHealthRemaining);
+			if(fractionHealthRemaining > 0.90)
 			{
 				System.out.println("npc "+getName()+" received a small attack");
 				world.getReputationInterface().addNewEvent("attacked", "small_damage", this);
 			}
-			else if((float)(health/MAX_HEALTH) > 0.5)
+			else if(fractionHealthRemaining > 0.5)
 			{
 				System.out.println("npc "+getName()+" received a medium attack");
 				world.getReputationInterface().addNewEvent("attacked", "medium_damage", this);
 			}
-			else if((float)(health/MAX_HEALTH) > 0.25)
+			else if(fractionHealthRemaining > 0.25)
 			{
 				System.out.println("npc "+getName()+" received a large attack");
 				world.getReputationInterface().addNewEvent("attacked", "large_damage", this);
@@ -627,18 +628,19 @@ public abstract class GameCharacter
 		receiveDamage(projectile.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			System.out.println("current health: "+(float)(health/MAX_HEALTH));
-			if((float)(health/MAX_HEALTH) > 0.90)
+			float fractionHealthRemaining = (float)health/(float)MAX_HEALTH;
+			System.out.println("current health: "+fractionHealthRemaining);
+			if(fractionHealthRemaining > 0.90)
 			{
 				System.out.println("npc "+getName()+" received a small attack");
 				world.getReputationInterface().addNewEvent("attacked", "small_damage", this);
 			}
-			else if((float)(health/MAX_HEALTH) > 0.5)
+			else if(fractionHealthRemaining > 0.5)
 			{
 				System.out.println("npc "+getName()+" received a medium attack");
 				world.getReputationInterface().addNewEvent("attacked", "medium_damage", this);
 			}
-			else if((float)(health/MAX_HEALTH) > 0.25)
+			else if(fractionHealthRemaining > 0.25)
 			{
 				System.out.println("npc "+getName()+" received a large attack");
 				world.getReputationInterface().addNewEvent("attacked", "large_damage", this);
