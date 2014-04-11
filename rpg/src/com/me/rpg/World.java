@@ -445,8 +445,6 @@ public final class World
 		Transition backToRectangle = new Transition(wls, not);
 		Transition toRandWlk = new Transition(rw4, or3);
 		rw4.setTransitions(toRangeAtk);
-		rfs.setTransitions(toRandWlk);
-
 		rfs.setTransitions(backToRectangle);
 		wls.setTransitions(toRandWlk, toRangeAtk);
 		
