@@ -18,6 +18,8 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	private ArrayList<ReputationEvent> MasterEventList;
 	private ArrayList<EventTemplate> eventTemplateList = new ArrayList<EventTemplate>();
 	private ArrayList<GroupRelation> groupRelations = new ArrayList<GroupRelation>();
+	
+	private long timeTicks = 0;
 
 	public ReputationSystem(World world) {
 		this.world = world;
@@ -50,23 +52,109 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	
 	public void update()
 	{
+		timeTicks ++;
 		ArrayList<GameCharacter> charactersInWorld = world.getCharactersInWorld();
 		
 		for(GameCharacter temp : charactersInWorld)
 		{
-			if(temp.getGroup()!= "player_group")
+			if(temp.getGroup() != "player_group")
 			{
-				
-				
-				//if sharing
-				shareKnowledge(temp);
+				temp.getNPCMemory().updatePriority(timeTicks);
+				if(temp.getWantsToShareKnowledge())
+				{
+					ArrayList<GameCharacter> receivingCharacters = temp.getCurrentMap().canHearCharacters(temp);
+					if(receivingCharacters != null)
+					{
+						shareKnowledge(temp, receivingCharacters);
+					}
+				}
 			}
 		}
 	}
 	
-	private void shareKnowledge(GameCharacter sharingCharacter)
+	private void shareKnowledge(GameCharacter sharingCharacter, ArrayList<GameCharacter> receivingCharacters)
 	{
-		ArrayList<GameCharacter> receivingCharacters = sharingCharacter.getCurrentMap().canHearCharacters(sharingCharacter);
+		ReputationEvent repEvent = sharingCharacter.getNPCMemory().getHighestPriorityEvent();
+		for(GameCharacter temp : receivingCharacters)
+		{
+			// the timeTicks for when the npc learns of the event, not when the event actually occurred
+			temp.getNPCMemory().addMemory(repEvent, timeTicks); 
+		}
+	}
+	
+	public void addNewEvent(String eventType, String eventSpecifier, GameCharacter characterAffected) {
+		
+		String groupAffected = characterAffected.getGroup();
+		Coordinate coordinate = Coordinate.copy(characterAffected.getCenter());
+		
+		Iterator<ReputationEvent> iter = MasterEventList.iterator();
+		while (iter.hasNext())
+		{
+			ReputationEvent tempRepEvent = iter.next();
+			
+			if (tempRepEvent.getEventType().equals(eventType) && tempRepEvent.getCharacterAffected()==characterAffected)
+			{
+				//separate events by times.  E.G. if same event type happens to same character,
+				//but event occurs 30 seconds after first, then create a new event
+				if((timeTicks - tempRepEvent.getTimeEventOccurred()) < 30000)
+				{
+					System.out.println("Event already exists");
+					updateExistingEvent();
+					return;
+				}
+			}
+		}
+
+		//event does not exist, create it
+		for (int i = 0; i < eventTemplateList.size(); i++) {
+			if (eventTemplateList.get(i).getEventName().equalsIgnoreCase(eventType) && 
+					eventTemplateList.get(i).getEventSpecifier().equalsIgnoreCase(eventSpecifier)) 
+			{
+				ReputationEvent reputationEvent = new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeTicks);
+				MasterEventList.add(reputationEvent);
+				System.out.println("Event Added To MasterEventList");
+				world.pushMessage("Event: "+eventType+"	Magnitude: "+eventTemplateList.get(i).getMagnitude()+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
+						"  Location: "+(int)coordinate.getX()+", "+(int)coordinate.getY());
+				int masterListIndex = MasterEventList.indexOf(reputationEvent);
+				if (masterListIndex >= 0) {
+					CheckForWitnesses(reputationEvent, coordinate);
+				}
+				if (masterListIndex < 0) {
+					System.out.println("Event not found in MasterEventList");
+				}
+				break;
+			}
+
+		}
+	}
+	
+	private void updateExistingEvent()
+	{
+		
+	}
+	
+	private void CheckForWitnesses(ReputationEvent reputationEvent, Coordinate coordinate) 
+	{
+		ArrayList<GameCharacter> charactersOnMap = world.getCurrentMap().getCharactersOnMap();
+		
+		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
+		while (iterator1.hasNext()) {
+			GameCharacter tempCharacter = iterator1.next();
+			if (tempCharacter.getName() != "Player") {
+				if (tempCharacter.checkCoordinateInVision(coordinate.getX(),
+						coordinate.getY()) || tempCharacter.checkCoordinateWithinHearing(coordinate.getX(), coordinate.getY())) 
+				{
+					if (tempCharacter.getNPCMemory() != null) {
+						//tempCharacter.setFaceDirection(Direction.RIGHT);
+						//add feature:  change face direction to look at event 
+						//
+						tempCharacter.getNPCMemory().addMemory(reputationEvent, timeTicks);
+						System.out.println("Event seen by: "
+								+ tempCharacter.getName());
+					}
+				}
+			}
+		}
 	}
 	
 	public String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2)
@@ -93,87 +181,6 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		//In case groups arent found,   should never happen though
 		System.out.println("ReputationSystem -> getRelationsBetweenCharacters():    Group not found");
 		return "neutral";
-	}
-	
-	public void addNewEvent(String eventType, String eventSpecifier, GameCharacter characterAffected) {
-		
-		String groupAffected = characterAffected.getGroup();
-		long timeEventOccurred = System.currentTimeMillis();
-		Coordinate coordinate = Coordinate.copy(characterAffected.getCenter());
-		
-		Iterator<ReputationEvent> iter = MasterEventList.iterator();
-		while (iter.hasNext())
-		{
-			ReputationEvent tempRepEvent = iter.next();
-			
-			if (tempRepEvent.getEventType().equals(eventType) && tempRepEvent.getCharacterAffected()==characterAffected)
-			{
-				//separate events by times.  E.G. if same event type happens to same character,
-				//but event occurs 30 seconds after first, then create a new event
-				if((timeEventOccurred - tempRepEvent.getTimeEventOccurred()) < 30000)
-				{
-					System.out.println("Event already exists");
-					updateExistingEvent();
-					return;
-				}
-			}
-		}
-
-		//event does not exist, create it
-		for (int i = 0; i < eventTemplateList.size(); i++) {
-			if (eventTemplateList.get(i).getEventName().equalsIgnoreCase(eventType) && 
-					eventTemplateList.get(i).getEventSpecifier().equalsIgnoreCase(eventSpecifier)) 
-			{
-				ReputationEvent reputationEvent = new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeEventOccurred);
-				MasterEventList.add(reputationEvent);
-				System.out.println("Event Added To MasterEventList");
-				world.pushMessage("Event: "+eventType+"	Magnitude: "+eventTemplateList.get(i).getMagnitude()+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
-						"  Location: "+(int)coordinate.getX()+", "+(int)coordinate.getY());
-				int masterListIndex = MasterEventList.indexOf(reputationEvent);
-				if (masterListIndex >= 0) {
-					CheckForWitnesses(reputationEvent, coordinate);
-				}
-				if (masterListIndex < 0) {
-					System.out.println("Event not found in MasterEventList");
-				}
-				break;
-			}
-
-		}
-	}
-	
-	private void updateExistingEvent()
-	{
-		
-	}
-	
-	private void addNewEventHelper()
-	{
-		
-	}
-
-	private void CheckForWitnesses(ReputationEvent reputationEvent, Coordinate coordinate) 
-	{
-		ArrayList<GameCharacter> charactersOnMap = world.getCurrentMap().getCharactersOnMap();
-		
-		Iterator<GameCharacter> iterator1 = charactersOnMap.iterator();
-		while (iterator1.hasNext()) {
-			GameCharacter tempCharacter = iterator1.next();
-			if (tempCharacter.getName() != "Player") {
-				if (tempCharacter.checkCoordinateInVision(coordinate.getX(),
-						coordinate.getY()) || tempCharacter.checkCoordinateWithinHearing(coordinate.getX(), coordinate.getY())) 
-				{
-					if (tempCharacter.getNPCMemory() != null) {
-						//tempCharacter.setFaceDirection(Direction.RIGHT);
-						//add feature:  change face direction to look at event 
-						//
-						tempCharacter.getNPCMemory().addMemory(reputationEvent);
-						System.out.println("Event seen by: "
-								+ tempCharacter.getName());
-					}
-				}
-			}
-		}
 	}
 	
 	public ArrayList<ReputationEvent> getMasterEventList()

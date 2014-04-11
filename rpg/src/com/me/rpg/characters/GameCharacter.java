@@ -79,6 +79,9 @@ public abstract class GameCharacter
 	protected Time lastAttackTime;
 
 	// Reputation Stuff
+	protected boolean urgentShareKnowledge = false;
+	protected boolean wantsToShareKnowledge = false;
+	
 	protected String group;
 	protected int dispositionValue;
 	protected String viewOfPlayer;
@@ -981,5 +984,25 @@ public abstract class GameCharacter
 	public String getGroup()
 	{
 		return group;
+	}
+	
+	public boolean getWantsToShareKnowledge()
+	{
+		return wantsToShareKnowledge;
+	}
+	
+	public boolean getUrgentShareKnowledge()
+	{
+		return urgentShareKnowledge;
+	}
+	
+	public void setWantsToShareKnowledge(boolean wantsToShareKnowledge)
+	{
+		this.wantsToShareKnowledge = wantsToShareKnowledge;
+	}
+	
+	public void setUrgentShareKnowledge(boolean urgentShareKnowledge)
+	{
+		this.urgentShareKnowledge = urgentShareKnowledge;
 	}
 }

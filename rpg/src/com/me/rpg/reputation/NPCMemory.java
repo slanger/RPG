@@ -23,12 +23,24 @@ public class NPCMemory implements Serializable
 		rememberedEvents = new ArrayList<RememberedEvent>();
 	}
 	
-	public void addMemory(ReputationEvent reputationEvent)
+	public void updatePriority(long timeTicks)
+	{
+		
+		
+	}
+	
+	public ReputationEvent getHighestPriorityEvent()
+	{
+		
+		return null;
+	}
+	
+	public void addMemory(ReputationEvent reputationEvent, long timeTicks)
 	{
 		
 		gameCharacter.updateDispositionValue(reputationEvent.getMagnitude());
 		System.out.println("magnitude is: "+reputationEvent.getMagnitude());
-		RememberedEvent temp = new RememberedEvent(reputationEvent);
+		RememberedEvent temp = new RememberedEvent(reputationEvent, timeTicks);
 		rememberedEvents.add(temp);
 		System.out.println("Added Event to a Single NPC");
 	}

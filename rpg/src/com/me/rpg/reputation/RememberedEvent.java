@@ -12,10 +12,12 @@ public class RememberedEvent implements Serializable
 	private ReputationEvent repEventPointer;
 	private int magnitudeKnownByNPC;
 	private long timeLearnedOfEvent;
+	private int priority;
 	
-	RememberedEvent(ReputationEvent reputationEvent)
+	RememberedEvent(ReputationEvent reputationEvent, long timeTicks)
 	{
 		repEventPointer = reputationEvent;
+		timeLearnedOfEvent = timeTicks;
 		magnitudeKnownByNPC = reputationEvent.getMagnitude();
 	}
 	
@@ -41,6 +43,16 @@ public class RememberedEvent implements Serializable
 	public void update(ReputationEvent reputationEvent)
 	{
 		//
+	}
+	
+	public int getPriority()
+	{
+		return priority;
+	}
+	
+	public void setPriority(int priority)
+	{
+		this.priority = priority;
 	}
 	
 }
