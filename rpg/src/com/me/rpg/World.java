@@ -604,7 +604,12 @@ public final class World
 			player.handlePauseMenuInput();
 			return;
 		}
-
+		
+		if(updateEnable)
+		{
+			reputationSystem.update();
+		}
+		
 		syncTimer.update(deltaTime);
 
 		Iterator<Map> iter = maps.iterator();

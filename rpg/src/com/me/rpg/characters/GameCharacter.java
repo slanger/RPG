@@ -79,6 +79,9 @@ public abstract class GameCharacter
 	protected Time lastAttackTime;
 
 	// Reputation Stuff
+	protected boolean urgentShareKnowledge = false;
+	protected boolean wantsToShareKnowledge = false;
+	
 	protected String group;
 	protected int dispositionValue;
 	protected String viewOfPlayer;
@@ -574,7 +577,28 @@ public abstract class GameCharacter
 		receiveDamage(weapon.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", this);
+			float fractionHealthRemaining = (float)health/(float)MAX_HEALTH;
+			System.out.println("current health: "+fractionHealthRemaining);
+			if(fractionHealthRemaining > 0.90)
+			{
+				System.out.println("npc "+getName()+" received a small attack");
+				world.getReputationInterface().addNewEvent("attacked", "small_damage", this);
+			}
+			else if(fractionHealthRemaining > 0.5)
+			{
+				System.out.println("npc "+getName()+" received a medium attack");
+				world.getReputationInterface().addNewEvent("attacked", "medium_damage", this);
+			}
+			else if(fractionHealthRemaining > 0.25)
+			{
+				System.out.println("npc "+getName()+" received a large attack");
+				world.getReputationInterface().addNewEvent("attacked", "large_damage", this);
+			}
+			else if(health == 0)
+			{
+				System.out.println("npc "+getName()+" was killed!");
+				world.getReputationInterface().addNewEvent("attacked", "killed", this);
+			}
 		}
 	}
 
@@ -593,7 +617,28 @@ public abstract class GameCharacter
 		receiveDamage(projectile.getPower());
 		if (!name.equals("Player") && (lastAttacker.getGroup().equalsIgnoreCase("player_group")))
 		{
-			world.getReputationInterface().addNewEvent("Attacked", this);
+			float fractionHealthRemaining = (float)health/(float)MAX_HEALTH;
+			System.out.println("current health: "+fractionHealthRemaining);
+			if(fractionHealthRemaining > 0.90)
+			{
+				System.out.println("npc "+getName()+" received a small attack");
+				world.getReputationInterface().addNewEvent("attacked", "small_damage", this);
+			}
+			else if(fractionHealthRemaining > 0.5)
+			{
+				System.out.println("npc "+getName()+" received a medium attack");
+				world.getReputationInterface().addNewEvent("attacked", "medium_damage", this);
+			}
+			else if(fractionHealthRemaining > 0.25)
+			{
+				System.out.println("npc "+getName()+" received a large attack");
+				world.getReputationInterface().addNewEvent("attacked", "large_damage", this);
+			}
+			else if(health == 0)
+			{
+				System.out.println("npc "+getName()+" was killed!");
+				world.getReputationInterface().addNewEvent("attacked", "killed", this);
+			}
 		}
 	}
 
@@ -939,5 +984,25 @@ public abstract class GameCharacter
 	public String getGroup()
 	{
 		return group;
+	}
+	
+	public boolean getWantsToShareKnowledge()
+	{
+		return wantsToShareKnowledge;
+	}
+	
+	public boolean getUrgentShareKnowledge()
+	{
+		return urgentShareKnowledge;
+	}
+	
+	public void setWantsToShareKnowledge(boolean wantsToShareKnowledge)
+	{
+		this.wantsToShareKnowledge = wantsToShareKnowledge;
+	}
+	
+	public void setUrgentShareKnowledge(boolean urgentShareKnowledge)
+	{
+		this.urgentShareKnowledge = urgentShareKnowledge;
 	}
 }

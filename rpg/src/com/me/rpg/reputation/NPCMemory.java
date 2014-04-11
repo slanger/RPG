@@ -13,23 +13,35 @@ public class NPCMemory implements Serializable
 	private static final long serialVersionUID = -6449602139129854263L;
 
 	private ArrayList<ReputationEvent> MasterEventList;
-	private ArrayList<NPCMemoryElement> PerNPCLongTermMemory;
+	private ArrayList<RememberedEvent> rememberedEvents;
 	private GameCharacter gameCharacter;
 	
 	public NPCMemory(GameCharacter gameCharacter, ArrayList<ReputationEvent> MasterEventList)
 	{
 		this.gameCharacter = gameCharacter;
 		this.MasterEventList = MasterEventList;
-		PerNPCLongTermMemory = new ArrayList<NPCMemoryElement>();
+		rememberedEvents = new ArrayList<RememberedEvent>();
 	}
 	
-	public void addMemory(ReputationEvent reputationEvent)
+	public void updatePriority(long timeTicks)
+	{
+		
+		
+	}
+	
+	public ReputationEvent getHighestPriorityEvent()
+	{
+		
+		return null;
+	}
+	
+	public void addMemory(ReputationEvent reputationEvent, long timeTicks)
 	{
 		
 		gameCharacter.updateDispositionValue(reputationEvent.getMagnitude());
 		System.out.println("magnitude is: "+reputationEvent.getMagnitude());
-		NPCMemoryElement temp = new NPCMemoryElement(reputationEvent);
-		PerNPCLongTermMemory.add(temp);
+		RememberedEvent temp = new RememberedEvent(reputationEvent, timeTicks);
+		rememberedEvents.add(temp);
 		System.out.println("Added Event to a Single NPC");
 	}
 	

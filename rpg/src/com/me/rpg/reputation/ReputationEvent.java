@@ -7,46 +7,75 @@ import com.me.rpg.utils.Coordinate;
 
 public class ReputationEvent implements Serializable
 {
-
+	
 	private static final long serialVersionUID = 3012016206183543799L;
 
-	private EventID id;
+	private String eventType; 		//didDamageTo, completedQuest, etc
+	private int highestKnownMagnitude;    		//highest magnitude known
+	private int eventID;			
+	private String groupAffected;
+	private GameCharacter characterAffected;
 	private Coordinate coordinate;
 	private long timeEventOccurred;
-	private int repImpactMagnitude;
 	private int referenceCount;
 
-	public ReputationEvent(String eventType, int magnitude, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred)
+	public ReputationEvent(String eventType, int highestKnownMagnitude, String groupAffected, GameCharacter characterAffected, Coordinate coordinate, long timeEventOccurred)
 	{
-		id = new EventID(eventType, groupAffected, characterAffected);
+		this.eventType = eventType;
+		this.highestKnownMagnitude = highestKnownMagnitude;
+		this.groupAffected = groupAffected;
 		this.coordinate = coordinate;
 		this.timeEventOccurred = timeEventOccurred;
-		repImpactMagnitude = -20; //temp placeholder
+		referenceCount = 0;
 	}
 
-	public EventID getEventID()
+	public String getEventType()
 	{
-		return id;
+		return eventType;
 	}
-
+	
+	public int getMagnitude()
+	{
+		return highestKnownMagnitude;
+	}
+	
+	public int getEventID()
+	{
+		return eventID;
+	}
+	
+	public String getGroupAffected()
+	{
+		return groupAffected;
+	}
+	
+	public GameCharacter getCharacterAffected()
+	{
+		return characterAffected;
+	}
+	
 	public Coordinate getCoordinate()
 	{
 		return coordinate;
 	}
-
-	public int getMagnitude()
+	
+	public long getTimeEventOccurred()
 	{
-		return repImpactMagnitude;
+		return timeEventOccurred;
 	}
 
-	public int incrementReferenceCount()
+	public int getReferenceCount()
 	{
-		return 0;
+		return referenceCount;
+	}
+	
+	public void incrementReferenceCount()
+	{
+		referenceCount++;
 	}
 
-	public int decrementReferenceCount()
+	public void decrementReferenceCount()
 	{
-		return 0;
+		referenceCount--;
 	}
-
 }
