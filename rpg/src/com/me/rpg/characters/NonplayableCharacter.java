@@ -35,12 +35,16 @@ public class NonplayableCharacter extends GameCharacter
 	@Override
 	public void doUpdate(float deltaTime)
 	{
-		UpdateResult result = stateMachine.update(deltaTime);
-		for (int i = 0; i < result.actions.size(); ++i) {
-			Action a  = result.actions.get(i);
-			a.doAction(deltaTime);
+		//added this condition so npcs without states can be added
+		//useful for testing the rep
+		if(this.getStateMachine() != null)
+		{
+			UpdateResult result = stateMachine.update(deltaTime);
+			for (int i = 0; i < result.actions.size(); ++i) {
+				Action a  = result.actions.get(i);
+				a.doAction(deltaTime);
+			}
 		}
-
 		updateTexture();
 	}
 

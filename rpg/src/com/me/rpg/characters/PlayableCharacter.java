@@ -148,7 +148,7 @@ public class PlayableCharacter extends GameCharacter
 			}
 			else
 			{
-				// handleReputationDebugMenuInput();
+				handleReputationDebugMenuInput();
 			}
 			return;
 		}
@@ -342,6 +342,46 @@ public class PlayableCharacter extends GameCharacter
 		 */
 	}
 
+	public void handleReputationDebugMenuInput()
+	{
+		if(world.getReputationDebugMenu().getInMenu() == false)
+		{
+			return;
+		}
+
+		if (Gdx.input.isKeyPressed(Keys.UP))
+		{
+			if (enableInputUp)
+			{
+				enableInputUp = false;
+				if (world.getReputationDebugMenu().getInMenu())
+				{
+					world.getReputationDebugMenu().acceptPlayerInput("UP");
+				}
+			}
+		}
+		else
+		{
+			enableInputUp = true;
+		}
+
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		{
+			if (enableInputDown)
+			{
+				enableInputDown = false;
+				if (world.getReputationDebugMenu().getInMenu())
+				{
+					world.getReputationDebugMenu().acceptPlayerInput("DOWN");
+				}
+			}
+		}
+		else
+		{
+			enableInputDown = true;
+		}
+	}
+	
 	public void handleInventoryMenuInput()
 	{
 		if (world.getInventoryMenu().getInMenu() == false)

@@ -975,7 +975,11 @@ public abstract class GameCharacter
 	
 	public void initializeReputation()
 	{
-		if(group.equalsIgnoreCase("Test_Group"))
+		if(group.equalsIgnoreCase("villain_group"))
+		{
+			setDispositionValue(-50);
+		}
+		if(group.equalsIgnoreCase("villager_group"))
 		{
 			setDispositionValue(0);
 		}

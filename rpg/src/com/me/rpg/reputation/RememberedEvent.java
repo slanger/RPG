@@ -55,4 +55,12 @@ public class RememberedEvent implements Serializable
 		this.priority = priority;
 	}
 	
+	public String toString()
+	{
+		String s;
+		s = "EventType: "+repEventPointer.getEventType()+"  groupAffected: "+repEventPointer.getGroupAffected();
+		s = s+"  charAffected: "+"  KnownMag: "+magnitudeKnownByNPC;
+		return s;
+	}
+	
 }

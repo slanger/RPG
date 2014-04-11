@@ -323,6 +323,17 @@ public final class World
 		npc4 = new NonplayableCharacter("NPC4", "villain_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 
+		//testing reputation with these characters
+		NonplayableCharacter rep_npc1 = new NonplayableCharacter("NPC4", "villager_group",
+				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+		NonplayableCharacter rep_npc2 = new NonplayableCharacter("NPC4", "villager_group",
+				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+		NonplayableCharacter rep_npc3 = new NonplayableCharacter("NPC4", "villager_group",
+				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+		westTown.addCharacterToMap(rep_npc1, new Location(westTown, 300, 480));
+		westTown.addCharacterToMap(rep_npc2, new Location(westTown, 320, 480));
+		westTown.addCharacterToMap(rep_npc3, new Location(westTown, 330, 480));
+		//
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap,
 				192, 544));

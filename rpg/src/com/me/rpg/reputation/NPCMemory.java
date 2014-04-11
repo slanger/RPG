@@ -50,4 +50,9 @@ public class NPCMemory implements Serializable
 		
 	}
 	
+	public ArrayList<RememberedEvent> getRememberedEvents()
+	{
+		return rememberedEvents;
+	}
+	
 }
