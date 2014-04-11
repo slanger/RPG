@@ -56,6 +56,7 @@ public class ScreenHandler extends Game
 		// load textures
 		manager.load(World.PLAYER_TEXTURE_PATH, Texture.class);
 		manager.load(World.NPC_TEXTURE_PATH, Texture.class);
+		manager.load(World.RGUARD_TEXTURE_PATH, Texture.class);
 
 		manager.load(Map.GRAVESTONE_PATH, Texture.class);
 		manager.load(World.FADED_RED_DOT_PATH, Texture.class);
