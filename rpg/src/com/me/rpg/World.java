@@ -340,7 +340,7 @@ public final class World
 
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap, 192, 544));
-		//exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
+		exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
 		exampleMap.addCharacterToMap(npc2, new Location(exampleMap, 480, 128));
 		exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
 		westTown.addCharacterToMap(npc4, new Location(westTown, 1000, 480));
@@ -462,7 +462,7 @@ public final class World
 
 // MELEE WEAPONS
 		
-		Weapon npc_sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth, weaponHeight,
+		Weapon npc_sword = new MeleeWeapon("NPC Sword", SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Weapon sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
@@ -474,9 +474,11 @@ public final class World
 				32, 32);
 		Weapon shadowSword = new MeleeWeapon("Shadow Sword", SHADOW_SWORD_PATH, weaponWidth, weaponHeight,
 				32, 32);
-	
-		shadowSword.addEffect(new Poison(500, 1, 1));
-		
+
+		// make Shadow Sword awesome
+		shadowSword.setPower(500);
+		shadowSword.addEffect(new Poison(500, 3, 1f));
+
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 

@@ -19,19 +19,10 @@ public class RangedWeapon extends Weapon
 	public RangedWeapon(String weaponName, String weaponSpritePath, int width,
 			int height, int tileWidth, int tileHeight)
 	{
-		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight);
-		setStatsDefault();
-	}
-	
-	protected void setStatsDefault() {
+		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight, 0.5f, 0.2f, 250, 20);
 		// note:  pixel/second is range/speed
-		// this should probably be faster than unit movement
-		speed = 0.5f;
-		fireRate = 0.2f;
-		range = 250;
-		power = 20;
-		setAttacking(false);
-		stateTime = 0f;
+		// speed should probably be faster than character movement
+
 		degreeRotation = 0f;
 	}
 	

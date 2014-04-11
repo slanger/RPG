@@ -22,17 +22,9 @@ public class MeleeWeapon extends Weapon
 	public MeleeWeapon(String weaponName, String weaponSpritePath, int width,
 			int height, int tileWidth, int tileHeight)
 	{
-		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight);
-		setStatsDefault();
-	}
-	
-	protected void setStatsDefault() {
-		speed = 0.2f;
-		fireRate = 0.2f;
-		range = 12; // 12 is good for a melee weapon of length 32
-		power = 2;
-		setAttacking(false);
-		stateTime = 0f;
+		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight, 0.2f, 0.2f, 12, 2);
+		// range of 12 is good for a melee weapon of length 32
+
 		currentStyle = AttackStyle.POKING;
 	}
 	
