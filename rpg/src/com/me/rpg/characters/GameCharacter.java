@@ -434,17 +434,6 @@ public abstract class GameCharacter
 
 	public void render(SpriteBatch batch)
 	{
-		doRenderBefore(batch);
-
-		// blink if Character has been hit
-		if (strikeImmunity > 0)
-		{
-			Color c = sprite.getColor();
-			// 16 is a good value for blinking rate
-			float alpha = (float) Math.abs(Math.cos(strikeImmunity * 16));
-			sprite.setColor(c.r, c.g, c.b, alpha);
-		}
-
 		// if we are facing up and using shield, draw shield before character
 		// sprite
 		if (isShielded() && faceDirection.equals(Direction.UP))
@@ -468,21 +457,20 @@ public abstract class GameCharacter
 			weaponSlot.render(sprite.getBoundingRectangle(),
 					getFaceDirection(), batch);
 		}
-
-		doRenderAfter(batch);
-	}
-
-	protected void doRenderBefore(SpriteBatch batch)
-	{
-	}
-
-	protected void doRenderAfter(SpriteBatch batch)
-	{
 	}
 
 	public final void update(float deltaTime)
 	{
 		addToStateTime(deltaTime);
+		
+		// blink if Character has been hit
+		if (strikeImmunity > 0)
+		{
+			Color c = sprite.getColor();
+			// 16 is a good value for blinking rate
+			float alpha = (float) Math.abs(Math.cos(strikeImmunity * 16));
+			sprite.setColor(c.r, c.g, c.b, alpha);
+		}
 
 		Iterator<StatusEffect> iter = inflictedEffects.iterator();
 		while (iter.hasNext())

@@ -44,6 +44,8 @@ public class MeleeWeapon extends Weapon
 			SpriteBatch batch) {
 
 		Sprite sprite = getWeaponSprite();
+		// slightly hacky, but this fixes an error where the weapon would be
+		// rendered in the wrong direction for a single frame when you turn
 		doUpdate(0f);
 		sprite.draw(batch);
 	}

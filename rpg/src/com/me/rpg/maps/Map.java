@@ -337,11 +337,6 @@ public abstract class Map
 		while (projectileIter.hasNext())
 		{
 			Projectile p = projectileIter.next();
-			if (p.isFinished() || !p.isFired())
-			{
-				projectileIter.remove();
-				continue;
-			}
 			Rectangle projectileLoc = p.getSpriteBounds();
 			if (projectileLoc.overlaps(cameraBounds))
 			{
@@ -439,18 +434,19 @@ public abstract class Map
 		while (projIter.hasNext())
 		{
 			Projectile p = projIter.next();
-			charIter = charactersOnMap.iterator();
 			Rectangle projectileBox = p.getSpriteBounds();
-			while (charIter.hasNext())
+			GameCharacter hitChar = checkCollisionWithCharacters(projectileBox, null);
+			if (hitChar != null && !hitChar.equals(p.getFiredWeapon().getOwner())) {
+				hitChar.receiveAttack(p);
+				p.setHasHit();
+			}
+			boolean hit = !checkCollisionWithObjects(projectileBox);
+			if (hit)
+				p.setHasHit();
+			
+			if (p.isFinished() || !p.isFired())
 			{
-				GameCharacter c = charIter.next();
-				if (c.equals(p.getFiredWeapon().getOwner()))
-					continue;
-				if (projectileBox.overlaps(c.getHitBox()))
-				{
-					c.receiveAttack(p);
-					p.setHasHit();
-				}
+				projIter.remove();
 			}
 		}
 

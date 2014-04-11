@@ -38,20 +38,7 @@ public class Shield extends Equippable implements IAttackable
 		// TODO: come up with a better value for protrusion --> the amount that the shield sticks out from character
 		// float protrusion = sprite.getWidth()/6;
 		
-		/*switch (currentStyle) {
-			// straight poking
-			case POKING:
-				sprite.setPosition(leftX + (getRenderOffset() + charRectangle.getWidth() - 8)*direction.getDx(), leftY + (getRenderOffset() + charRectangle.getHeight() - 8)*direction.getDy());
-				break;
-			
-			// slashing
-			case SLASHING:
-				float strangeMultiplier = (direction == Direction.RIGHT ? -1 : 1);
-				sprite.setRotation(getDegreeOffset() * strangeMultiplier);
-				sprite.setPosition(leftX + (charRectangle.getWidth() - 4)*direction.getDx(), leftY + (charRectangle.getHeight() - 4)*direction.getDy());
-				sprite.setOrigin(sprite.getWidth()/2 * (-direction.getDx() + 1), sprite.getHeight()/2 * (-direction.getDy() + 1));
-				break;
-		}*/
+		// This line is safe because Shield is always rendered relative to equipping character
 		sprite.setPosition(bottomLeftX, bottomLeftY);
 		sprite.draw(batch);
 	}

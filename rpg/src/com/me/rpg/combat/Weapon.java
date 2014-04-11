@@ -108,6 +108,7 @@ public abstract class Weapon extends Equippable
 			SpriteBatch batch) {
 		if (!attacking)
 			return;
+		// TODO: this needs to be set elsewhere, maybe also fix the hacky call in MeleeWeapon
 		lastDirection = direction;
 		doRender(charRectangle, direction, batch);
 	}
