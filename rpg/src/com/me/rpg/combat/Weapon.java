@@ -26,16 +26,31 @@ public abstract class Weapon extends Equippable
 		return power;
 	}
 	
+	public void setPower(int power)
+	{
+		this.power = power;
+	}
+	
 	public Direction getLastDirection() {
 		return lastDirection;
 	}
 	
-	public Weapon(String weaponName, String weaponSpritePath, int width,
-			int height, int tileWidth, int tileHeight)
+	protected Weapon(String weaponName, String weaponSpritePath, int width,
+			int height, int tileWidth, int tileHeight, float speed,
+			float fireRate, int range, int power)
 	{
 		super(weaponName, weaponSpritePath, width, height, tileWidth, tileHeight);
+		
+		this.speed = speed;
+		this.fireRate = fireRate;
+		this.range = range;
+		this.power = power;
+		
+		stateTime = 0f;
 		lastDirection = Direction.DOWN;
 		effects = new StatusEffect[0];
+		
+		setAttacking(false);
 	}
 	
 	public float getSpeed() {
@@ -93,6 +108,7 @@ public abstract class Weapon extends Equippable
 			SpriteBatch batch) {
 		if (!attacking)
 			return;
+		// TODO: this needs to be set elsewhere, maybe also fix the hacky call in MeleeWeapon
 		lastDirection = direction;
 		doRender(charRectangle, direction, batch);
 	}

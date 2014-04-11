@@ -60,12 +60,7 @@ public class DeadCharacter
 	{
 		if (passedTime < fadeTime)
 		{
-			deceased.getSprite().setColor(1f, 1f, 1f,
-					(fadeTime - passedTime) / fadeTime);
 			deceased.getSprite().draw(batch);
-			gravestone.setColor(1f, 1f, 1f, passedTime / fadeTime);
-			gravestone.setX(deceased.getSprite().getX()
-					+ (float) Math.cos(passedTime * 200 * Math.PI));
 			gravestone.draw(batch, passedTime / fadeTime);
 			return;
 		}
@@ -77,6 +72,11 @@ public class DeadCharacter
 		if (passedTime > fadeTime)
 			return;
 		passedTime += deltaTime;
+		deceased.getSprite().setColor(1f, 1f, 1f,
+				(fadeTime - passedTime) / fadeTime);
+		gravestone.setColor(1f, 1f, 1f, passedTime / fadeTime);
+		gravestone.setX(deceased.getSprite().getX()
+				+ (float) Math.cos(passedTime * 200 * Math.PI));
 	}
 
 	public String getDeadName()

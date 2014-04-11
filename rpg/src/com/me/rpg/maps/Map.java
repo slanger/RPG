@@ -337,11 +337,6 @@ public abstract class Map
 		while (projectileIter.hasNext())
 		{
 			Projectile p = projectileIter.next();
-			if (p.isFinished() || !p.isFired())
-			{
-				projectileIter.remove();
-				continue;
-			}
 			Rectangle projectileLoc = p.getSpriteBounds();
 			if (projectileLoc.overlaps(cameraBounds))
 			{
@@ -439,18 +434,19 @@ public abstract class Map
 		while (projIter.hasNext())
 		{
 			Projectile p = projIter.next();
-			charIter = charactersOnMap.iterator();
 			Rectangle projectileBox = p.getSpriteBounds();
-			while (charIter.hasNext())
+			GameCharacter hitChar = checkCollisionWithCharacters(projectileBox, null);
+			if (hitChar != null && !hitChar.equals(p.getFiredWeapon().getOwner())) {
+				hitChar.receiveAttack(p);
+				p.setHasHit();
+			}
+			boolean hit = !checkCollisionWithObjects(projectileBox);
+			if (hit)
+				p.setHasHit();
+			
+			if (p.isFinished() || !p.isFired())
 			{
-				GameCharacter c = charIter.next();
-				if (c.equals(p.getFiredWeapon().getOwner()))
-					continue;
-				if (projectileBox.overlaps(c.getHitBox()))
-				{
-					c.receiveAttack(p);
-					p.setHasHit();
-				}
+				projIter.remove();
 			}
 		}
 
@@ -468,8 +464,8 @@ public abstract class Map
 		{
 			GameCharacter character = removeIter.next();
 			removeCharacter(character);
-			removeIter.remove();
 		}
+		charactersToRemove.clear();
 
 		Iterator<Projectile> projectileIter = flyingProjectiles.iterator();
 		while (projectileIter.hasNext())
@@ -867,6 +863,7 @@ public abstract class Map
 
 	private void removeCharacter(GameCharacter removeCharacter)
 	{
+		removeEquippedWeapon(removeCharacter.getEquippedWeapon());
 		charactersOnMap.remove(removeCharacter);
 		removeCharacter.removedFromMap();
 		if (focusedCharacter != null && focusedCharacter.equals(removeCharacter))
@@ -893,6 +890,7 @@ public abstract class Map
 							+ newCharacter + " " + newLocation);
 		}
 		charactersOnMap.add(newCharacter);
+		addEquippedWeapon(newCharacter.getEquippedWeapon());
 		newCharacter.addedToMap(newLocation);
 	}
 
@@ -930,12 +928,14 @@ public abstract class Map
 
 	public void addEquippedWeapon(Weapon w)
 	{
-		equippedWeapons.add(w);
+		if (w != null)
+			equippedWeapons.add(w);
 	}
 
 	public void removeEquippedWeapon(Weapon w)
 	{
-		equippedWeapons.remove(w);
+		if (w != null)
+			equippedWeapons.remove(w);
 	}
 
 	@Override
@@ -947,6 +947,13 @@ public abstract class Map
 	public GameCharacter getFocusedCharacter()
 	{
 		return focusedCharacter;
+	}
+
+	public boolean isRectangleOutOfBounds(Rectangle r)
+	{
+		Rectangle bounds = new Rectangle(0, 0, mapWidth, mapHeight);
+		return !(((r.x >= bounds.x && r.x <= bounds.x + bounds.width) && (r.x + r.width >= bounds.x && r.x + r.width <= bounds.x + bounds.width))
+			&& ((r.y >= bounds.y && r.y <= bounds.y + bounds.height) && (r.y + r.height >= bounds.y && r.y + r.height <= bounds.y + bounds.height)));
 	}
 
 }

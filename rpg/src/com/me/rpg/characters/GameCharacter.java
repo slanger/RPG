@@ -432,21 +432,8 @@ public abstract class GameCharacter
 
 	public abstract void moveToOtherMap(Location newLocation);
 
-	public abstract void warpToOtherMap(Location newLocation);
-
 	public void render(SpriteBatch batch)
 	{
-		doRenderBefore(batch);
-
-		// blink if Character has been hit
-		if (strikeImmunity > 0)
-		{
-			Color c = sprite.getColor();
-			// 16 is a good value for blinking rate
-			float alpha = (float) Math.abs(Math.cos(strikeImmunity * 16));
-			sprite.setColor(c.r, c.g, c.b, alpha);
-		}
-
 		// if we are facing up and using shield, draw shield before character
 		// sprite
 		if (isShielded() && faceDirection.equals(Direction.UP))
@@ -470,21 +457,20 @@ public abstract class GameCharacter
 			weaponSlot.render(sprite.getBoundingRectangle(),
 					getFaceDirection(), batch);
 		}
-
-		doRenderAfter(batch);
-	}
-
-	protected void doRenderBefore(SpriteBatch batch)
-	{
-	}
-
-	protected void doRenderAfter(SpriteBatch batch)
-	{
 	}
 
 	public final void update(float deltaTime)
 	{
 		addToStateTime(deltaTime);
+		
+		// blink if Character has been hit
+		if (strikeImmunity > 0)
+		{
+			Color c = sprite.getColor();
+			// 16 is a good value for blinking rate
+			float alpha = (float) Math.abs(Math.cos(strikeImmunity * 16));
+			sprite.setColor(c.r, c.g, c.b, alpha);
+		}
 
 		Iterator<StatusEffect> iter = inflictedEffects.iterator();
 		while (iter.hasNext())
@@ -772,8 +758,9 @@ public abstract class GameCharacter
 	 * 
 	 * @param sword
 	 */
-	public boolean equipWeapon(Map m, Weapon weapon)
+	public boolean equipWeapon(Weapon weapon)
 	{
+		Map m = getCurrentMap();
 		if (weaponSlot != null)
 		{
 			m.removeEquippedWeapon(weaponSlot);
@@ -790,24 +777,6 @@ public abstract class GameCharacter
 		this.weaponSlot = weapon;
 		m.addEquippedWeapon(weapon);
 		return result;
-	}
-
-	public void swapWeapon(Map m)
-	{
-		m.removeEquippedWeapon(weaponSlot);
-		weaponSlot.unequip();
-
-		Weapon temp = weaponSlot;
-		weaponSlot = swapWeaponSlot;
-		swapWeaponSlot = temp;
-		if (weaponSlot == null)
-			return;
-		weaponSlot.tryEquip(this);
-		m.addEquippedWeapon(weaponSlot);
-		if(temp instanceof RangedWeapon)
-		{
-			((RangedWeapon) temp).equipProjectile(getEquippedArrows(), 1000);
-		}
 	}
 
 	public Rectangle getHitBox()

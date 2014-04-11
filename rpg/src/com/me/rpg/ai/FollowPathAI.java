@@ -96,7 +96,7 @@ public class FollowPathAI
 
 		if (hE < Coordinate.EPS)
 		{
-			character.setMoving(false);
+			character.setMoving(true);
 			character.setCenter(nextCenter);
 		}
 		else
@@ -132,6 +132,11 @@ public class FollowPathAI
 			character.setBottomLeftCorner(newCoordinate);
 		}
 
+		if (!character.isMoving())
+		{
+			return;
+		}
+
 		Vector2 characterCenter = new Vector2(character.getCenterX(),
 				character.getCenterY());
 		Rectangle nextWaypointRectangle = nextCenter
@@ -139,32 +144,18 @@ public class FollowPathAI
 		if (nextWaypointRectangle.contains(characterCenter))
 		{
 			currentIndex++;
-			if (nextWaypoint.isSourceWarpPoint())
+		}
+
+		// check warp point collision
+		Waypoint warpWaypoint = character.getCurrentMap()
+				.checkCollisionWithWarpPoints(
+						character.getBoundingRectangle());
+		if (warpWaypoint != null)
+		{
+			character.moveToOtherMap(warpWaypoint.location);
+			if (currentIndex < path.size() - 1)
 			{
 				currentIndex++;
-				Waypoint warpToWaypoint = nextWaypoint.connectedWarpPoint;
-				character.moveToOtherMap(warpToWaypoint.location);
-			}
-
-			// if current location and destination are connected, bypass the
-			// rest of the path and go directly to destination
-			if (currentIndex < path.size())
-			{
-				currentMap = character.getCurrentMap();
-				Waypoint destinationWaypoint = path.get(path.size() - 1);
-				if (currentMap.equals(destinationWaypoint.location.getMap()))
-				{
-					currentArea = character.getBoundingRectangle();
-					currentLocation = new Location(currentMap, currentArea);
-					currentCenter = currentLocation.getCenter();
-					Coordinate destinationCenter = destinationWaypoint
-							.getCenter();
-					if (currentMap.pointsConnected(currentCenter,
-							destinationCenter))
-					{
-						currentIndex = path.size() - 1;
-					}
-				}
 			}
 		}
 	}
@@ -181,10 +172,14 @@ public class FollowPathAI
 
 	private List<Waypoint> makePath(Location source, Location destination)
 	{
+		// if destination is off the map, then return null
+		Map destinationMap = destination.getMap();
+		if (destinationMap.isRectangleOutOfBounds(destination.getArea()))
+			return null;
+
 		List<Waypoint> shortestPath;
 
 		Map sourceMap = source.getMap();
-		Map destinationMap = destination.getMap();
 		Coordinate sourceCenter = source.getCenter();
 		Coordinate destinationCenter = destination.getCenter();
 

@@ -8,7 +8,9 @@ import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Location;
 
 public class RangedMoveTowardAction implements Action {
-	
+
+	private static final long serialVersionUID = -8045839330465590406L;
+
 	private GameCharacter character;
 	
 	public RangedMoveTowardAction(GameCharacter character) {

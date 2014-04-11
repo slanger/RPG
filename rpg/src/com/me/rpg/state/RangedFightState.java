@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.AttackAction;
-import com.me.rpg.state.action.KeepDistanceAction;
 import com.me.rpg.state.action.RangedMoveTowardAction;
 import com.me.rpg.state.action.SetStrafeAction;
 import com.me.rpg.state.transition.AttackerInRangeCondition;
@@ -36,11 +35,11 @@ public class RangedFightState extends ResettingHierarchicalState {
 			StandStillState standStill = new StandStillState(this, character, null);
 			RFSCannotAttack cannotAtt = new RFSCannotAttack(this, character);
 			
-			FloatCondition waitToAttCondition = cannotAtt.getFloatCondition("timeInState", 1f, Comparison.GREATER);
+			FloatCondition waitToAttCondition = cannotAtt.getFloatCondition("timeInState", 0.3f, Comparison.GREATER);
 			Transition toCanAtt = new Transition(canAtt, waitToAttCondition);
 			cannotAtt.setTransitions(toCanAtt);
 			
-			FloatCondition waitToCannotCond = standStill.getFloatCondition("timeInState", 0.3f, Comparison.GREATER);
+			FloatCondition waitToCannotCond = standStill.getFloatCondition("timeInState", 0.2f, Comparison.GREATER);
 			Transition toCannotAtt = new Transition(cannotAtt, waitToCannotCond);
 			standStill.setTransitions(toCannotAtt);
 			

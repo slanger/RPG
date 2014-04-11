@@ -8,8 +8,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.World;
 import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
-import com.me.rpg.combat.Equippable;
-import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
@@ -23,9 +21,7 @@ public class PlayableCharacter extends GameCharacter
 	private static final long serialVersionUID = 2335023793457785574L;
 
 	private boolean enableReseting = true;
-	private boolean enableSaving = true;
 	private boolean enableAttack = true;
-	private boolean enableWeaponSwitch = true;
 	private boolean enableStyleSwitch = true;
 	private boolean enableControls = true;
 	private boolean enablePushing = true;
@@ -43,24 +39,24 @@ public class PlayableCharacter extends GameCharacter
 	// private boolean enableInputDown = true;
 	private boolean enableInputRight = true;
 	private boolean enableInputLeft = true;
-	
+
 	private long timeInventoryOpened = 0;
-	
-	//pause menu keys
+
+	// pause menu keys
 	private boolean enableInputEscape = true;
-		//UP, DOWN, ENTER
-	
-	//debug menu keys
+	// UP, DOWN, ENTER
+
+	// debug menu keys
 	private long timeDebugMenuOpened = 0;
 	private boolean enableInputQ = true;
-		//left right
-	
+	// left right
+
 	private ArrayList<Weapon> weaponsInInventory;
 	private ArrayList<Shield> shieldsInInventory;
 	private ArrayList<Projectile> arrowsInInventory;
 	private RangedWeapon rangedWeaponInInventory;
-	//private ArrayList<> miscItemsInInventory;
-	
+	// private ArrayList<> miscItemsInInventory;
+
 	private PlayerControlledWalkAI walkAI;
 
 	public boolean getEnableControls()
@@ -123,9 +119,8 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputEscape = true;
 		}
-		//END PAUSE
-		
-		
+		// END PAUSE
+
 		// reset the game
 		if (Gdx.input.isKeyPressed(Keys.R))
 		{
@@ -140,27 +135,28 @@ public class PlayableCharacter extends GameCharacter
 			enableReseting = true;
 		}
 
-
 		/*
-		 *  INVENTORY MENU
+		 * INVENTORY MENU
 		 */
-		
-		if(world.getReputationDebugMenu().getInMenu() == true)
+
+		if (world.getReputationDebugMenu().getInMenu() == true)
 		{
-			if(Gdx.input.isKeyPressed(Keys.Q) && (System.currentTimeMillis() - timeDebugMenuOpened > 250))
+			if (Gdx.input.isKeyPressed(Keys.Q)
+					&& (System.currentTimeMillis() - timeDebugMenuOpened > 250))
 			{
 				world.getReputationDebugMenu().closeMenu();
 			}
 			else
 			{
-				//handleReputationDebugMenuInput();
+				// handleReputationDebugMenuInput();
 			}
 			return;
 		}
-		
-		if(world.getInventoryMenu().getInMenu() == true)
+
+		if (world.getInventoryMenu().getInMenu() == true)
 		{
-			if(Gdx.input.isKeyPressed(Keys.I) && (System.currentTimeMillis() - timeInventoryOpened > 250))
+			if (Gdx.input.isKeyPressed(Keys.I)
+					&& (System.currentTimeMillis() - timeInventoryOpened > 250))
 			{
 				world.getInventoryMenu().closeInventory();
 			}
@@ -175,7 +171,8 @@ public class PlayableCharacter extends GameCharacter
 			if (enableInputI)
 			{
 				enableInputI = false;
-				if (!world.getInventoryMenu().getInMenu() && (System.currentTimeMillis() - timeInventoryOpened) >= 300)
+				if (!world.getInventoryMenu().getInMenu()
+						&& (System.currentTimeMillis() - timeInventoryOpened) >= 300)
 				{
 					timeInventoryOpened = System.currentTimeMillis();
 					world.getInventoryMenu().openInventory(this);
@@ -186,22 +183,22 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputI = true;
 		}
-		
+
 		/*
-		 *  END INVENTORY MENU
+		 * END INVENTORY MENU
 		 */
-		
+
 		/*
-		 *  REP DEBUG MENU
+		 * REP DEBUG MENU
 		 */
-		
-		
+
 		if (Gdx.input.isKeyPressed(Keys.Q))
 		{
 			if (enableInputQ)
 			{
 				enableInputQ = false;
-				if (!world.getReputationDebugMenu().getInMenu() && (System.currentTimeMillis() - timeDebugMenuOpened) >= 300)
+				if (!world.getReputationDebugMenu().getInMenu()
+						&& (System.currentTimeMillis() - timeDebugMenuOpened) >= 300)
 				{
 					timeDebugMenuOpened = System.currentTimeMillis();
 					world.getReputationDebugMenu().openMenu();
@@ -212,12 +209,11 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputQ = true;
 		}
-		
+
 		/*
-		 *  END REP DEBUG MENU
+		 * END REP DEBUG MENU
 		 */
-		
-		
+
 		/*
 		 * DIALOGUE
 		 */
@@ -328,18 +324,18 @@ public class PlayableCharacter extends GameCharacter
 		}
 
 		// switch weapon
-//		if (Gdx.input.isKeyPressed(Keys.M))
-//		{
-//			if (enableWeaponSwitch)
-//			{
-//				swapWeapon(getCurrentMap());
-//				enableWeaponSwitch = false;
-//			}
-//		}
-//		else
-//		{
-//			enableWeaponSwitch = true;
-//		}
+		// if (Gdx.input.isKeyPressed(Keys.M))
+		// {
+		// if (enableWeaponSwitch)
+		// {
+		// swapWeapon(getCurrentMap());
+		// enableWeaponSwitch = false;
+		// }
+		// }
+		// else
+		// {
+		// enableWeaponSwitch = true;
+		// }
 
 		/*
 		 * END COMBAT
@@ -348,17 +344,17 @@ public class PlayableCharacter extends GameCharacter
 
 	public void handleInventoryMenuInput()
 	{
-		if(world.getInventoryMenu().getInMenu() == false)
+		if (world.getInventoryMenu().getInMenu() == false)
 		{
 			return;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.UP))
+
+		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
-			if(enableInputUp)
+			if (enableInputUp)
 			{
 				enableInputUp = false;
-				if(world.getInventoryMenu().getInMenu())
+				if (world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("UP");
 				}
@@ -368,13 +364,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputUp = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.DOWN))
+
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			if(enableInputDown)
+			if (enableInputDown)
 			{
 				enableInputDown = false;
-				if(world.getInventoryMenu().getInMenu())
+				if (world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("DOWN");
 				}
@@ -384,13 +380,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputDown = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.RIGHT))
+
+		if (Gdx.input.isKeyPressed(Keys.RIGHT))
 		{
-			if(enableInputRight)
+			if (enableInputRight)
 			{
 				enableInputRight = false;
-				if(world.getInventoryMenu().getInMenu())
+				if (world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("RIGHT");
 				}
@@ -400,13 +396,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputRight = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.LEFT))
+
+		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
-			if(enableInputLeft)
+			if (enableInputLeft)
 			{
 				enableInputLeft = false;
-				if(world.getInventoryMenu().getInMenu())
+				if (world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("LEFT");
 				}
@@ -416,13 +412,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputLeft = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.E))
+
+		if (Gdx.input.isKeyPressed(Keys.E))
 		{
-			if(enableInputE)
+			if (enableInputE)
 			{
 				enableInputE = false;
-				if(world.getInventoryMenu().getInMenu())
+				if (world.getInventoryMenu().getInMenu())
 				{
 					world.getInventoryMenu().acceptPlayerInput("E");
 				}
@@ -433,15 +429,14 @@ public class PlayableCharacter extends GameCharacter
 			enableInputE = true;
 		}
 	}
-	
+
 	public void handleDialogueInput()
 	{
-		if(world.getDialogueSystem().getInDialogue() == false)
+		if (world.getDialogueSystem().getInDialogue() == false)
 		{
 			return;
 		}
-		
-		
+
 		if (!enableControls)
 		{
 			return;
@@ -513,20 +508,20 @@ public class PlayableCharacter extends GameCharacter
 		 */
 
 	}
-	
+
 	public void handlePauseMenuInput()
 	{
-		if(world.getPauseScreen().getInMenu() == false)
+		if (world.getPauseScreen().getInMenu() == false)
 		{
 			return;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.ESCAPE))
+
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE))
 		{
-			if(enableInputEscape)
+			if (enableInputEscape)
 			{
 				enableInputEscape = false;
-				if(world.getPauseScreen().getInMenu())
+				if (world.getPauseScreen().getInMenu())
 				{
 					world.getPauseScreen().acceptPlayerInput("ESCAPE");
 				}
@@ -536,13 +531,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputEscape = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.UP))
+
+		if (Gdx.input.isKeyPressed(Keys.UP))
 		{
-			if(enableInputUp)
+			if (enableInputUp)
 			{
 				enableInputUp = false;
-				if(world.getPauseScreen().getInMenu())
+				if (world.getPauseScreen().getInMenu())
 				{
 					world.getPauseScreen().acceptPlayerInput("UP");
 				}
@@ -552,13 +547,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputUp = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.DOWN))
+
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
 		{
-			if(enableInputDown)
+			if (enableInputDown)
 			{
 				enableInputDown = false;
-				if(world.getPauseScreen().getInMenu())
+				if (world.getPauseScreen().getInMenu())
 				{
 					world.getPauseScreen().acceptPlayerInput("DOWN");
 				}
@@ -568,13 +563,13 @@ public class PlayableCharacter extends GameCharacter
 		{
 			enableInputDown = true;
 		}
-		
-		if(Gdx.input.isKeyPressed(Keys.ENTER))
+
+		if (Gdx.input.isKeyPressed(Keys.ENTER))
 		{
-			if(enableInputRight)
+			if (enableInputRight)
 			{
 				enableInputRight = false;
-				if(world.getPauseScreen().getInMenu())
+				if (world.getPauseScreen().getInMenu())
 				{
 					world.getPauseScreen().acceptPlayerInput("ENTER");
 				}
@@ -639,125 +634,48 @@ public class PlayableCharacter extends GameCharacter
 		currentLocation.getMap().removeCharacterFromMap(this);
 	}
 
-	@Override
-	public void warpToOtherMap(Location newLocation)
-	{
-		moveToOtherMap(newLocation);
-
-		/* TODO
-		currentMap.close();
-		world.setUpdateEnable(false);
-		warping = true;
-		warpingAlpha = 0f;
-		world.warpSound.play();
-		setWarpEnable(false);
-		Vector2 center = newLocation.getCenter(new Vector2());
-		Coordinate warpLocation = new Coordinate(center.x - getSpriteWidth() / 2, center.y - getSpriteHeight() / 2);
-
-		world.getTimer().scheduleTask(new Timer.Task()
-		{
-
-			private static final long serialVersionUID = -4094471058413909756L;
-
-			@Override
-			public void run()
-			{
-				warpingAlpha += 0.1f;
-				if (warpingAlpha > 1f)
-				{
-					warpingAlpha = 1f;
-					this.cancel();
-				}
-			}
-
-		}, 0f, 0.1f);
-
-		timer.scheduleTask(new Timer.Task()
-		{
-
-			private static final long serialVersionUID = 8348680306281141956L;
-
-			@Override
-			public void run()
-			{
-				currentMap.removeCharacterFromMap(player);
-				newMap.addFocusedCharacterToMap(player, newLocation);
-
-				timer.scheduleTask(new Timer.Task()
-				{
-
-					private static final long serialVersionUID = -1100673244597339611L;
-
-					@Override
-					public void run()
-					{
-						warpingAlpha -= 0.1f;
-					}
-
-				}, 0f, 0.1f, 10);
-
-				timer.scheduleTask(new Timer.Task()
-				{
-
-					private static final long serialVersionUID = 4263563367493321895L;
-
-					@Override
-					public void run()
-					{
-						updateEnable = true;
-						warping = false;
-						newMap.open();
-					}
-
-				}, 1.0f);
-			}
-
-		}, 3.0f);
-		*/
-	}
-	
 	public void addItemToInventory(Weapon item)
 	{
 		weaponsInInventory.add(item);
 	}
-	
+
 	public void addItemToInventory(Projectile item)
 	{
 		arrowsInInventory.add(item);
 	}
-	
+
 	public void addItemToInventory(Shield item)
 	{
 		shieldsInInventory.add(item);
 	}
-	
+
 	public void addItemToInventory(RangedWeapon item)
 	{
 		rangedWeaponInInventory = item;
 	}
-	
+
 	public ArrayList<Weapon> getWeapons()
 	{
 		return weaponsInInventory;
 	}
-	
+
 	public ArrayList<Projectile> getArrows()
 	{
 		return arrowsInInventory;
 	}
-	
+
 	public ArrayList<Shield> getShields()
 	{
 		return shieldsInInventory;
 	}
-	
+
 	public RangedWeapon getRangedWeaponInInventory()
 	{
 		return rangedWeaponInInventory;
 	}
-//	public void addItemToInventory(MiscItem item)
-//	{
-//		
-//	}
+	// public void addItemToInventory(MiscItem item)
+	// {
+	//
+	// }
 
 }

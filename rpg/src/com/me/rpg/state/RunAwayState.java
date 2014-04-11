@@ -47,6 +47,7 @@ public class RunAwayState extends State
 		}
 		else if (people.size() == 0)
 		{
+			character.setMoving(false);
 			return new ArrayList<Action>();
 		}
 
