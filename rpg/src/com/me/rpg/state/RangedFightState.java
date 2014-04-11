@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.AttackAction;
-import com.me.rpg.state.action.KeepDistanceAction;
 import com.me.rpg.state.action.RangedMoveTowardAction;
 import com.me.rpg.state.action.SetStrafeAction;
 import com.me.rpg.state.transition.AttackerInRangeCondition;

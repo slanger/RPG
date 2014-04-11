@@ -54,14 +54,4 @@ public class NonplayableCharacter extends GameCharacter
 		currentLocation.getMap().removeCharacterFromMap(this);
 	}
 
-	/**
-	 * Move NPC to other map "quietly"--without interrupting the player.
-	 */
-	@Override
-	public void warpToOtherMap(Location newLocation)
-	{
-		// Nothing flashy for NPC--just use moveToOtherMap()
-		moveToOtherMap(newLocation);
-	}
-
 }

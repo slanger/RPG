@@ -1,7 +1,6 @@
 package com.me.rpg.reputation;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.utils.Coordinate;

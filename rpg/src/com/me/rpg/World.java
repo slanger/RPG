@@ -8,13 +8,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -40,8 +38,8 @@ import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
 import com.me.rpg.reputation.ReputationDebugMenu;
-import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.reputation.ReputationInterface;
+import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
@@ -78,50 +76,43 @@ public final class World
 	public static final String FADED_RED_DOT_PATH = "faded_red_dot.png";
 	public static final String PLAYER_TEXTURE_PATH = "hero.png";
 	public static final String NPC_TEXTURE_PATH = "villain.png";
-	
 
-	//swords
+	// swords
 	public static final String SWORD_PATH = "sword.png";
 	public static final String EVIL_SWORD_PATH = "evil_sword.png";
 	public static final String HOLY_SWORD_PATH = "holy_sword.png";
 	public static final String BLUE_SWORD_PATH = "blue_sword.png";
 	public static final String SHADOW_SWORD_PATH = "shadow_sword.png";
 
-	//bows
+	// bows
 	public static final String ARROW_PATH = "arrow.png";
 	public static final String FIRE_ARROW_PATH = "fire_arrow.png";
-	//shields
+
+	// shields
 	public static final String SHIELD_PATH = "shield.png";
 	public static final String SHADOW_SHIELD_PATH = "shadow_shield.png";
 	public static final String GRAY_SHIELD_PATH = "gray_shield.png";
 
-	//other items
-	
-	
 	public transient OrthographicCamera camera;
 	public transient SpriteBatch batch;
 	private transient ShapeRenderer shapeRenderer;
 	private transient BitmapFont debugFont;
 	private final List<Map> maps = new ArrayList<Map>();
-	private final Timer timer = new Timer();
+	private final Timer asyncTimer = new Timer();
+	private final Timer syncTimer = new Timer();
 	private PlayableCharacter player;
 	public List<Waypoint> waypoints;
 
 	private int dayCount = 0;
 	private final int NUM_SECONDS_PER_DAY = 60;
 	private final int NUM_DAYS = 10;
-	private Timer dayTimer = new Timer();
 
 	private final DialogueSystem dialogueSystem = new DialogueSystem();
-	private final InventoryMenu	inventoryMenu	= new InventoryMenu();
+	private final InventoryMenu inventoryMenu = new InventoryMenu();
 	private final PauseScreen pauseScreen = new PauseScreen(this);
-	private final ReputationDebugMenu reputationDebugMenu = new ReputationDebugMenu(this);
+	private final ReputationDebugMenu reputationDebugMenu = new ReputationDebugMenu(
+			this);
 	private ReputationInterface reputationSystem;
-
-	private boolean warping = false;
-	private float warpingAlpha;
-	public transient Sound warpSound;
-	private transient Sprite whiteScreen;
 
 	private boolean isGameOver = false;
 	private boolean resetGame = false;
@@ -132,8 +123,7 @@ public final class World
 	private long removeMessageTimer = 0;
 	private final long MESSAGE_DISPLAY_SECONDS = 5;
 	private ArrayList<Message> messageQueue = new ArrayList<Message>();
-	
-	
+
 	private transient BitmapFont messageFont;
 	private transient Texture messageTexture;
 
@@ -151,17 +141,17 @@ public final class World
 	{
 		return inventoryMenu;
 	}
-	
+
 	public PauseScreen getPauseScreen()
 	{
 		return pauseScreen;
 	}
-	
+
 	public ReputationDebugMenu getReputationDebugMenu()
 	{
 		return reputationDebugMenu;
 	}
-	
+
 	public Map getCurrentMap()
 	{
 		return player.getCurrentMap();
@@ -234,16 +224,10 @@ public final class World
 		messageFont = new BitmapFont();
 		messageTexture = new Texture(
 				Gdx.files.internal("images/DialogueBackground.png"));
-
-		// warp resources
-		warpSound = ScreenHandler.manager.get(WARP_SOUND_PATH, Sound.class);
-		Texture whiteScreenTexture = ScreenHandler.manager.get(
-				LoadScreen.WHITE_DOT_PATH, Texture.class);
-		whiteScreen = new Sprite(whiteScreenTexture);
 	}
 
-	private void readObject(ObjectInputStream inputStream)
-		throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream inputStream) throws IOException,
+			ClassNotFoundException
 	{
 		create();
 		inputStream.defaultReadObject();
@@ -252,7 +236,7 @@ public final class World
 	private void initializeWorld()
 	{
 		// create day timer
-		dayTimer.scheduleTask(new Timer.Task()
+		syncTimer.scheduleTask(new Timer.Task()
 		{
 
 			private static final long serialVersionUID = 121629940674023363L;
@@ -268,10 +252,10 @@ public final class World
 			}
 
 		}, NUM_SECONDS_PER_DAY, NUM_SECONDS_PER_DAY);
-		
+
 		// setup global timer
 		GlobalTimerTask.getInstance().cancel();
-		timer.scheduleTask(GlobalTimerTask.getInstance(), 1000000000.0f);
+		asyncTimer.scheduleTask(GlobalTimerTask.getInstance(), 1000000000.0f);
 
 		// create reputation system
 		reputationSystem = new ReputationSystem(this);
@@ -325,21 +309,22 @@ public final class World
 		final int height = 28;
 
 		// create characters
-		player = new PlayableCharacter("Player", "player_group", PLAYER_TEXTURE_PATH,
-				width, height, 16, 16, 0.15f, this);
+		player = new PlayableCharacter("Player", "player_group",
+				PLAYER_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		player.setBaseSpeed(200f);
 
-		npc1 = new NonplayableCharacter("NPC1", "villager_group", NPC_TEXTURE_PATH,
-				width, height, 16, 16, 0.15f, this);
-		npc2 = new NonplayableCharacter("NPC2", "villager_group", NPC_TEXTURE_PATH,
-				width, height, 16, 16, 0.15f, this);
-		npc3 = new NonplayableCharacter("NPC3", "villain_group", NPC_TEXTURE_PATH,
-				width, height, 16, 16, 0.15f, this);
-		npc4 = new NonplayableCharacter("NPC4", "villain_group", NPC_TEXTURE_PATH,
-				width, height, 16, 16, 0.15f, this);
+		npc1 = new NonplayableCharacter("NPC1", "villager_group",
+				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+		npc2 = new NonplayableCharacter("NPC2", "villager_group",
+				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+		npc3 = new NonplayableCharacter("NPC3", "villain_group",
+				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
+		npc4 = new NonplayableCharacter("NPC4", "villain_group",
+				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 
 		// add characters to map
-		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap, 192, 544));
+		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap,
+				192, 544));
 		exampleMap.addCharacterToMap(npc1, new Location(exampleMap, 544, 544));
 		exampleMap.addCharacterToMap(npc2, new Location(exampleMap, 480, 128));
 		exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
@@ -352,25 +337,27 @@ public final class World
 				new Location(exampleMap, new Coordinate(50, 50)),
 				new Location(exampleMap, new Coordinate(300, 50)),
 				new Location(exampleMap, new Coordinate(300, 300)),
-				new Location(exampleMap, new Coordinate(50, 300))
-		};
+				new Location(exampleMap, new Coordinate(50, 300)) };
 		PatrolState patrol1 = new PatrolState(parent1, npc1, patrolLocations1);
 
 		MeleeFightState fight1 = new MeleeFightState(parent1, npc1);
 
 		Condition canSee = new SeePeopleCondition(npc1, 0, Comparison.NOTEQUALS);
-		Condition canHear = new HearPeopleCondition(npc1, 0, Comparison.NOTEQUALS);
+		Condition canHear = new HearPeopleCondition(npc1, 0,
+				Comparison.NOTEQUALS);
 		Condition cannotSee = new NotCondition(canSee);
 		Condition cannotHear = new NotCondition(canHear);
 		Condition canSeeOrHear = new OrCondition(canSee, canHear);
 		Condition cannotSeeNorHear = new AndCondition(cannotSee, cannotHear);
-		
+
 		Condition enemyDead = new TargetDeadCondition(npc1);
 		Condition or = new OrCondition(cannotSeeNorHear, enemyDead);
 
 		ArrayList<Action> patrolToFightActions = new ArrayList<Action>();
-		patrolToFightActions.add(new RememberNearestPersonAction(npc1, true, true, true));
-		Transition patrolToFight = new Transition(fight1, patrolToFightActions, canSeeOrHear);
+		patrolToFightActions.add(new RememberNearestPersonAction(npc1, true,
+				true, true));
+		Transition patrolToFight = new Transition(fight1, patrolToFightActions,
+				canSeeOrHear);
 		Transition fightToPatrol = new Transition(patrol1, or);
 
 		patrol1.setTransitions(patrolToFight);
@@ -383,7 +370,8 @@ public final class World
 		HierarchicalState parent2 = new HierarchicalState(null, npc2);
 		HierarchicalState subparent = new HierarchicalState(parent2, npc2);
 		subparent.setName("subParent");
-		WalkToLocationState notAtCen = new WalkToLocationState(subparent, npc2, new Location(exampleMap, 500, 100));
+		WalkToLocationState notAtCen = new WalkToLocationState(subparent, npc2,
+				new Location(exampleMap, 500, 100));
 		notAtCen.setName("notAtCen");
 		Rectangle walkingBoundary = new Rectangle(32, 32, 576, 224);
 		RandomWalkState randomWalkState = new RandomWalkState(subparent, npc2,
@@ -399,8 +387,10 @@ public final class World
 				new Coordinate(500, 100));
 		Transition notCenToRandom = new Transition(randomWalkState, dist);
 
-		Condition canSee2 = new SeePeopleCondition(npc2, 0, Comparison.NOTEQUALS);
-		Condition canHear2 = new HearPeopleCondition(npc2, 0, Comparison.NOTEQUALS);
+		Condition canSee2 = new SeePeopleCondition(npc2, 0,
+				Comparison.NOTEQUALS);
+		Condition canHear2 = new HearPeopleCondition(npc2, 0,
+				Comparison.NOTEQUALS);
 		Condition cannotSee2 = new NotCondition(canSee2);
 		Condition cannotHear2 = new NotCondition(canHear2);
 		Condition canSeeOrHear2 = new OrCondition(canSee2, canHear2);
@@ -423,35 +413,37 @@ public final class World
 
 		Location[] patrolLocations3 = new Location[] {
 				new Location(westTown, 1536, 160),
-				new Location(exampleMap, 500, 500)
-		};
+				new Location(exampleMap, 500, 500) };
 		PatrolState patrol3 = new PatrolState(parent3, npc3, patrolLocations3);
 
 		parent3.setInitialState(patrol3);
 
 		npc3.setStateMachine(parent3);
-		
+
 		// state machine for npc4
 		HierarchicalState parent4 = new HierarchicalState(null, npc4);
 		Rectangle wb4 = new Rectangle(50, 50, 1100, 1100);
 		RandomWalkState rw4 = new RandomWalkState(parent4, npc4, wb4);
 		RangedFightState rfs = new RangedFightState(parent4, npc4);
-		
-		Condition seePeople4 = new SeePeopleCondition(npc4, 0, Comparison.GREATER);
-		Condition hearPeople4 = new HearPeopleCondition(npc4, 0, Comparison.GREATER);
+
+		Condition seePeople4 = new SeePeopleCondition(npc4, 0,
+				Comparison.GREATER);
+		Condition hearPeople4 = new HearPeopleCondition(npc4, 0,
+				Comparison.GREATER);
 		Condition or2 = new OrCondition(seePeople4, hearPeople4);
 		Condition not = new NotCondition(or2);
-		
+
 		ArrayList<Action> toRangeAtkActions = new ArrayList<Action>();
-		toRangeAtkActions.add(new RememberNearestPersonAction(npc4, true, true, true));
-		
+		toRangeAtkActions.add(new RememberNearestPersonAction(npc4, true, true,
+				true));
+
 		Transition toRangeAtk = new Transition(rfs, toRangeAtkActions, or2);
 		Transition toRandWlk = new Transition(rw4, not);
 		rw4.setTransitions(toRangeAtk);
 		rfs.setTransitions(toRandWlk);
-		
+
 		parent4.setInitialState(rw4);
-		
+
 		npc4.setSightDistance(400f);
 		npc4.setStateMachine(parent4);
 
@@ -460,20 +452,20 @@ public final class World
 		final int weaponWidth = 32;
 		final int weaponHeight = 32;
 
-// MELEE WEAPONS
-		
-		Weapon npc_sword = new MeleeWeapon("NPC Sword", SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Weapon sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Weapon evilSword = new MeleeWeapon("Evil Sword", EVIL_SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Weapon holySword = new MeleeWeapon("Holy Sword", HOLY_SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Weapon blueSword = new MeleeWeapon("Blue Sword", BLUE_SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Weapon shadowSword = new MeleeWeapon("Shadow Sword", SHADOW_SWORD_PATH, weaponWidth, weaponHeight,
-				32, 32);
+		// MELEE WEAPONS
+
+		Weapon npc_sword = new MeleeWeapon("NPC Sword", SWORD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		Weapon sword = new MeleeWeapon("Lame Sword", SWORD_PATH, weaponWidth,
+				weaponHeight, 32, 32);
+		Weapon evilSword = new MeleeWeapon("Evil Sword", EVIL_SWORD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		Weapon holySword = new MeleeWeapon("Holy Sword", HOLY_SWORD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		Weapon blueSword = new MeleeWeapon("Blue Sword", BLUE_SWORD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		Weapon shadowSword = new MeleeWeapon("Shadow Sword", SHADOW_SWORD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
 
 		// make Shadow Sword awesome
 		shadowSword.setPower(500);
@@ -483,7 +475,6 @@ public final class World
 		sword.addEffect(poison);
 
 		player.equipWeapon(exampleMap, sword);
-		//player.swapWeapon(exampleMap);
 		npc1.equipWeapon(exampleMap, npc_sword);
 
 		player.addItemToInventory(sword);
@@ -491,47 +482,45 @@ public final class World
 		player.addItemToInventory(holySword);
 		player.addItemToInventory(blueSword);
 		player.addItemToInventory(shadowSword);
-		
-		
-// BOWS/PROJECTILES
-		RangedWeapon bow = new RangedWeapon("Lame Bow", ARROW_PATH, weaponWidth,
-				weaponHeight, 32, 32);
-		RangedWeapon npc_bow = new RangedWeapon("NPCBow", ARROW_PATH, weaponWidth,
-				weaponHeight, 32, 32);
+
+		// BOWS/PROJECTILES
+
+		RangedWeapon bow = new RangedWeapon("Lame Bow", ARROW_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		RangedWeapon npc_bow = new RangedWeapon("NPCBow", ARROW_PATH,
+				weaponWidth, weaponHeight, 32, 32);
 		npc4.equipWeapon(westTownInsideHouse, npc_bow);
-		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		
+		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth,
+				weaponHeight, 32, 32);
+		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+
 		player.addItemToInventory(bow);
 		player.addItemToInventory(arrow);
 		player.addItemToInventory(fireArrow);
 		player.setEquippedArrows(fireArrow);
-		
+
 		bow.equipProjectile(fireArrow, 1000);
 		npc_bow.equipProjectile(fireArrow, 10000);
 
-//SHIELDS		
-		Shield shield = new Shield("Lame Shield", SHIELD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Shield shadowShield = new Shield("Shadow Shield", SHADOW_SHIELD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Shield grayShield = new Shield("Gray Shield", GRAY_SHIELD_PATH, weaponWidth, weaponHeight,
-				32, 32);
-		Shield npc_shield = new Shield("Plain Shield", SHIELD_PATH, weaponWidth,
+		// SHIELDS
+
+		Shield shield = new Shield("Lame Shield", SHIELD_PATH, weaponWidth,
 				weaponHeight, 32, 32);
-		
+		Shield shadowShield = new Shield("Shadow Shield", SHADOW_SHIELD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		Shield grayShield = new Shield("Gray Shield", GRAY_SHIELD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+		Shield npc_shield = new Shield("Plain Shield", SHIELD_PATH,
+				weaponWidth, weaponHeight, 32, 32);
+
 		player.addItemToInventory(shield);
 		player.addItemToInventory(shadowShield);
 		player.addItemToInventory(grayShield);
-		
+
 		npc1.equipShield(npc_shield);
-		
-		
-		// npc1.usingShield(true);
 	}
-	
+
 	public void render()
 	{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -550,39 +539,30 @@ public final class World
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
-		// temporary dialogue stuff
-		
 		if (dialogueSystem.getInDialogue())
 		{
 			dialogueSystem.render(batch, camera);
 		}
 
-		if(inventoryMenu.getInMenu())
+		if (inventoryMenu.getInMenu())
 		{
 			inventoryMenu.render(batch, camera);
 		}
-		
-		if(pauseScreen.getInMenu())
+
+		if (pauseScreen.getInMenu())
 		{
 			pauseScreen.render(batch, camera);
 		}
-		
-		if(reputationDebugMenu.getInMenu())
+
+		if (reputationDebugMenu.getInMenu())
 		{
 			reputationDebugMenu.render(batch, camera);
 		}
-		// rendering reputation, and other notifications
-		if(messageQueue.size() > 0)
+
+		// render messages and notifications
+		if (messageQueue.size() > 0)
 		{
 			renderMessage();
-		}
-
-		if (warping)
-		{
-			whiteScreen.setSize(camera.viewportWidth, camera.viewportHeight);
-			whiteScreen.setPosition(camera.position.x - camera.viewportWidth
-					/ 2, camera.position.y - camera.viewportHeight / 2);
-			whiteScreen.draw(batch, warpingAlpha);
 		}
 
 		// render HUD and overlays
@@ -607,7 +587,7 @@ public final class World
 	public void update(float deltaTime)
 	{
 		camera.update();
-		timer.update(deltaTime);
+		asyncTimer.update(deltaTime);
 
 		if (!updateEnable)
 		{
@@ -615,8 +595,8 @@ public final class World
 			player.handlePauseMenuInput();
 			return;
 		}
-		
-		dayTimer.update(deltaTime);
+
+		syncTimer.update(deltaTime);
 
 		Iterator<Map> iter = maps.iterator();
 		while (iter.hasNext())
@@ -752,61 +732,66 @@ public final class World
 
 	private void renderMessage()
 	{
-		
+
 		LabelStyle normalStyle = new LabelStyle(messageFont, Color.DARK_GRAY);
 		LabelStyle errorStyle = new LabelStyle(messageFont, Color.RED);
-		
-		if((System.currentTimeMillis() - removeMessageTimer)/1000 > MESSAGE_DISPLAY_SECONDS )
+
+		if ((System.currentTimeMillis() - removeMessageTimer) / 1000 > MESSAGE_DISPLAY_SECONDS)
 		{
-			if(messageQueue.size()>0)
+			if (messageQueue.size() > 0)
 			{
-				messageQueue.remove(messageQueue.size()-1);
+				messageQueue.remove(messageQueue.size() - 1);
 				removeMessageTimer = System.currentTimeMillis();
 			}
 		}
-		while(messageQueue.size() >= 10)
+		while (messageQueue.size() >= 10)
 		{
-			messageQueue.remove(messageQueue.size()-1);
+			messageQueue.remove(messageQueue.size() - 1);
 		}
-		if(messageQueue.size()<1)
+		if (messageQueue.size() < 1)
 		{
 			return;
 		}
-		
-		//draw the background texture
-		//float messagePositionX = (float) (camera.position.x
-		//		- camera.viewportWidth / 2 + (0.1 * camera.viewportWidth));
-		//float messagePositionY = camera.position.y - camera.viewportHeight / 2;
-		//float messageHeight = 40.0f;
+
+		// draw the background texture
+		// float messagePositionX = (float) (camera.position.x
+		// - camera.viewportWidth / 2 + (0.1 * camera.viewportWidth));
+		// float messagePositionY = camera.position.y - camera.viewportHeight /
+		// 2;
+		// float messageHeight = 40.0f;
 		float messageWidth = (float) (camera.viewportWidth * 0.9);
 		float messagePositionX = (float) (camera.position.x
-						- camera.viewportWidth / 2 + (0.05 * camera.viewportWidth));
+				- camera.viewportWidth / 2 + (0.05 * camera.viewportWidth));
 		float messagePositionY = camera.position.y - camera.viewportHeight / 2;
-		float messageHeight = 20.0f * (messageQueue.size()+1);
-		
+		float messageHeight = 20.0f * (messageQueue.size() + 1);
+
 		batch.draw(messageTexture, messagePositionX, messagePositionY,
 				messageWidth, messageHeight);
-		
-		//draw the messages
-		for(int i=0; i<messageQueue.size(); i++)
+
+		// draw the messages
+		for (int i = 0; i < messageQueue.size(); i++)
 		{
-			if(messageQueue.get(i).getIsErrorMessage() == true)
+			if (messageQueue.get(i).getIsErrorMessage() == true)
 			{
-				Label messageLabel = new Label(messageQueue.get(i).getMessage(), errorStyle);
+				Label messageLabel = new Label(
+						messageQueue.get(i).getMessage(), errorStyle);
 				messageLabel.setWrap(true);
-				
-				messageLabel.setBounds(messagePositionX,messagePositionY + (i+1)*20.0f, 0, 0);
-				
+
+				messageLabel.setBounds(messagePositionX, messagePositionY
+						+ (i + 1) * 20.0f, 0, 0);
+
 				messageLabel.draw(batch, 1.0f);
 				messageLabel.clear();
 			}
 			else
 			{
-				Label messageLabel = new Label(messageQueue.get(i).getMessage(), normalStyle);
+				Label messageLabel = new Label(
+						messageQueue.get(i).getMessage(), normalStyle);
 				messageLabel.setWrap(true);
-				
-				messageLabel.setBounds(messagePositionX,messagePositionY + (i+1)*20.0f, 0, 0);
-				
+
+				messageLabel.setBounds(messagePositionX, messagePositionY
+						+ (i + 1) * 20.0f, 0, 0);
+
 				messageLabel.draw(batch, 1.0f);
 				messageLabel.clear();
 			}
@@ -816,54 +801,58 @@ public final class World
 	public void pushMessage(String msg)
 	{
 		Message message = new Message(msg, false);
-		if(messageQueue.size()<1)
+		if (messageQueue.size() < 1)
 		{
 			removeMessageTimer = System.currentTimeMillis();
 		}
 		messageQueue.add(0, message);
 	}
-	
+
 	public void pushErrorMessage(String msg)
 	{
 		Message message = new Message(msg, true);
-		if(messageQueue.size()<1)
+		if (messageQueue.size() < 1)
 		{
 			removeMessageTimer = System.currentTimeMillis();
 		}
 		messageQueue.add(0, message);
 	}
-	
-	private class Message implements Serializable
+
+	private class Message
+		implements Serializable
 	{
-		
+
 		private static final long serialVersionUID = -2899401714649534910L;
+
 		private String message;
 		private boolean isErrorMessage;
-		
+
 		public Message(String message, boolean isErrorMessage)
 		{
 			this.message = message;
 			this.isErrorMessage = isErrorMessage;
 		}
-		
+
 		public String getMessage()
 		{
 			return message;
 		}
-		
+
 		public boolean getIsErrorMessage()
 		{
 			return isErrorMessage;
 		}
+
 	}
-	
+
 	public ArrayList<GameCharacter> getCharactersInWorld()
 	{
 		ArrayList<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
-		for(Map map : maps)
+		for (Map map : maps)
 		{
 			allGameCharacters.addAll(map.getCharactersOnMap());
 		}
 		return allGameCharacters;
 	}
+
 }

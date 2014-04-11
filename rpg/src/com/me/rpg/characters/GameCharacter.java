@@ -432,8 +432,6 @@ public abstract class GameCharacter
 
 	public abstract void moveToOtherMap(Location newLocation);
 
-	public abstract void warpToOtherMap(Location newLocation);
-
 	public void render(SpriteBatch batch)
 	{
 		doRenderBefore(batch);

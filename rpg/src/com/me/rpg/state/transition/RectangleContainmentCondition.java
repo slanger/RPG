@@ -6,9 +6,9 @@ package com.me.rpg.state.transition;
  *
  */
 public class RectangleContainmentCondition implements Condition {
-	
-	
-	
+
+	private static final long serialVersionUID = 3193383724803616003L;
+
 	@Override
 	public boolean test() {
 		// TODO Auto-generated method stub
