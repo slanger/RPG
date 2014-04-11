@@ -482,9 +482,8 @@ public final class World
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 
-		player.equipWeapon(exampleMap, sword);
-		//player.swapWeapon(exampleMap);
-		npc1.equipWeapon(exampleMap, npc_sword);
+		player.equipWeapon(sword);
+		npc1.equipWeapon(npc_sword);
 
 		player.addItemToInventory(sword);
 		player.addItemToInventory(evilSword);
@@ -498,7 +497,7 @@ public final class World
 				weaponHeight, 32, 32);
 		RangedWeapon npc_bow = new RangedWeapon("NPCBow", ARROW_PATH, weaponWidth,
 				weaponHeight, 32, 32);
-		npc4.equipWeapon(westTownInsideHouse, npc_bow);
+		npc4.equipWeapon(npc_bow);
 		Projectile arrow = new Projectile("Arrow", ARROW_PATH, weaponWidth, weaponHeight,
 				32, 32);
 		Projectile fireArrow = new Projectile("Fire Arrow", FIRE_ARROW_PATH, weaponWidth, weaponHeight,
