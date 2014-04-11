@@ -949,4 +949,11 @@ public abstract class Map
 		return focusedCharacter;
 	}
 
+	public boolean isRectangleOutOfBounds(Rectangle r)
+	{
+		Rectangle bounds = new Rectangle(0, 0, mapWidth, mapHeight);
+		return !(((r.x >= bounds.x && r.x <= bounds.x + bounds.width) && (r.x + r.width >= bounds.x && r.x + r.width <= bounds.x + bounds.width))
+			&& ((r.y >= bounds.y && r.y <= bounds.y + bounds.height) && (r.y + r.height >= bounds.y && r.y + r.height <= bounds.y + bounds.height)));
+	}
+
 }
