@@ -105,7 +105,15 @@ public class ReputationDebugMenu implements Serializable
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
 		ArrayList<GameCharacter> charactersInWorld = world.getCharactersInWorld();
-		GameCharacter selectedCharacter = charactersInWorld.get(rowSelectionIndex);
+		GameCharacter selectedCharacter = null;
+		if(rowSelectionIndex > world.getCharactersInWorld().size())
+		{
+			selectedCharacter = charactersInWorld.get(world.getCharactersInWorld().size()-1);
+		}
+		else
+		{
+			selectedCharacter = charactersInWorld.get(rowSelectionIndex);
+		}
 		//Set up MainTable, contains everything else
 		stage.addActor(mainTable);
 		mainTable.setFillParent(true);

@@ -490,11 +490,13 @@ public final class World
 		shadowSword.setPower(500);
 		shadowSword.addEffect(new Poison(500, 3, 1f));
 
+		holySword.setPower(10);
+		
 		StatusEffect poison = new Poison(50, 3, 2f);
 		sword.addEffect(poison);
 
 
-		player.equipWeapon(sword);
+		player.equipWeapon(holySword);
 		npc1.equipWeapon(npc_sword);
 
 		player.addItemToInventory(sword);

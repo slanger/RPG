@@ -218,6 +218,22 @@ public class InventoryMenu implements Serializable
 		else if(key.equals("RIGHT"))
 		{
 			colSelectionIndex ++;
+			if(rowSelectionIndex == 0)
+			{
+				if(colSelectionIndex >= meleeWeapons.size()) colSelectionIndex = meleeWeapons.size()-1;
+			}
+			if(rowSelectionIndex == 1)
+			{
+				if(colSelectionIndex >= arrows.size()) colSelectionIndex = arrows.size()-1;
+			}
+			if(rowSelectionIndex == 2)
+			{
+				if(colSelectionIndex >= shields.size()) colSelectionIndex = shields.size()-1;
+			}
+			if(rowSelectionIndex == 3)
+			{
+				//if(colSelectionIndex >= meleeWeapons.size()) colSelectionIndex = meleeWeapons.size()-1;
+			}
 		}
 		else if(key.equals("LEFT"))
 		{
