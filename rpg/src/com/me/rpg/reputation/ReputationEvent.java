@@ -24,6 +24,7 @@ public class ReputationEvent implements Serializable
 		this.eventType = eventType;
 		this.highestKnownMagnitude = highestKnownMagnitude;
 		this.groupAffected = groupAffected;
+		this.characterAffected = characterAffected;
 		this.coordinate = coordinate;
 		this.timeEventOccurred = timeEventOccurred;
 		referenceCount = 0;
@@ -77,5 +78,10 @@ public class ReputationEvent implements Serializable
 	public void decrementReferenceCount()
 	{
 		referenceCount--;
+	}
+	
+	public void setHighestKnownMagnitude(int highestKnownMagnitude)
+	{
+		this.highestKnownMagnitude = highestKnownMagnitude;
 	}
 }

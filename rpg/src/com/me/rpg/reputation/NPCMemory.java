@@ -35,14 +35,24 @@ public class NPCMemory implements Serializable
 		return null;
 	}
 	
-	public void addMemory(ReputationEvent reputationEvent, long timeTicks)
+	public void addMemory(int seenMagnitude, ReputationEvent repEvent, long timeTicks)
 	{
+		for(RememberedEvent temp : rememberedEvents)
+		{
+			if(temp.getRepEventPointer().getEventType().equalsIgnoreCase(repEvent.getEventType()) && temp.getRepEventPointer().getCharacterAffected() == repEvent.getCharacterAffected())
+			{
+				if(seenMagnitude > temp.getRepEventPointer().getMagnitude())
+				{
+					temp.setMagnitudeKnownByNPC(seenMagnitude);
+					gameCharacter.updateDispositionValue(seenMagnitude);
+				}
+				return;
+			}
+		}
 		
-		gameCharacter.updateDispositionValue(reputationEvent.getMagnitude());
-		System.out.println("magnitude is: "+reputationEvent.getMagnitude());
-		RememberedEvent temp = new RememberedEvent(reputationEvent, timeTicks);
+		RememberedEvent temp = new RememberedEvent(seenMagnitude, repEvent, timeTicks);
 		rememberedEvents.add(temp);
-		System.out.println("Added Event to a Single NPC");
+		gameCharacter.updateDispositionValue(seenMagnitude);
 	}
 	
 	public void update(ReputationEvent reputationEvent)

@@ -14,14 +14,14 @@ public class RememberedEvent implements Serializable
 	private long timeLearnedOfEvent;
 	private int priority;
 	
-	RememberedEvent(ReputationEvent reputationEvent, long timeTicks)
+	RememberedEvent(int magnitudeKnownByNPC, ReputationEvent reputationEvent, long timeTicks)
 	{
 		repEventPointer = reputationEvent;
 		timeLearnedOfEvent = timeTicks;
 		magnitudeKnownByNPC = reputationEvent.getMagnitude();
 	}
 	
-	public ReputationEvent getReputationEventPointer()
+	public ReputationEvent getRepEventPointer()
 	{
 		return repEventPointer;
 	}
@@ -29,6 +29,11 @@ public class RememberedEvent implements Serializable
 	public int getMagnitudeKnownByNPC()
 	{
 		return magnitudeKnownByNPC;
+	}
+	
+	public void setMagnitudeKnownByNPC(int newMagnitudeKnownByNPC)
+	{
+		this.magnitudeKnownByNPC = newMagnitudeKnownByNPC;
 	}
 	
 	public long getTimeLearnedOfEvent()
@@ -53,13 +58,6 @@ public class RememberedEvent implements Serializable
 	public void setPriority(int priority)
 	{
 		this.priority = priority;
-	}
-	
-	public String toString()
-	{
-		String s;
-		s = repEventPointer.getEventType()+"    "+repEventPointer.getGroupAffected()+"    "+"temp"+"    "+magnitudeKnownByNPC;
-		return s;
 	}
 	
 }

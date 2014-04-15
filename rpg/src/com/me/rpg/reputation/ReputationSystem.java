@@ -78,7 +78,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		for(GameCharacter temp : receivingCharacters)
 		{
 			// the timeTicks for when the npc learns of the event, not when the event actually occurred
-			temp.getNPCMemory().addMemory(repEvent, timeTicks); 
+			//temp.getNPCMemory().addMemory(repEvent, timeTicks); 
 		}
 	}
 	
@@ -88,56 +88,69 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		Coordinate coordinate = Coordinate.copy(characterAffected.getCenter());
 		ArrayList<GameCharacter> witnesses = characterAffected.getCurrentMap().canSeeOrHearCharacters(characterAffected);
 		witnesses.add(characterAffected);
-		System.out.println(witnesses.size());
+	
 		
 		for (int i = 0; i < eventTemplateList.size(); i++)
 		{
 			if (eventTemplateList.get(i).getEventName().equalsIgnoreCase(eventType) && 
 					eventTemplateList.get(i).getEventSpecifier().equalsIgnoreCase(eventSpecifier)) 
 			{
-				ReputationEvent repEvent = new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeTicks);
-				addEventToMasterEventList(repEvent);
-				
 				world.pushMessage("Event: "+eventType+"	Magnitude: "+eventTemplateList.get(i).getMagnitude()+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
 						"  Location: "+(int)coordinate.getX()+", "+(int)coordinate.getY());
+				
+				ReputationEvent repEvent = checkEventInMasterEventList(new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeTicks));
+				
+				int seenMagnitude = eventTemplateList.get(i).getMagnitude();
 				
 				for(GameCharacter tempChar : witnesses)
 				{
 					if(!tempChar.getGroup().equalsIgnoreCase("player_group"))
 					{
-						tempChar.getNPCMemory().addMemory(repEvent, timeTicks);
+						tempChar.getNPCMemory().addMemory(seenMagnitude, repEvent, timeTicks);
 						world.pushMessage("Event seen by: "+tempChar.getName());
 					}
 				}
+				break;
 			}
 		}
-//		for(ReputationEvent temp : MasterEventList)
-//		{
-//			if(temp.getEventType().equalsIgnoreCase(eventType) && temp.getCharacterAffected() == characterAffected)
-//			{
-//				world.pushErrorMessage("Event already in master event list!");
-//				//separate events by times.  E.G. if same event type happens to same character,
-//				//but event occurs 30 seconds after first, then create a new event
-//				if((timeTicks - temp.getTimeEventOccurred()) < 1800)
-//				{
-//					System.out.println("Similar event already exists...checking if happened long ago");
-//					updateExistingEvent();
-//					return;
-//				}
-//			}
-//		}
+//		
 		
 		
 	}
 	
 	
-	private void addEventToMasterEventList(ReputationEvent repEvent)
+	private ReputationEvent checkEventInMasterEventList(ReputationEvent repEvent)
 	{
+		//if already in master list, will return the reference to the existing event.  If not, will create a new event and return it.
+		for(ReputationEvent temp : MasterEventList)
+		{
+			if(temp.getEventType().equalsIgnoreCase(repEvent.getEventType()) && temp.getCharacterAffected() == repEvent.getCharacterAffected())
+			{
+				world.pushErrorMessage("Similar event already in master event list...checking if recent");
+				//separate events by times.  E.G. if same event type happens to same character,
+				//but event occurs 30 seconds after first, then create a new event
+				if((timeTicks - temp.getTimeEventOccurred()) < 1800)
+				{
+					world.pushErrorMessage("Similar event occurred recently, updating existing event");
+					if(repEvent.getMagnitude() > temp.getMagnitude())
+					{
+						temp.setHighestKnownMagnitude(repEvent.getMagnitude());
+					}
+					return temp; //return the existing event
+				}
+				else
+				{
+					MasterEventList.add(repEvent);
+					world.pushErrorMessage("Similar event happened long ago...adding as new event");
+					return repEvent; //return the new event 
+				}
+			}
+		}
 		
-	}
-	private void updateExistingEvent()
-	{
-		
+		//if event not found
+		MasterEventList.add(repEvent);
+		world.pushErrorMessage("No event found in master event list, adding new one...");
+		return repEvent;
 	}
 
 	public String getRelationsBetweenCharacters(GameCharacter character1, GameCharacter character2)

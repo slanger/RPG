@@ -168,22 +168,34 @@ public class ReputationDebugMenu implements Serializable
 			}
 		}
 		
-		Label temp4 = new Label("EventType    GroupAffected    CharAffected    KnownMag",style);
+		Label temp4 = new Label("EventType",style);
+		Label temp5 = new Label("Group",style);
+		Label temp6 = new Label("Character",style);
+		Label temp7 = new Label("Magnitude",style);
+		
 		rightPane.row().expandX().fillX();
 		rightPane.add(temp4).padRight(10.0f);
+		rightPane.add(temp5).padRight(10.0f);
+		rightPane.add(temp6).padRight(10.0f);
+		rightPane.add(temp7).padRight(10.0f);
+
 		
 		if(selectedCharacter != null && !selectedCharacter.getGroup().equals("player_group"))
 		{
 			selectedCharacter.getNPCMemory().getRememberedEvents();
 			for(int i=0; i<selectedCharacter.getNPCMemory().getRememberedEvents().size(); i++)
 			{
-				String eventInfoString = selectedCharacter.getNPCMemory().getRememberedEvents().get(i).toString();
-				
-				Label eventInfo = new Label(eventInfoString,style);
+				Label eventTypeLabel = new Label(selectedCharacter.getNPCMemory().getRememberedEvents().get(i).getRepEventPointer().getEventType(), style);
+				Label groupLabel = new Label(selectedCharacter.getNPCMemory().getRememberedEvents().get(i).getRepEventPointer().getGroupAffected(), style);
+				Label npcNameLabel = new Label(selectedCharacter.getNPCMemory().getRememberedEvents().get(i).getRepEventPointer().getCharacterAffected().getName(), style);
+				Label magnitudeLabel = new Label(Integer.toString(selectedCharacter.getNPCMemory().getRememberedEvents().get(i).getMagnitudeKnownByNPC()),style);
 				
 				rightPane.row().expandX().fillX();
-				
-				rightPane.add(eventInfo).padRight(10.0f);
+				rightPane.add(eventTypeLabel).padRight(10.0f);
+				rightPane.add(groupLabel).padRight(10.0f);
+				rightPane.add(npcNameLabel).padRight(10.0f);
+				rightPane.add(magnitudeLabel).padRight(10.0f);
+
 			}
 		}
 		
