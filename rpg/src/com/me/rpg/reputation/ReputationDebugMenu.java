@@ -122,10 +122,21 @@ public class ReputationDebugMenu implements Serializable
 		mainTable.add(leftPane).width(200.0f).fillY().expandY().top().left();
 		mainTable.add(rightPane).top();
 		leftPane.top().left();
+		
+		
+		LabelStyle style = new LabelStyle(menuFont, Color.WHITE);
+		LabelStyle selectedStyle = new LabelStyle(menuFont, Color.GREEN);
+		
+		Label temp1 = new Label("Name",style);
+		Label temp2 = new Label("Disp",style);
+		Label temp3 = new Label("PlayerView",style);
+		leftPane.row().expandX().fillX();
+		leftPane.add(temp1).padRight(10.0f);
+		leftPane.add(temp2).padRight(10.0f);
+		leftPane.add(temp3).padRight(10.0f);
 		for(int i=0; i<NUM_ROWS; i++)
 		{
-			LabelStyle style = new LabelStyle(menuFont, Color.WHITE);
-			LabelStyle selectedStyle = new LabelStyle(menuFont, Color.GREEN);
+			
 			if(i < charactersInWorld.size())
 			{
 				String name = charactersInWorld.get(i).getName();
@@ -156,13 +167,17 @@ public class ReputationDebugMenu implements Serializable
 				
 			}
 		}
+		
+		Label temp4 = new Label("EventType    GroupAffected    CharAffected    KnownMag",style);
+		rightPane.row().expandX().fillX();
+		rightPane.add(temp4).padRight(10.0f);
+		
 		if(selectedCharacter != null && !selectedCharacter.getGroup().equals("player_group"))
 		{
 			selectedCharacter.getNPCMemory().getRememberedEvents();
 			for(int i=0; i<selectedCharacter.getNPCMemory().getRememberedEvents().size(); i++)
 			{
 				String eventInfoString = selectedCharacter.getNPCMemory().getRememberedEvents().get(i).toString();
-				LabelStyle style = new LabelStyle(menuFont, Color.WHITE);
 				
 				Label eventInfo = new Label(eventInfoString,style);
 				

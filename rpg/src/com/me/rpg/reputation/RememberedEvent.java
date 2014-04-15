@@ -58,8 +58,7 @@ public class RememberedEvent implements Serializable
 	public String toString()
 	{
 		String s;
-		s = "EventType: "+repEventPointer.getEventType()+"  groupAffected: "+repEventPointer.getGroupAffected();
-		s = s+"  charAffected: "+"  KnownMag: "+magnitudeKnownByNPC;
+		s = repEventPointer.getEventType()+"    "+repEventPointer.getGroupAffected()+"    "+"temp"+"    "+magnitudeKnownByNPC;
 		return s;
 	}
 	
