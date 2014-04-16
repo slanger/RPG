@@ -55,7 +55,7 @@ public abstract class Map
 	private ArrayList<Weapon> equippedWeapons = new ArrayList<Weapon>();
 	private ArrayList<DeadCharacter> corpses = new ArrayList<DeadCharacter>();
 
-	private List<RectangleMapObject> collidables;
+	private List<Rectangle> collidables = new ArrayList<Rectangle>();
 
 	// Tiled map variables
 	protected transient TiledMap tiledMap;
@@ -143,9 +143,6 @@ public abstract class Map
 		tileHeight = (Integer) mapProperties.get("tileheight");
 		mapWidth = ((Integer) mapProperties.get("width")) * tileWidth;
 		mapHeight = ((Integer) mapProperties.get("height")) * tileHeight;
-
-		// load collidables
-		loadCollidables();
 	}
 
 	protected void setup()
@@ -153,6 +150,15 @@ public abstract class Map
 		// get Tiled map
 		tiledMap = ScreenHandler.manager.get(mapTmxPath, TiledMap.class);
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, world.batch);
+
+		// load collidables
+		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
+		MapObjects collidableObjects = collisionLayer.getObjects();
+		for (int i = 0; i < collidableObjects.getCount(); i++)
+		{
+			RectangleMapObject collidableObject = (RectangleMapObject) collidableObjects.get(i);
+			collidables.add(collidableObject.getRectangle());
+		}
 	}
 
 	private void readObject(ObjectInputStream inputStream)
@@ -160,18 +166,6 @@ public abstract class Map
 	{
 		inputStream.defaultReadObject();
 		setup();
-	}
-
-	private void loadCollidables()
-	{
-		MapLayer collisionLayer = tiledMap.getLayers().get("Collision");
-		MapObjects collidableObjects = collisionLayer.getObjects();
-		collidables = new ArrayList<RectangleMapObject>();
-		for (int i = 0; i < collidableObjects.getCount(); i++)
-		{
-			RectangleMapObject collidableObject = (RectangleMapObject) collidableObjects.get(i);
-			collidables.add(collidableObject);
-		}
 	}
 
 	private void loadWarpPoints(final List<RectangleMapObject> sourceWarpPoints, final List<RectangleMapObject> destinationWarpPoints)
@@ -510,13 +504,12 @@ public abstract class Map
 			}
 		}
 
-		for (RectangleMapObject collidable : collidables)
+		for (Rectangle collidable : collidables)
 		{
-			Rectangle r = collidable.getRectangle();
-			float x = r.getX();
-			float y = r.getY();
-			float width = r.getWidth();
-			float height = r.getHeight();
+			float x = collidable.getX();
+			float y = collidable.getY();
+			float width = collidable.getWidth();
+			float height = collidable.getHeight();
 
 			Rectangle bottomLeft = new Rectangle(x - tileWidth, y - tileHeight,
 					tileWidth, tileHeight);
@@ -586,10 +579,9 @@ public abstract class Map
 		}
 
 		// check if waypoint is inside a static collidable
-		for (RectangleMapObject collidable : collidables)
+		for (Rectangle collidable : collidables)
 		{
-			Rectangle r = collidable.getRectangle();
-			if (rectangle.overlaps(r))
+			if (rectangle.overlaps(collidable))
 			{
 				return false;
 			}
@@ -667,9 +659,8 @@ public abstract class Map
 			float x = c1.x + i * (deltaX / n) * dx;
 			float y = c1.y + i * (deltaY / n) * dy;
 			Vector2 v = new Vector2(x, y);
-			for (RectangleMapObject collidable : collidables)
+			for (Rectangle r : collidables)
 			{
-				Rectangle r = collidable.getRectangle();
 				if (rectangleContainsPoint(r, v))
 				{
 					return false;
@@ -745,10 +736,9 @@ public abstract class Map
 	 */
 	public boolean checkCollisionWithObjects(Rectangle boundingRectangle)
 	{
-		for (RectangleMapObject object : collidables)
+		for (Rectangle object : collidables)
 		{
-			Rectangle r = object.getRectangle();
-			if (r.overlaps(boundingRectangle))
+			if (object.overlaps(boundingRectangle))
 			{
 				return false;
 			}
