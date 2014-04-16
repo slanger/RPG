@@ -63,7 +63,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		
 		for(GameCharacter temp : charactersInWorld)
 		{
-			if(temp.getGroup() != "player_group")
+			if(!temp.getGroup().equals("player_group"))
 			{
 				temp.getNPCMemory().update(timeTicks);
 				if(temp.getWantsToShareKnowledge() && !temp.getNPCMemory().getRecentlySharedKnowledge())
