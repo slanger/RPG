@@ -48,6 +48,8 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	private void initializeGroupRelations()
 	{
 		groupRelations.add(new GroupRelation("villager_group", "villain_group", "hate"));
+		groupRelations.add(new GroupRelation("villager_group", "villager_group", "like"));
+		groupRelations.add(new GroupRelation("villain_group", "villain_group", "like"));
 	}
 	
 	public void update()
@@ -81,7 +83,10 @@ public class ReputationSystem implements Serializable, ReputationInterface
 			if(!temp.getGroup().equals("player_group"))
 			{
 				System.out.println("Character "+sharingCharacter.getName()+" told character "+temp.getName()+" of event.");
-				temp.getNPCMemory().addMemory(sharedMagnitude, sharedEvent, timeTicks); 
+				
+				int adjustedMag = adjustMagnitudeByRelations(sharedMagnitude, temp, sharedEvent.getCharacterAffected());
+				
+				temp.getNPCMemory().addMemory(adjustedMag, sharedEvent, timeTicks); 
 				
 				sharingCharacter.setWantsToShareKnowledge(false);
 				sharingCharacter.getNPCMemory().setRecentlySharedKnowledge(true);
@@ -105,21 +110,44 @@ public class ReputationSystem implements Serializable, ReputationInterface
 				world.pushMessage("Event: "+eventType+"	Magnitude: "+eventTemplateList.get(i).getMagnitude()+"  Group: "+groupAffected+"   NPC: "+characterAffected.getName()+
 						"  Location: "+(int)coordinate.getX()+", "+(int)coordinate.getY());
 				
-				ReputationEvent repEvent = checkEventInMasterEventList(new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeTicks));
+				ReputationEvent repEvent = checkEventInMasterEventList(new ReputationEvent(eventType, Math.abs(eventTemplateList.get(i).getMagnitude()), groupAffected, characterAffected, coordinate, timeTicks));
 				
 				int seenMagnitude = eventTemplateList.get(i).getMagnitude();
-				System.out.println("seen mag: "+seenMagnitude );
 				
 				for(GameCharacter tempChar : witnesses)
 				{
 					if(!tempChar.getGroup().equalsIgnoreCase("player_group"))
 					{
-						tempChar.getNPCMemory().addMemory(seenMagnitude, repEvent, timeTicks);
+						int adjustedMag = adjustMagnitudeByRelations(seenMagnitude, tempChar, repEvent.getCharacterAffected());
+						tempChar.getNPCMemory().addMemory(adjustedMag, repEvent, timeTicks);
 						world.pushMessage("Event seen by: "+tempChar.getName());
 					}
 				}
 				break;
 			}
+		}
+	}
+	
+	private int adjustMagnitudeByRelations(int rawMagnitude, GameCharacter char1, GameCharacter char2)
+	{
+		String relation = getRelationsBetweenCharacters(char1, char2);
+		System.out.println(char1.getName()+" "+char2.getName()+" relation: "+relation);
+		if(relation.equalsIgnoreCase("like"))
+		{
+			return rawMagnitude;
+		}
+		else if(relation.equalsIgnoreCase("neutral"))
+		{
+			return (int)(rawMagnitude *0.2f);
+		}
+		else if(relation.equalsIgnoreCase("hate"))
+		{
+			return -rawMagnitude;
+		}
+		else
+		{
+			System.out.println("no relation found");
+			return 0;
 		}
 	}
 	
@@ -138,7 +166,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 					world.pushErrorMessage("Similar event occurred recently, updating existing event");
 					if(repEvent.getMagnitude() > temp.getMagnitude())
 					{
-						temp.setHighestKnownMagnitude(repEvent.getMagnitude());
+						temp.setHighestKnownMagnitude(Math.abs(repEvent.getMagnitude()));
 					}
 					return temp; //return the existing event
 				}
