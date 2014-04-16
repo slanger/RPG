@@ -249,7 +249,7 @@ public class FollowPathAI
 		for (Waypoint w : graph)
 		{
 			w.distanceFromSource = INFINITY;
-			w.previousEdge = null;
+			w.previousVertex = null;
 		}
 		source.distanceFromSource = 0;
 
@@ -274,7 +274,7 @@ public class FollowPathAI
 					{// update priority queue
 						unvisited.remove(toVertex);
 						toVertex.distanceFromSource = newDist;
-						toVertex.previousEdge = e;
+						toVertex.previousVertex = currentVertex;
 						unvisited.add(toVertex);
 					}
 				}
@@ -289,10 +289,17 @@ public class FollowPathAI
 		totalPathDistance = 0;
 		while (!current.equals(source))
 		{
-			totalPathDistance += current.previousEdge.cost;
+			// add to totalPathDistance
+			for (Waypoint.Edge e : current.connections)
+			{
+				if (e.connectedWaypoint.equals(current.previousVertex))
+				{
+					totalPathDistance += e.cost;
+				}
+			}
 
 			path.add(current);
-			current = current.previousEdge.connectedWaypoint;
+			current = current.previousVertex;
 		}
 
 		Collections.reverse(path);

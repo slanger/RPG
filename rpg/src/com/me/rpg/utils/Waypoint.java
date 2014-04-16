@@ -19,7 +19,7 @@ public class Waypoint
 	public Waypoint connectedWarpPoint;
 	// to be used by dijkstra's algorithm
 	public float distanceFromSource;
-	public Edge previousEdge;
+	public Waypoint previousVertex;
 
 	public Waypoint(Location location)
 	{
