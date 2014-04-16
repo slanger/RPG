@@ -16,6 +16,12 @@ public class NPCMemory implements Serializable
 	private ArrayList<RememberedEvent> rememberedEvents;
 	private GameCharacter gameCharacter;
 	
+	private RememberedEvent currentSharedEvent;
+	
+	private int timeStartedEventSharing = 0;
+	
+	private boolean recentlySharedKnowledge = false;
+	
 	public NPCMemory(GameCharacter gameCharacter, ArrayList<ReputationEvent> MasterEventList)
 	{
 		this.gameCharacter = gameCharacter;
@@ -23,19 +29,50 @@ public class NPCMemory implements Serializable
 		rememberedEvents = new ArrayList<RememberedEvent>();
 	}
 	
-	public void updatePriority(long timeTicks)
+	public void update(int timeTicks)
 	{
+		if((gameCharacter.getWantsToShareKnowledge()==true) &&((timeTicks - timeStartedEventSharing) > 1800))//~ 30 seconds
+		{
+			System.out.println("interval expired");
+			timeStartedEventSharing = 0;
+			gameCharacter.setWantsToShareKnowledge(false);
+			recentlySharedKnowledge = false;
+		}
 		
+		if(gameCharacter.getWantsToShareKnowledge() == true)
+		{
+			return;
+		}
+		
+		RememberedEvent currentHighestPriorityEvent = null;
+		int currentHighestPriority = 0;
+		
+		for(RememberedEvent temp : rememberedEvents)
+		{
+			int newPriority = temp.update(timeTicks);
+			if(newPriority > 200 && newPriority > currentHighestPriority)
+			{
+				currentHighestPriority = newPriority;
+				currentHighestPriorityEvent = temp;
+			}
+		}
+		
+		if(currentHighestPriorityEvent != null)
+		{
+			timeStartedEventSharing = timeTicks;
+			System.out.println("NPC "+gameCharacter.getName()+" wants to share an event!");
+			currentSharedEvent = currentHighestPriorityEvent;
+			gameCharacter.setWantsToShareKnowledge(true);
+		}
 		
 	}
 	
-	public ReputationEvent getHighestPriorityEvent()
+	public RememberedEvent getSharedEvent()
 	{
-		
-		return null;
+		return currentSharedEvent;
 	}
 	
-	public void addMemory(int seenMagnitude, ReputationEvent repEvent, long timeTicks)
+	public void addMemory(int seenMagnitude, ReputationEvent repEvent, int timeTicks)
 	{
 		for(RememberedEvent temp : rememberedEvents)
 		{
@@ -49,15 +86,9 @@ public class NPCMemory implements Serializable
 				return;
 			}
 		}
-		
 		RememberedEvent temp = new RememberedEvent(seenMagnitude, repEvent, timeTicks);
 		rememberedEvents.add(temp);
 		gameCharacter.updateDispositionValue(seenMagnitude);
-	}
-	
-	public void update(ReputationEvent reputationEvent)
-	{
-		
 	}
 	
 	public ArrayList<RememberedEvent> getRememberedEvents()
@@ -65,4 +96,13 @@ public class NPCMemory implements Serializable
 		return rememberedEvents;
 	}
 	
+	public boolean getRecentlySharedKnowledge()
+	{
+		return recentlySharedKnowledge;
+	}
+	
+	public void setRecentlySharedKnowledge(boolean recentlySharedKnowledge)
+	{
+		this.recentlySharedKnowledge = recentlySharedKnowledge;
+	}
 }

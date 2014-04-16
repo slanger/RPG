@@ -19,7 +19,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	private ArrayList<EventTemplate> eventTemplateList = new ArrayList<EventTemplate>();
 	private ArrayList<GroupRelation> groupRelations = new ArrayList<GroupRelation>();
 	
-	private long timeTicks = 0;
+	private int timeTicks = 0;
 
 	public ReputationSystem(World world) {
 		this.world = world;
@@ -59,8 +59,8 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		{
 			if(temp.getGroup() != "player_group")
 			{
-				temp.getNPCMemory().updatePriority(timeTicks);
-				if(temp.getWantsToShareKnowledge())
+				temp.getNPCMemory().update(timeTicks);
+				if(temp.getWantsToShareKnowledge() && !temp.getNPCMemory().getRecentlySharedKnowledge())
 				{
 					ArrayList<GameCharacter> receivingCharacters = temp.getCurrentMap().canHearCharacters(temp);
 					if(receivingCharacters != null)
@@ -74,11 +74,18 @@ public class ReputationSystem implements Serializable, ReputationInterface
 	
 	private void shareKnowledge(GameCharacter sharingCharacter, ArrayList<GameCharacter> receivingCharacters)
 	{
-		ReputationEvent repEvent = sharingCharacter.getNPCMemory().getHighestPriorityEvent();
+		int sharedMagnitude = sharingCharacter.getNPCMemory().getSharedEvent().getMagnitudeKnownByNPC();
+		ReputationEvent sharedEvent = sharingCharacter.getNPCMemory().getSharedEvent().getRepEventPointer();
 		for(GameCharacter temp : receivingCharacters)
 		{
-			// the timeTicks for when the npc learns of the event, not when the event actually occurred
-			//temp.getNPCMemory().addMemory(repEvent, timeTicks); 
+			if(!temp.getGroup().equals("player_group"))
+			{
+				System.out.println("Character "+sharingCharacter.getName()+" told character "+temp.getName()+" of event.");
+				temp.getNPCMemory().addMemory(sharedMagnitude, sharedEvent, timeTicks); 
+				
+				sharingCharacter.setWantsToShareKnowledge(false);
+				sharingCharacter.getNPCMemory().setRecentlySharedKnowledge(true);
+			}
 		}
 	}
 	
@@ -101,6 +108,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 				ReputationEvent repEvent = checkEventInMasterEventList(new ReputationEvent(eventType, eventTemplateList.get(i).getMagnitude(), groupAffected, characterAffected, coordinate, timeTicks));
 				
 				int seenMagnitude = eventTemplateList.get(i).getMagnitude();
+				System.out.println("seen mag: "+seenMagnitude );
 				
 				for(GameCharacter tempChar : witnesses)
 				{
@@ -113,11 +121,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 				break;
 			}
 		}
-//		
-		
-		
 	}
-	
 	
 	private ReputationEvent checkEventInMasterEventList(ReputationEvent repEvent)
 	{

@@ -122,7 +122,7 @@ public final class World
 	private boolean updateEnable = true;
 
 	private long removeMessageTimer = 0;
-	private final long MESSAGE_DISPLAY_SECONDS = 5;
+	private final long MESSAGE_DISPLAY_SECONDS = 1;
 	private ArrayList<Message> messageQueue = new ArrayList<Message>();
 
 	private transient BitmapFont messageFont;
@@ -314,21 +314,21 @@ public final class World
 				PLAYER_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		player.setBaseSpeed(200f);
 
-		npc1 = new NonplayableCharacter("NPC1", "villager_group",
+		npc1 = new NonplayableCharacter("TheKiller", "villain_group",
 				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-		npc2 = new NonplayableCharacter("NPC2", "villager_group",
+		npc2 = new NonplayableCharacter("Coward", "villager_group",
 				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-		npc3 = new NonplayableCharacter("NPC3", "villain_group",
+		npc3 = new NonplayableCharacter("Wanderer", "villager_group",
 				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-		npc4 = new NonplayableCharacter("NPC4", "villain_group",
+		npc4 = new NonplayableCharacter("AngryArcher", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 
 		//testing reputation with these characters
-		NonplayableCharacter rep_npc1 = new NonplayableCharacter("NPC4", "villager_group",
+		NonplayableCharacter rep_npc1 = new NonplayableCharacter("rep_victim1", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-		NonplayableCharacter rep_npc2 = new NonplayableCharacter("NPC4", "villager_group",
+		NonplayableCharacter rep_npc2 = new NonplayableCharacter("rep_victim2", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-		NonplayableCharacter rep_npc3 = new NonplayableCharacter("NPC4", "villager_group",
+		NonplayableCharacter rep_npc3 = new NonplayableCharacter("rep_victim3", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		westTown.addCharacterToMap(rep_npc1, new Location(westTown, 300, 480));
 		westTown.addCharacterToMap(rep_npc2, new Location(westTown, 320, 480));
@@ -618,10 +618,7 @@ public final class World
 			return;
 		}
 		
-		if(updateEnable)
-		{
-			reputationSystem.update();
-		}
+		reputationSystem.update();
 		
 		syncTimer.update(deltaTime);
 

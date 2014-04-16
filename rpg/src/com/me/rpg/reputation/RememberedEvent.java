@@ -1,6 +1,8 @@
 package com.me.rpg.reputation;
 
 import java.io.Serializable;
+import java.lang.Math;
+import java.util.Random;
 
 import com.me.rpg.characters.GameCharacter;
 
@@ -10,15 +12,15 @@ public class RememberedEvent implements Serializable
 	private static final long serialVersionUID = 928305096707093169L;
 
 	private ReputationEvent repEventPointer;
-	private int magnitudeKnownByNPC;
-	private long timeLearnedOfEvent;
+	private int knownMagnitude;
+	private int timeLearnedOfEvent;
 	private int priority;
 	
-	RememberedEvent(int magnitudeKnownByNPC, ReputationEvent reputationEvent, long timeTicks)
+	RememberedEvent(int knownMagnitude, ReputationEvent reputationEvent, int timeTicks)
 	{
+		this.knownMagnitude = knownMagnitude;
 		repEventPointer = reputationEvent;
 		timeLearnedOfEvent = timeTicks;
-		magnitudeKnownByNPC = reputationEvent.getMagnitude();
 	}
 	
 	public ReputationEvent getRepEventPointer()
@@ -28,12 +30,12 @@ public class RememberedEvent implements Serializable
 	
 	public int getMagnitudeKnownByNPC()
 	{
-		return magnitudeKnownByNPC;
+		return knownMagnitude;
 	}
 	
 	public void setMagnitudeKnownByNPC(int newMagnitudeKnownByNPC)
 	{
-		this.magnitudeKnownByNPC = newMagnitudeKnownByNPC;
+		this.knownMagnitude = newMagnitudeKnownByNPC;
 	}
 	
 	public long getTimeLearnedOfEvent()
@@ -41,23 +43,19 @@ public class RememberedEvent implements Serializable
 		return timeLearnedOfEvent;
 	}
 	
-	public boolean match(String eventType, int magnitude, String groupAffected, GameCharacter characterAffected)
+	public int update(int timeTicks)
 	{
-		return false;
-	}
-	public void update(ReputationEvent reputationEvent)
-	{
-		//
-	}
-	
-	public int getPriority()
-	{
+		//System.out.println("the time ticks: "+timeTicks);
+		int timeComponent = Math.max(0, (int)(100-((timeTicks-timeLearnedOfEvent)/120))); 
+		//System.out.println("in computing priority, time component is: "+timeComponent);
+		
+		Random random = new Random();
+		int randomComponent = random.nextInt(150);
+		
+		priority = knownMagnitude + timeComponent + randomComponent;
+		
+		//System.out.println("priority is: "+priority);
+		
 		return priority;
 	}
-	
-	public void setPriority(int priority)
-	{
-		this.priority = priority;
-	}
-	
 }
