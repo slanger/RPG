@@ -1,4 +1,4 @@
-package com.me.rpg.ai;
+package com.me.rpg.reputation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
 
 public class DialogueSystem implements Serializable
@@ -42,8 +43,12 @@ public class DialogueSystem implements Serializable
 	private String npcStatement = null;
 	private ArrayList<String> responses;
 	
-	public DialogueSystem()
+	private boolean justStartedConversation = true;
+	private World world;
+	
+	public DialogueSystem(World world)
 	{
+		this.world = world;
 		create();
 		initializeDialogueSystem();
 	}
@@ -91,6 +96,7 @@ public class DialogueSystem implements Serializable
 				currentDialogueNode = rootNode;
 				choiceIndex = 0;
 				showIndex = 0;
+				justStartedConversation = true;
 				return true;
 			}
 		}
@@ -101,16 +107,25 @@ public class DialogueSystem implements Serializable
 	{
 		if(key.equals("ENTER"))
 		{		
-			if(currentDialogueNode.getNumChildren() > 0 )
+			if(justStartedConversation)
 			{
 				currentDialogueNode = currentDialogueNode.getChild(choiceIndex);
+				activateTrigger(currentDialogueNode.getTrigger());
+				justStartedConversation = false;
 			}
 			else
 			{
-				inDialogue = false;
-				return true;
+				if(currentDialogueNode.getNumChildren() > 0 )
+				{
+					currentDialogueNode = currentDialogueNode.getChild(choiceIndex).getChild(0);
+					activateTrigger(currentDialogueNode.getTrigger());
+				}
+				else
+				{
+					inDialogue = false;
+					return true;
+				}
 			}
-			
 			//activate trigger for this child
 			
 			responses.clear();
@@ -146,6 +161,58 @@ public class DialogueSystem implements Serializable
 		return false;
 	}
 	
+	public void activateTrigger(String trigger)
+	{
+		if(trigger.equalsIgnoreCase("null")) return;
+		
+		String delimiters = "[_]+";
+		String[] tokens = trigger.split(delimiters);
+		
+		if(tokens[0].equalsIgnoreCase("repEvent"))
+		{
+			for(GameCharacter temp : world.getCharactersInWorld())
+			{
+				if(temp.getName().equalsIgnoreCase(tokens[3]))
+				{
+					world.getReputationInterface().addNewEvent(tokens[1], tokens[2], temp);
+					break;
+				}
+			}
+		}
+		
+		
+//		String line = scanner.nextLine();
+//		String delimiters = "[ ]+";
+//		String[] tokens = line.split(delimiters);
+//		for(int i = 0; i<tokens.length; i++)
+//		{
+//			tokens[i] = tokens[i].trim();
+//		}
+//		
+//		if(tokens[0].equalsIgnoreCase("NPC"))
+//		{
+//			String objectType = tokens[0];
+//			String objectID = tokens[1];
+//			String disposition = tokens[2];
+//			
+//			Node rootNode = new Node(objectType, objectID, disposition);
+//			nodeStorage.add(rootNode);
+//		}
+//		
+//		if(tokens[0].equalsIgnoreCase("responses"))
+//		{
+//			int numChildren = Integer.parseInt(tokens[1]);
+//			String trigger = tokens[3];
+//			String dialogue = "";
+//			for(int i = 5; i<tokens.length ;i++)
+//			{
+//				dialogue = dialogue + tokens[i]+" ";
+//			}
+//			Node newNode = new Node(dialogue, trigger, currentNode, numChildren);
+//			nodeStorage.add(newNode);
+//		}
+		
+	}
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{		
@@ -174,7 +241,8 @@ public class DialogueSystem implements Serializable
 		Label objectName = new Label(conversingNPC.getName() , style);
 		Label npcStatement1 = new Label(npcStatement, style);
 		Label separator = new Label("------------------------------------------------------------------"
-				+ "------------------------------------------------", separatorStyle);
+				+ "-------------------------------------------------------------------------------------------------------------"
+				+ "----------------", separatorStyle);
 		
 		
 		
@@ -412,7 +480,6 @@ public class DialogueSystem implements Serializable
 					}
 					Node newNode = new Node(dialogue, trigger, currentNode, numChildren);
 					nodeStorage.add(newNode);
-	
 				}
 			}
 			scanner.close();

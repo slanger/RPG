@@ -45,6 +45,8 @@ public class RememberedEvent implements Serializable
 	
 	public int update(int timeTicks)
 	{
+		int magnitudeComponent = Math.abs(knownMagnitude);
+		
 		//System.out.println("the time ticks: "+timeTicks);
 		int timeComponent = Math.max(0, (int)(100-((timeTicks-timeLearnedOfEvent)/120))); 
 		//System.out.println("in computing priority, time component is: "+timeComponent);
@@ -52,7 +54,7 @@ public class RememberedEvent implements Serializable
 		Random random = new Random();
 		int randomComponent = random.nextInt(150);
 		
-		priority = knownMagnitude + timeComponent + randomComponent;
+		priority = magnitudeComponent + timeComponent + randomComponent;
 		
 		//System.out.println("priority is: "+priority);
 		

@@ -6,13 +6,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.World;
-import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
+import com.me.rpg.reputation.DialogueSystem;
 import com.me.rpg.utils.Location;
 
 public class PlayableCharacter extends GameCharacter

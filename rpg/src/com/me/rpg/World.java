@@ -20,7 +20,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Disposable;
-import com.me.rpg.ai.DialogueSystem;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.NonplayableCharacter;
 import com.me.rpg.characters.PlayableCharacter;
@@ -37,6 +36,7 @@ import com.me.rpg.maps.Map;
 import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.WestTownInsideHouse;
 import com.me.rpg.maps.WestTownMap;
+import com.me.rpg.reputation.DialogueSystem;
 import com.me.rpg.reputation.ReputationDebugMenu;
 import com.me.rpg.reputation.ReputationInterface;
 import com.me.rpg.reputation.ReputationSystem;
@@ -108,7 +108,7 @@ public final class World
 	private final int NUM_SECONDS_PER_DAY = 60;
 	private final int NUM_DAYS = 10;
 
-	private final DialogueSystem dialogueSystem = new DialogueSystem();
+	private final DialogueSystem dialogueSystem = new DialogueSystem(this);	
 	private final InventoryMenu inventoryMenu = new InventoryMenu();
 	private final PauseScreen pauseScreen = new PauseScreen(this);
 	private final ReputationDebugMenu reputationDebugMenu = new ReputationDebugMenu(

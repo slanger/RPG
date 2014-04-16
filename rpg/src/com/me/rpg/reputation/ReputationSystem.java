@@ -36,13 +36,17 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		eventTemplateList.add(new EventTemplate("attacked", "large_damage", -50));
 		eventTemplateList.add(new EventTemplate("attacked", "killed", -100));
 		
-		eventTemplateList.add(new EventTemplate("talked_to_npc", "small_bonus", 1));
-		eventTemplateList.add(new EventTemplate("talked_to_npc", "medium_bonus", 3));
-		eventTemplateList.add(new EventTemplate("talked_to_npc", "large_bonus", 5));
+		eventTemplateList.add(new EventTemplate("positiveConversation", "small", 1));
+		eventTemplateList.add(new EventTemplate("positiveConversation", "medium", 3));
+		eventTemplateList.add(new EventTemplate("positiveConversation", "large", 5));
 
-		eventTemplateList.add(new EventTemplate("completed_quest", "small_bonus", 10));
-		eventTemplateList.add(new EventTemplate("completed_quest", "medium_bonus", 30));
-		eventTemplateList.add(new EventTemplate("completed_quest", "large_bonus", 50));
+		eventTemplateList.add(new EventTemplate("negativeConversation", "small", -1));
+		eventTemplateList.add(new EventTemplate("negativeConversation", "medium", -3));
+		eventTemplateList.add(new EventTemplate("negativeConversation", "large", -5));
+		
+		eventTemplateList.add(new EventTemplate("completed_quest", "small", 10));
+		eventTemplateList.add(new EventTemplate("completed_quest", "medium", 30));
+		eventTemplateList.add(new EventTemplate("completed_quest", "large", 50));
 	}
 
 	private void initializeGroupRelations()

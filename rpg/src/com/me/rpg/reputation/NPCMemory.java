@@ -4,6 +4,7 @@ package com.me.rpg.reputation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.lang.Math;
 
 import com.me.rpg.characters.GameCharacter;
 
@@ -78,7 +79,7 @@ public class NPCMemory implements Serializable
 		{
 			if(temp.getRepEventPointer().getEventType().equalsIgnoreCase(repEvent.getEventType()) && temp.getRepEventPointer().getCharacterAffected() == repEvent.getCharacterAffected())
 			{
-				if(seenMagnitude > temp.getRepEventPointer().getMagnitude())
+				if(Math.abs(seenMagnitude) > Math.abs(temp.getMagnitudeKnownByNPC()))
 				{
 					temp.setMagnitudeKnownByNPC(seenMagnitude);
 					gameCharacter.updateDispositionValue(seenMagnitude);
