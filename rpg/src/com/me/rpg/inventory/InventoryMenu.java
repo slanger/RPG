@@ -25,6 +25,7 @@ import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.UsableItem;
 import com.me.rpg.combat.Weapon;
 
 public class InventoryMenu implements Serializable
@@ -81,7 +82,7 @@ public class InventoryMenu implements Serializable
 	private ArrayList<Projectile> arrows;   //second row
 	
 	private ArrayList<Shield> shields;       //third row
-	private ArrayList<String> miscItems; 	 //fourth row
+	private ArrayList<UsableItem> usableItems; 	 //fourth row
 	
 	public InventoryMenu()
 	{
@@ -151,6 +152,7 @@ public class InventoryMenu implements Serializable
 		meleeWeapons = player.getWeapons();
 		arrows = player.getArrows();
 		shields = player.getShields();
+		usableItems = player.getUsableItemsInInventory();
 		
 		inMenu = true;
 		rowSelectionIndex = 0;
@@ -195,7 +197,11 @@ public class InventoryMenu implements Serializable
 			}
 			if(rowSelectionIndex == 3)
 			{
-				
+				if(usableItems.size() > colSelectionIndex)
+				{
+					usableItems.get(colSelectionIndex).use(player);
+					player.getUsableItemsInInventory().remove(colSelectionIndex);
+				}
 			}
 		}
 		else if(key.equals("UP"))
@@ -232,7 +238,7 @@ public class InventoryMenu implements Serializable
 			}
 			if(rowSelectionIndex == 3)
 			{
-				//if(colSelectionIndex >= meleeWeapons.size()) colSelectionIndex = meleeWeapons.size()-1;
+				if(colSelectionIndex >= usableItems.size()) colSelectionIndex = usableItems.size()-1;
 			}
 		}
 		else if(key.equals("LEFT"))
@@ -412,6 +418,8 @@ public class InventoryMenu implements Serializable
 		miscItemRow.left().padLeft(20.0f);
 		for(int i=0; i<NUM_ITEMS_DISPLAYED; i++)
 		{
+			miscItemRow.add(miscItemTables.get(i)).size(50.0f).pad(10.0f);
+			
 			if(rowSelectionIndex == 3 && colSelectionIndex == i)
 			{
 				miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
@@ -421,9 +429,20 @@ public class InventoryMenu implements Serializable
 				miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemRowTexture)));
 			}
 			
-			miscItemRow.add(miscItemTables.get(i)).size(50.0f).pad(10.0f);
-			miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
-			miscItemTables.get(i).add(new Image(bowWeapon)).expand().fill();
+			UsableItem temp = null;
+			if(usableItems.size() > i)
+			{
+				if(rowSelectionIndex == 3 && colSelectionIndex == i)
+				{
+					miscItemTables.get(i).setBackground(new TextureRegionDrawable(new TextureRegion(itemSelectionTexture)));
+				}
+				temp = usableItems.get(i);
+				miscItemTables.get(i).add(new Image(temp.getItemSprite())).expand().fill();
+			}
+			else
+			{
+				
+			}
 			miscItemTables.get(i).debug();
 		}
 		
@@ -465,10 +484,6 @@ public class InventoryMenu implements Serializable
 	
 	public void updateTopPane()
 	{
-		String itemName="";
-		String itemType="";
-		String itemDescription = "";
-		
 		LabelStyle style = new LabelStyle(menuFont, Color.WHITE);
 		
 		topPane.setBackground(new TextureRegionDrawable(new TextureRegion(testTexture)));
@@ -480,13 +495,19 @@ public class InventoryMenu implements Serializable
 		
 		if(rowSelectionIndex == 0)
 		{
-			itemName = "Item Name:   "+"test";
-			itemType = "Item Type:   "+"Sword";
-			itemDescription = "Description: "+"Legendary sword.";
+			String itemName;
+			String itemPower;
+			String itemRange;
+			
+			Weapon temp = meleeWeapons.get(colSelectionIndex);
+			
+			itemName = "Sword Name:   "+temp.getName();
+			itemPower = "Power:   "+temp.getPower();
+			itemRange = "Range:   "+temp.getRange();
 			
 			Label label1 = new Label(itemName, style);
-			Label label2 = new Label(itemType, style);
-			Label label3 = new Label(itemDescription, style);
+			Label label2 = new Label(itemPower, style);
+			Label label3 = new Label(itemRange, style);
 			
 			topPaneLeft.add(new Image(meleeWeapons.get(colSelectionIndex).getItemSpriteUp())).expand().fill();
 			topPaneRight.add(label1).left();
@@ -497,13 +518,19 @@ public class InventoryMenu implements Serializable
 		}
 		if(rowSelectionIndex == 1)
 		{
-			itemName = "Item Name:   "+"test";
-			itemType = "Item Type:   "+"Sword";
-			itemDescription = "Description: "+"Legendary sword.";
+			String itemName;
+			String itemPower;
+			String itemSpeed;
+			
+			Projectile temp = arrows.get(colSelectionIndex);
+			
+			itemName = "Arrow Name:   "+temp.getName();
+			itemPower = "Power:   "+temp.getPower();
+			itemSpeed = "Speed:   "+temp.getSpeed();
 			
 			Label label1 = new Label(itemName, style);
-			Label label2 = new Label(itemType, style);
-			Label label3 = new Label(itemDescription, style);
+			Label label2 = new Label(itemPower, style);
+			Label label3 = new Label(itemSpeed, style);
 			
 			topPaneLeft.add(new Image(arrows.get(colSelectionIndex).getItemSpriteUp())).expand().fill();
 			topPaneRight.add(label1).left();
@@ -514,24 +541,46 @@ public class InventoryMenu implements Serializable
 		}
 		if(rowSelectionIndex == 2)
 		{
-			itemName = "Item Name:   "+"test";
-			itemType = "Item Type:   "+"Sword";
-			itemDescription = "Description: "+"Legendary sword.";
+			String itemName;
+			String itemStrength;
+			
+			Shield temp = shields.get(colSelectionIndex);
+			
+			itemName = "Shield Name:   "+temp.getName();
+			itemStrength = "Shield Strength:   "+temp.getHealth();
 			
 			Label label1 = new Label(itemName, style);
-			Label label2 = new Label(itemType, style);
-			Label label3 = new Label(itemDescription, style);
+			Label label2 = new Label(itemStrength, style);
+			//Label label3 = new Label(itemDescription, style);
 			
 			topPaneLeft.add(new Image(shields.get(colSelectionIndex).getItemSpriteUp())).expand().fill();
 			topPaneRight.add(label1).left();
 			topPaneRight.row();
 			topPaneRight.add(label2).left();
-			topPaneRight.row();
-			topPaneRight.add(label3).left();
+			//topPaneRight.row();
+			//topPaneRight.add(label3).left();
 		}
 		if(rowSelectionIndex == 3)
 		{
+			String itemName;
+			String itemPower;
+			String itemRange;
 			
+			if(usableItems.size() >colSelectionIndex)
+			{
+				UsableItem temp = usableItems.get(colSelectionIndex);
+				
+				itemName = "Item Name:   "+temp.getName();
+				itemPower = "Power:   "+temp.getPower();
+				
+				Label label1 = new Label(itemName, style);
+				Label label2 = new Label(itemPower, style);
+				
+				topPaneLeft.add(new Image(usableItems.get(colSelectionIndex).getItemSprite())).expand().fill();
+				topPaneRight.add(label1).left();
+				topPaneRight.row();
+				topPaneRight.add(label2).left();
+			}
 		}
 	}
 	

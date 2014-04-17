@@ -76,7 +76,8 @@ public class ScreenHandler extends Game
 		manager.load(World.GRAY_SHIELD_PATH, Texture.class);
 		manager.load(World.SHADOW_SHIELD_PATH, Texture.class);
 		//load misc item textures
-		
+		manager.load(World.HEALTH_POTION_PATH, Texture.class);
+		manager.load(World.SPEED_POTION_PATH, Texture.class);
 		
 		// load sounds and music
 		manager.load(World.WARP_SOUND_PATH, Sound.class);

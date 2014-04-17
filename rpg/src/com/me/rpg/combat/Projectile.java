@@ -135,7 +135,14 @@ public class Projectile implements Cloneable, Serializable
 	}
 	
 	public int getPower() {
-		return power + firedFrom.power;
+		if(firedFrom == null)
+		{
+			return power;
+		}
+		else
+		{
+			return power+firedFrom.power;
+		}
 	}
 	
 	protected int getRange() {
@@ -147,7 +154,14 @@ public class Projectile implements Cloneable, Serializable
 	}
 	
 	public float getSpeed() {
-		return firedFrom.speed * speedMultiplier;
+		if(firedFrom==null)
+		{
+			return speedMultiplier;
+		}
+		else
+		{
+			return firedFrom.speed * speedMultiplier;
+		}
 	}
 	
 	public void render(SpriteBatch batch) {

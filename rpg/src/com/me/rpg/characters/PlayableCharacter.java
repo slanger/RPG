@@ -10,6 +10,7 @@ import com.me.rpg.ai.PlayerControlledWalkAI;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.UsableItem;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 import com.me.rpg.reputation.DialogueSystem;
@@ -55,7 +56,7 @@ public class PlayableCharacter extends GameCharacter
 	private ArrayList<Shield> shieldsInInventory;
 	private ArrayList<Projectile> arrowsInInventory;
 	private RangedWeapon rangedWeaponInInventory;
-	// private ArrayList<> miscItemsInInventory;
+	private ArrayList<UsableItem> usableItemsInInventory;
 
 	private PlayerControlledWalkAI walkAI;
 
@@ -78,6 +79,7 @@ public class PlayableCharacter extends GameCharacter
 		weaponsInInventory = new ArrayList<Weapon>();
 		arrowsInInventory = new ArrayList<Projectile>();
 		shieldsInInventory = new ArrayList<Shield>();
+		usableItemsInInventory = new ArrayList<UsableItem>();
 		npcMemory = null;
 		walkAI = new PlayerControlledWalkAI(this);
 	}
@@ -693,6 +695,11 @@ public class PlayableCharacter extends GameCharacter
 	{
 		rangedWeaponInInventory = item;
 	}
+	
+	public void addItemToInventory(UsableItem item)
+	{
+		usableItemsInInventory.add(item);
+	}
 
 	public ArrayList<Weapon> getWeapons()
 	{
@@ -713,9 +720,10 @@ public class PlayableCharacter extends GameCharacter
 	{
 		return rangedWeaponInInventory;
 	}
-	// public void addItemToInventory(MiscItem item)
-	// {
-	//
-	// }
+	
+	public ArrayList<UsableItem> getUsableItemsInInventory()
+	{
+		return usableItemsInInventory;
+	}
 
 }

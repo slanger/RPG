@@ -260,9 +260,14 @@ public abstract class GameCharacter
 	public void usingShield(boolean shielding)
 	{
 		if (shieldSlot == null)
-			throw new RuntimeException("There's no shield equipped!");
-		this.shielding = shielding;
-		setStrafing(shielding);
+		{
+			return;
+		}
+		else
+		{
+			this.shielding = shielding;
+			setStrafing(shielding);
+		}		
 	}
 
 	public boolean isShielded()
@@ -997,5 +1002,11 @@ public abstract class GameCharacter
 	public void setWantsToShareKnowledge(boolean wantsToShareKnowledge)
 	{
 		this.wantsToShareKnowledge = wantsToShareKnowledge;
+	}
+	
+	public void heal(int healingAmount)
+	{
+		int tempHealth = health+healingAmount;
+		health = Math.min(MAX_HEALTH, tempHealth);
 	}
 }

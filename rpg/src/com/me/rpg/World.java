@@ -23,11 +23,13 @@ import com.badlogic.gdx.utils.Disposable;
 import com.me.rpg.characters.GameCharacter;
 import com.me.rpg.characters.NonplayableCharacter;
 import com.me.rpg.characters.PlayableCharacter;
+import com.me.rpg.combat.HealthPotion;
 import com.me.rpg.combat.MeleeWeapon;
 import com.me.rpg.combat.Poison;
 import com.me.rpg.combat.Projectile;
 import com.me.rpg.combat.RangedWeapon;
 import com.me.rpg.combat.Shield;
+import com.me.rpg.combat.SpeedPotion;
 import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.inventory.InventoryMenu;
@@ -93,6 +95,10 @@ public final class World
 	public static final String SHIELD_PATH = "shield.png";
 	public static final String SHADOW_SHIELD_PATH = "shadow_shield.png";
 	public static final String GRAY_SHIELD_PATH = "gray_shield.png";
+	
+	//potions
+	public static final String HEALTH_POTION_PATH = "health_potion.png";
+	public static final String SPEED_POTION_PATH = "speed_potion.png";
 
 	public transient OrthographicCamera camera;
 	public transient SpriteBatch batch;
@@ -541,6 +547,15 @@ public final class World
 		player.addItemToInventory(grayShield);
 
 		npc1.equipShield(npc_shield);
+		
+		//potions
+		HealthPotion healthPotion1 = new HealthPotion("Minor Health Potion", HEALTH_POTION_PATH, 32,
+				32, 32, 32, 50);
+		SpeedPotion speedPotion1 = new SpeedPotion("Minor Speed Potion", SPEED_POTION_PATH, 32,
+				32, 32, 32, 3);
+		
+		player.addItemToInventory(healthPotion1);
+		player.addItemToInventory(speedPotion1);
 	}
 
 	public void render()
