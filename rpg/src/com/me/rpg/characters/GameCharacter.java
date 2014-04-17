@@ -27,6 +27,7 @@ import com.me.rpg.combat.StatusEffect;
 import com.me.rpg.combat.Weapon;
 import com.me.rpg.maps.Map;
 import com.me.rpg.reputation.NPCMemory;
+import com.me.rpg.reputation.RememberedEvent;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.GlobalTimerTask;
@@ -954,14 +955,20 @@ public abstract class GameCharacter
 		updateViewOfPlayer();
 	}
 	
-	public void updateDispositionValue(int dispositionValue)
+	public void updateDispositionValue()
 	{
-		this.dispositionValue = this.dispositionValue + dispositionValue;
+		int newDisposition = 0;
+		for(RememberedEvent temp : npcMemory.getRememberedEvents())
+		{
+			newDisposition = newDisposition + temp.getMagnitudeKnownByNPC();
+		}
+		dispositionValue = newDisposition;
 		updateViewOfPlayer();
 	}
 	
 	public void updateViewOfPlayer()
 	{
+		
 		if(dispositionValue > 50) viewOfPlayer = "like";
 		else if(dispositionValue < 0) viewOfPlayer = "hate";
 		else viewOfPlayer = "neutral";

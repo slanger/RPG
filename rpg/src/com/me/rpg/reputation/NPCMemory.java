@@ -82,14 +82,14 @@ public class NPCMemory implements Serializable
 				if(Math.abs(seenMagnitude) > Math.abs(temp.getMagnitudeKnownByNPC()))
 				{
 					temp.setMagnitudeKnownByNPC(seenMagnitude);
-					gameCharacter.updateDispositionValue(seenMagnitude);
+					gameCharacter.updateDispositionValue();
 				}
 				return;
 			}
 		}
 		RememberedEvent temp = new RememberedEvent(seenMagnitude, repEvent, timeTicks);
 		rememberedEvents.add(temp);
-		gameCharacter.updateDispositionValue(seenMagnitude);
+		gameCharacter.updateDispositionValue();
 	}
 	
 	public ArrayList<RememberedEvent> getRememberedEvents()
