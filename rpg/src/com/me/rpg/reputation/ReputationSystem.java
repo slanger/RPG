@@ -39,7 +39,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		
 		eventTemplateList.add(new EventTemplate("positiveConversation", "small", 1));
 		eventTemplateList.add(new EventTemplate("positiveConversation", "medium", 3));
-		eventTemplateList.add(new EventTemplate("positiveConversation", "large", 15));
+		eventTemplateList.add(new EventTemplate("positiveConversation", "large", 60));
 
 		eventTemplateList.add(new EventTemplate("negativeConversation", "small", -1));
 		eventTemplateList.add(new EventTemplate("negativeConversation", "medium", -3));

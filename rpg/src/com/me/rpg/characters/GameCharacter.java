@@ -3,9 +3,11 @@ package com.me.rpg.characters;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -369,6 +371,25 @@ public abstract class GameCharacter
 	
 	public GameCharacter getRememberedAttacker() {
 		return rememberedAttacker;
+	}
+	
+	public void setRandomAttacker()
+	{
+		Random random = new Random();
+		ArrayList<GameCharacter> potentialAttackers = new ArrayList<GameCharacter>(getCurrentMap().getCharactersOnMap());
+		potentialAttackers.remove(this);
+		if(potentialAttackers.size()>0)
+		{
+			int randomPick = random.nextInt(potentialAttackers.size());
+			this.rememberedAttacker = potentialAttackers.get(randomPick);
+			return;
+		}
+		this.rememberedAttacker=this;
+	}
+	
+	public void setAttackerPlayer()
+	{
+		this.rememberedAttacker = world.getPlayer();
 	}
 	
 	public void rememberLastAttacker() {

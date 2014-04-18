@@ -46,6 +46,7 @@ import com.me.rpg.reputation.ReputationSystem;
 import com.me.rpg.state.HierarchicalState;
 import com.me.rpg.state.MeleeFightState;
 import com.me.rpg.state.PatrolState;
+import com.me.rpg.state.RagnarokState;
 import com.me.rpg.state.RandomWalkState;
 import com.me.rpg.state.RangedFightState;
 import com.me.rpg.state.RunAwayState;
@@ -57,11 +58,11 @@ import com.me.rpg.state.action.RememberNearestPersonAction;
 import com.me.rpg.state.transition.AndCondition;
 import com.me.rpg.state.transition.AttackerInRangeCondition;
 import com.me.rpg.state.transition.Condition;
+import com.me.rpg.state.transition.DispositionCondition;
 import com.me.rpg.state.transition.DistanceCondition;
 import com.me.rpg.state.transition.HearPeopleCondition;
 import com.me.rpg.state.transition.NotCondition;
 import com.me.rpg.state.transition.OrCondition;
-import com.me.rpg.state.transition.PlayerViewCondition;
 import com.me.rpg.state.transition.SeePeopleCondition;
 import com.me.rpg.state.transition.ShareEventCondition;
 import com.me.rpg.state.transition.TargetDeadCondition;
@@ -638,6 +639,7 @@ public final class World
 
 				Weapon rep_test_sword = new MeleeWeapon("NPC Sword", SWORD_PATH,
 						32, 32, 32, 32);
+				rep_test_sword.setPower(10);
 				rep_test_npc.equipWeapon(rep_test_sword);
 				
 				
@@ -654,31 +656,36 @@ public final class World
 						rep_test_walkingBoundary);
 				
 				//WalkToRandomCharacterState rep_test_walkToRandomCharacterState = new WalkToRandomCharacterState(rep_test_parent, rep_test_npc, rep_test_npc.getCurrentMap());
-				MeleeFightState rep_test_FightState = new MeleeFightState(rep_test_parent, rep_test_npc);
+				RagnarokState rep_test_ragnarokState = new RagnarokState(rep_test_parent, rep_test_npc);
 	
 				Condition rep_test_npc_canSee = new SeePeopleCondition(rep_test_npc, 0,Comparison.NOTEQUALS);
 				Condition rep_test_npc_canHear = new HearPeopleCondition(rep_test_npc, 0,Comparison.NOTEQUALS);
 				
 				Condition rep_npc1_canSeeOrHear = new OrCondition(rep_test_npc_canSee, rep_test_npc_canHear);
 		
-				Condition rep_test_timer = rep_test_randomWalkState.getFloatCondition("timeInState", 10f, Comparison.GREATER);
+				Condition rep_test_timer = rep_test_standStill.getFloatCondition("timeInState", 10f, Comparison.GREATER);
 				
 				Condition rep_test_npc_shareEventCondition = new ShareEventCondition(rep_test_npc, true, Comparison.EQUALS);
 				Condition rep_test_npc_notShareEventCondition = new NotCondition(rep_test_npc_shareEventCondition);
 				
 				Condition rep_test_AttackerInRangeCondition = new AttackerInRangeCondition(rep_test_npc);
 				
-				Condition rep_test_positiveViewCondition = new PlayerViewCondition(rep_test_npc, "like", Comparison.EQUALS);
-				Condition rep_test_negativePlayerView = new PlayerViewCondition(rep_test_npc, "hate", Comparison.EQUALS);
+				Condition rep_test_positivePlayerView = new DispositionCondition(rep_test_npc, 50, Comparison.GREATEREQ);
+				Condition rep_test_negativePlayerView = new DispositionCondition(rep_test_npc, 0, Comparison.LESS);
 				
-				Condition rep_test_AND = new AndCondition(rep_test_npc_shareEventCondition, rep_test_positiveViewCondition);
+				Condition rep_test_AND = new AndCondition(rep_test_npc_shareEventCondition, rep_test_positivePlayerView);
 				
-				Transition rep_test_npc_standStillToRandomWalk = new Transition(rep_test_randomWalkState, rep_test_npc_shareEventCondition);
-				//Transition rep_test_npc_standStillToAttack = new Transition(rep_test_FightState, rep_test_negativePlayerView);
+				Transition rep_test_npc_standStillToRandomWalk = new Transition(rep_test_randomWalkState, rep_test_positivePlayerView);
+				Transition rep_test_npc_standStillToAttack = new Transition(rep_test_ragnarokState, rep_test_negativePlayerView);
 				
-				rep_test_standStill.setTransitions(rep_test_npc_standStillToRandomWalk);
-				//rep_test_standStill.setTransitions(rep_test_npc_standStillToAttack);
+				rep_test_standStill.setTransitions(rep_test_npc_standStillToRandomWalk, rep_test_npc_standStillToAttack);
 
+				Transition rep_test_npc_AttackToFriendly = new Transition(rep_test_randomWalkState, rep_test_positivePlayerView);
+				Transition rep_test_npc_FriendlyToAttack = new Transition(rep_test_ragnarokState, rep_test_negativePlayerView);
+				
+				rep_test_ragnarokState.setTransitions(rep_test_npc_AttackToFriendly);
+				rep_test_randomWalkState.setTransitions(rep_test_npc_FriendlyToAttack);
+				
 				rep_test_parent.setInitialState(rep_test_standStill);
 				rep_test_npc.setStateMachine(rep_test_parent);
 			}
@@ -1019,6 +1026,11 @@ public final class World
 			allGameCharacters.addAll(map.getCharactersOnMap());
 		}
 		return allGameCharacters;
+	}
+	
+	public GameCharacter getPlayer()
+	{
+		return player;
 	}
 
 }
