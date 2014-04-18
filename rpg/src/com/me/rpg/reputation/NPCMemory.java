@@ -32,7 +32,7 @@ public class NPCMemory implements Serializable
 	
 	public void update(int timeTicks)
 	{
-		if((gameCharacter.getWantsToShareKnowledge()==true) &&((timeTicks - timeStartedEventSharing) > 1800))//~ 30 seconds
+		if((gameCharacter.getWantsToShareKnowledge()==true) &&((timeTicks - timeStartedEventSharing) > 300))//~ 5 seconds
 		{
 			System.out.println("interval expired");
 			timeStartedEventSharing = 0;
@@ -51,7 +51,7 @@ public class NPCMemory implements Serializable
 		for(RememberedEvent temp : rememberedEvents)
 		{
 			int newPriority = temp.update(timeTicks);
-			if(newPriority > 200 && newPriority > currentHighestPriority)
+			if(newPriority > 250 && newPriority > currentHighestPriority)
 			{
 				currentHighestPriority = newPriority;
 				currentHighestPriorityEvent = temp;

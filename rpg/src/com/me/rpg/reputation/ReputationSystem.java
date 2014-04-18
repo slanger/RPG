@@ -3,6 +3,7 @@ package com.me.rpg.reputation;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import com.me.rpg.World;
 import com.me.rpg.characters.GameCharacter;
@@ -38,7 +39,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		
 		eventTemplateList.add(new EventTemplate("positiveConversation", "small", 1));
 		eventTemplateList.add(new EventTemplate("positiveConversation", "medium", 3));
-		eventTemplateList.add(new EventTemplate("positiveConversation", "large", 5));
+		eventTemplateList.add(new EventTemplate("positiveConversation", "large", 15));
 
 		eventTemplateList.add(new EventTemplate("negativeConversation", "small", -1));
 		eventTemplateList.add(new EventTemplate("negativeConversation", "medium", -3));
@@ -71,7 +72,12 @@ public class ReputationSystem implements Serializable, ReputationInterface
 					ArrayList<GameCharacter> receivingCharacters = temp.getCurrentMap().canHearCharacters(temp);
 					if(receivingCharacters != null)
 					{
-						shareKnowledge(temp, receivingCharacters);
+						Random randomChance = new Random();
+						int random = randomChance.nextInt(60);
+						if(random == 24)
+						{
+							shareKnowledge(temp, receivingCharacters);
+						}
 					}
 				}
 			}
@@ -124,7 +130,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 					{
 						int adjustedMag = adjustMagnitudeByRelations(seenMagnitude, tempChar, repEvent.getCharacterAffected());
 						tempChar.getNPCMemory().addMemory(adjustedMag, repEvent, timeTicks);
-						world.pushMessage("Event seen by: "+tempChar.getName());
+						//world.pushMessage("Event seen by: "+tempChar.getName());
 					}
 				}
 				break;
@@ -162,12 +168,12 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		{
 			if(temp.getEventType().equalsIgnoreCase(repEvent.getEventType()) && temp.getCharacterAffected() == repEvent.getCharacterAffected())
 			{
-				world.pushErrorMessage("Similar event already in master event list...checking if recent");
+				//world.pushErrorMessage("Similar event already in master event list...checking if recent");
 				//separate events by times.  E.G. if same event type happens to same character,
 				//but event occurs 30 seconds after first, then create a new event
 				if((timeTicks - temp.getTimeEventOccurred()) < 1800)
 				{
-					world.pushErrorMessage("Similar event occurred recently, updating existing event");
+					//world.pushErrorMessage("Similar event occurred recently, updating existing event");
 					if(repEvent.getMagnitude() > temp.getMagnitude())
 					{
 						temp.setHighestKnownMagnitude(Math.abs(repEvent.getMagnitude()));
@@ -177,7 +183,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 				else
 				{
 					MasterEventList.add(repEvent);
-					world.pushErrorMessage("Similar event happened long ago...adding as new event");
+					//world.pushErrorMessage("Similar event happened long ago...adding as new event");
 					return repEvent; //return the new event 
 				}
 			}
@@ -185,7 +191,7 @@ public class ReputationSystem implements Serializable, ReputationInterface
 		
 		//if event not found
 		MasterEventList.add(repEvent);
-		world.pushErrorMessage("No event found in master event list, adding new one...");
+		//world.pushErrorMessage("No event found in master event list, adding new one...");
 		return repEvent;
 	}
 

@@ -37,7 +37,8 @@ public class ReputationDebugMenu implements Serializable
 	//non transients
 	private boolean inMenu = false;
 	private int rowSelectionIndex;
-	private final int NUM_ROWS = 20;
+	private final int NUM_ROWS = 27;
+	private int showIndex = 0;
 
 	public ReputationDebugMenu(World world)
 	{
@@ -74,6 +75,7 @@ public class ReputationDebugMenu implements Serializable
 	{
 		inMenu = true;
 		rowSelectionIndex = 0;
+		showIndex = 0;
 	}
 	
 	public void closeMenu()
@@ -90,6 +92,10 @@ public class ReputationDebugMenu implements Serializable
 				rowSelectionIndex--;
 			}
 			
+			if(rowSelectionIndex >= 27)
+			{
+				showIndex--;
+			}
 		}
 		if(key.equals("DOWN"))
 		{
@@ -97,15 +103,22 @@ public class ReputationDebugMenu implements Serializable
 			{
 				rowSelectionIndex++;
 			}
+			if(rowSelectionIndex >27)
+			{
+				showIndex ++;
+			}
 		}
+		System.out.println("rowIndex "+rowSelectionIndex );
+		System.out.println("showIndex "+showIndex );
 		return false;
+		
 	}
 	
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera)
 	{
 		ArrayList<GameCharacter> charactersInWorld = new ArrayList<GameCharacter>(world.getCharactersInWorld());
-		for(int i=0; i<charactersInWorld.size(); i++)
+		for(int i = 0; i<charactersInWorld.size(); i++)
 		{
 			if (charactersInWorld.get(i).getGroup().equalsIgnoreCase("player_group"))
 			{
@@ -140,7 +153,7 @@ public class ReputationDebugMenu implements Serializable
 		leftPane.add(temp1).padRight(10.0f);
 		leftPane.add(temp2).padRight(10.0f);
 		leftPane.add(temp3).padRight(10.0f);
-		for(int i=0; i<NUM_ROWS; i++)
+		for(int i=showIndex; i<NUM_ROWS+showIndex; i++)
 		{
 			
 			if(i < charactersInWorld.size())
@@ -153,7 +166,7 @@ public class ReputationDebugMenu implements Serializable
 				Label dispositionValueLabel = null;
 				Label viewOfPlayerLabel = null;
 				
-				if(i == rowSelectionIndex)
+				if(i == rowSelectionIndex+showIndex)
 				{
 					nameLabel = new Label(name, selectedStyle);
 					dispositionValueLabel = new Label(dispositionValue, selectedStyle);

@@ -6,7 +6,8 @@ public enum MapType
 	EXAMPLE					("example", 0),
 	PROTOTYPE				("prototype_map", 1),
 	WEST_TOWN				("west_town", 2),
-	WEST_TOWN_INSIDE_HOUSE	("west_town_inside_house", 3);
+	WEST_TOWN_INSIDE_HOUSE	("west_town_inside_house", 3), 
+	RAGNAROK				("ragnarok", 4);
 
 	private String mapName;
 	private int index;

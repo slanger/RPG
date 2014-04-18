@@ -1,7 +1,42 @@
 NPC TheKiller dislike
 	responses 0 trigger repEvent_negativeConversation_medium_TheKiller dialogue "You killed my father... prepare to die!"
 		
+NPC repTest24 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest24 dialogue "Hi there, how are you?"
 
+NPC repTest23 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest23 dialogue "Hi there, how are you?"
+	
+NPC repTest22 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest22 dialogue "Hi there, how are you?"
+	
+NPC repTest21 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest21 dialogue "Hi there, how are you?"
+	
+NPC repTest20 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest20 dialogue "Hi there, how are you?"
+	
+NPC repTest19 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest19 dialogue "Hi there, how are you?"	
+	
+NPC repTest24 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest24 dialogue "Good to see you again!"
+
+NPC repTest23 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest23 dialogue "Good to see you again!"
+	
+NPC repTest22 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest22 dialogue "Good to see you again!"
+	
+NPC repTest21 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest21 dialogue "Good to see you again!"
+	
+NPC repTest20 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest20 dialogue "Good to see you again!"
+	
+NPC repTest19 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest19 dialogue "Good to see you again!"
+		
 NPC Coward like
 	responses 5 trigger repEvent_positiveConversation_medium_Coward dialogue "What would you like to buy"	
 		responses 1 trigger test dialogue "Sword  	50 	gold"

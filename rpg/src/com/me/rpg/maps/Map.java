@@ -174,6 +174,7 @@ public abstract class Map
 		MapObjects warpObjects = warpLayer.getObjects();
 		for (int i = 0; i < warpObjects.getCount(); i++)
 		{
+			System.out.println("loading warps for map: "+ mapTmxPath);
 			RectangleMapObject warpObject = (RectangleMapObject) warpObjects.get(i);
 			if (warpObject.getName() == null)
 			{
