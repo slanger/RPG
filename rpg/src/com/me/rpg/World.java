@@ -49,6 +49,7 @@ import com.me.rpg.state.RandomWalkState;
 import com.me.rpg.state.RangedFightState;
 import com.me.rpg.state.RunAwayState;
 import com.me.rpg.state.WalkToLocationState;
+import com.me.rpg.state.WalkToRandomCharacterState;
 import com.me.rpg.state.action.Action;
 import com.me.rpg.state.action.RememberNearestPersonAction;
 import com.me.rpg.state.transition.AndCondition;
@@ -58,6 +59,7 @@ import com.me.rpg.state.transition.HearPeopleCondition;
 import com.me.rpg.state.transition.NotCondition;
 import com.me.rpg.state.transition.OrCondition;
 import com.me.rpg.state.transition.SeePeopleCondition;
+import com.me.rpg.state.transition.ShareEventCondition;
 import com.me.rpg.state.transition.TargetDeadCondition;
 import com.me.rpg.state.transition.Transition;
 import com.me.rpg.utils.Comparison;
@@ -336,9 +338,9 @@ public final class World
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		NonplayableCharacter rep_npc3 = new NonplayableCharacter("rep_victim3", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-		westTown.addCharacterToMap(rep_npc1, new Location(westTown, 300, 480));
-		westTown.addCharacterToMap(rep_npc2, new Location(westTown, 320, 480));
-		westTown.addCharacterToMap(rep_npc3, new Location(westTown, 330, 480));
+		westTown.addCharacterToMap(rep_npc1, new Location(westTown, 150, 490));
+		westTown.addCharacterToMap(rep_npc2, new Location(westTown, 450, 490));
+		westTown.addCharacterToMap(rep_npc3, new Location(westTown, 700, 490));
 		//
 		// add characters to map
 		exampleMap.addFocusedCharacterToMap(player, new Location(exampleMap,
@@ -472,6 +474,57 @@ public final class World
 		npc4.setBaseSpeed(150f);
 		npc4.setStateMachine(parent4);
 
+		//state machine for rep_npc1 
+		HierarchicalState rep_npc1_parent = new HierarchicalState(null, rep_npc1);
+		
+		
+		
+		Coordinate rep_npc_center = new Coordinate(150, 490);
+		WalkToLocationState rep_npc1_notAtCen = new WalkToLocationState(rep_npc1_parent, rep_npc1,
+				new Location(westTown, rep_npc_center));
+		rep_npc1_notAtCen.setName("rep_npc1_notAtCen");
+		
+		
+		
+		Rectangle rep_npc1_walkingBoundary = new Rectangle(32, 32, 576, 224);
+		RandomWalkState rep_npc1_randomWalkState = new RandomWalkState(rep_npc1_parent, rep_npc1,
+				rep_npc1_walkingBoundary);
+		rep_npc1_randomWalkState.setName("rep_npc1_randomWalk");
+		
+		
+		WalkToRandomCharacterState shareEvent = new WalkToRandomCharacterState(rep_npc1_parent, 
+				rep_npc1, rep_npc1.getCurrentMap());
+
+		Condition rep_npc1_canSee = new SeePeopleCondition(rep_npc1, 0,
+				Comparison.NOTEQUALS);
+		Condition rep_npc1_canHear = new HearPeopleCondition(rep_npc1, 0,
+				Comparison.NOTEQUALS);
+		Condition rep_npc1_canSeeOrHear = new OrCondition(rep_npc1_canSee, rep_npc1_canHear);
+
+		Condition rep_npc1_timer = shareEvent.getFloatCondition("timeInState", 10f,
+				Comparison.GREATER);
+		
+		Condition rep_npc1_shareEventCondition = new ShareEventCondition(rep_npc1, true, Comparison.EQUALS);
+		Condition rep_npc1_notShareEventCondition = new NotCondition(rep_npc1_shareEventCondition);
+		
+		
+		Transition rep_npc1_randWalkToShareEvent = new Transition(shareEvent, rep_npc1_shareEventCondition);
+		Transition rep_npc1_shareToRandomWalk	= new Transition(rep_npc1_randomWalkState, rep_npc1_timer);
+		
+		rep_npc1_randomWalkState.setTransitions(rep_npc1_randWalkToShareEvent);
+		shareEvent.setTransitions(rep_npc1_shareToRandomWalk);
+		
+
+		rep_npc1_parent.setInitialState(rep_npc1_randomWalkState);
+		rep_npc1.setStateMachine(rep_npc1_parent);
+		
+		//state machine for rep_npc2
+		
+		//state machine for rep_npc3
+		
+		
+		//end state machines
+		
 		// WEAPONS SETUP
 
 		final int weaponWidth = 32;
