@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.me.rpg.characters.GameCharacter;
+import com.me.rpg.maps.Map;
 import com.me.rpg.utils.Coordinate;
 import com.me.rpg.utils.Direction;
 import com.me.rpg.utils.Waypoint;
@@ -35,8 +36,8 @@ public class PlayerControlledWalkAI
 		float spriteHeight = character.getSpriteHeight();
 		float oldX = character.getBottomLeftX();
 		float oldY = character.getBottomLeftY();
-		float x = oldX;
-		float y = oldY;
+		float newX = oldX;
+		float newY = oldY;
 		float speed = character.getSpeed();
 		int dx = 0;
 		int dy = 0;
@@ -80,16 +81,16 @@ public class PlayerControlledWalkAI
 		if (diff == 2)
 		{
 			// moving diagonally, slow down movement in x and y
-			x += (dx * speed * deltaTime) / Math.sqrt(2);
-			y += (dy * speed * deltaTime) / Math.sqrt(2);
+			newX += (dx * speed * deltaTime) / Math.sqrt(2);
+			newY += (dy * speed * deltaTime) / Math.sqrt(2);
 			ret = Direction.getDirectionByDiff(0, dy);
 			moving = true;
 		}
 		else if (diff == 1)
 		{
 			// moving in 1 direction
-			x += dx * speed * deltaTime;
-			y += dy * speed * deltaTime;
+			newX += dx * speed * deltaTime;
+			newY += dy * speed * deltaTime;
 			ret = Direction.getDirectionByDiff(dx, dy);
 			moving = true;
 		}
@@ -99,22 +100,47 @@ public class PlayerControlledWalkAI
 		if (moving)
 		{
 			// collision detection with objects on map
-			boolean didMove = character.getCurrentMap().checkCollision(x, y,
-					oldX, oldY, character, newCoordinate);
+			Map currentMap = character.getCurrentMap();
+			boolean didMove = currentMap.checkCollision(newX, newY, oldX, oldY,
+					character, newCoordinate);
+			if (!didMove)
+			{
+				// check if we are stuck inside another character/object
+				Rectangle oldBoundingRectangle = character
+						.getBoundingRectangle();
+				// check characters
+				GameCharacter collidedChar = currentMap
+						.checkCollisionWithCharacters(oldBoundingRectangle,
+								character);
+				boolean areStuck = (collidedChar != null);
+				if (!areStuck)
+				{
+					// check objects
+					areStuck = currentMap.checkCollisionWithObjects(character
+							.getBoundingRectangle());
+				}
+
+				if (areStuck)
+				{
+					// we are stuck, so ignore collision detection
+					didMove = true;
+					newCoordinate.setX(newX);
+					newCoordinate.setY(newY);
+				}
+			}
+
 			moving = didMove;
-			x = newCoordinate.getX();
-			y = newCoordinate.getY();
 
 			// check warp point collision
 			if (didMove)
 			{
-				Waypoint warpWaypoint = character.getCurrentMap()
-						.checkCollisionWithWarpPoints(
-								new Rectangle(x, y, spriteWidth,
-										spriteHeight));
+				Rectangle newBoundingRectangle = new Rectangle(
+						newCoordinate.getX(), newCoordinate.getY(),
+						spriteWidth, spriteHeight);
+				Waypoint warpWaypoint = currentMap
+						.checkCollisionWithWarpPoints(newBoundingRectangle);
 				if (warpWaypoint != null)
 				{
-					// character.warpToOtherMap(warpWaypoint.location);
 					character.moveToOtherMap(warpWaypoint.location);
 				}
 			}
