@@ -29,13 +29,6 @@ public class FollowPathAI
 
 	public FollowPathAI(GameCharacter character, Location targetLocation)
 	{
-		if (character == null)
-			throw new NullPointerException(
-					"Can't have a null character for the AI");
-		if (targetLocation == null)
-			throw new NullPointerException(
-					"Can't have a null location for the AI");
-
 		this.character = character;
 		this.targetLocation = targetLocation;
 
@@ -174,9 +167,9 @@ public class FollowPathAI
 	{
 		// if destination is off the map, then return null
 		if (destination.isOutOfBounds())
+		{
 			return null;
-
-		List<Waypoint> shortestPath;
+		}
 
 		Coordinate sourceCenter = source.getCenter();
 		Coordinate destinationCenter = destination.getCenter();
@@ -185,7 +178,7 @@ public class FollowPathAI
 		// the destination
 		if (source.connectedTo(destination))
 		{
-			shortestPath = new ArrayList<Waypoint>();
+			List<Waypoint> shortestPath = new ArrayList<Waypoint>();
 			shortestPath.add(new Waypoint(destination));
 			totalPathDistance = sourceCenter.distanceTo(destinationCenter);
 			return shortestPath;
@@ -211,7 +204,9 @@ public class FollowPathAI
 		}
 
 		if (sourceWaypoint.connections.size() == 0)
+		{
 			return null;
+		}
 
 		worldWaypoints.add(sourceWaypoint);
 
@@ -228,14 +223,14 @@ public class FollowPathAI
 		}
 
 		if (destinationWaypoint.connections.size() == 0)
+		{
 			return null;
+		}
 
 		worldWaypoints.add(destinationWaypoint);
 
 		// use Djikstra's algorithm to create shortest path
-		shortestPath = dijkstra(worldWaypoints, sourceWaypoint, destinationWaypoint);
-
-		return shortestPath;
+		return dijkstra(worldWaypoints, sourceWaypoint, destinationWaypoint);
 	}
 
 	/**
@@ -249,7 +244,7 @@ public class FollowPathAI
 		for (Waypoint w : graph)
 		{
 			w.distanceFromSource = INFINITY;
-			w.previousVertex = null;
+			w.previousEdge = null;
 		}
 		source.distanceFromSource = 0;
 
@@ -259,10 +254,14 @@ public class FollowPathAI
 		PriorityQueue<Waypoint> unvisited = new PriorityQueue<Waypoint>(graph);
 
 		Waypoint currentVertex = unvisited.poll(); // initially equals source
-													// vertex
-		while (unvisited.contains(destination)
-				&& currentVertex.distanceFromSource != INFINITY)
+		while (unvisited.contains(destination))
 		{
+			if (currentVertex.distanceFromSource == INFINITY)
+			{
+				// destination is unreachable
+				return null;
+			}
+
 			for (Waypoint.Edge e : currentVertex.connections)
 			{// for each connection to current vertex...
 				Waypoint toVertex = e.connectedWaypoint;
@@ -274,11 +273,12 @@ public class FollowPathAI
 					{// update priority queue
 						unvisited.remove(toVertex);
 						toVertex.distanceFromSource = newDist;
-						toVertex.previousVertex = currentVertex;
+						toVertex.previousEdge = new Waypoint.Edge(currentVertex, cost);
 						unvisited.add(toVertex);
 					}
 				}
 			}
+
 			currentVertex = unvisited.poll(); // vertex with shortest distance
 												// from source
 		}
@@ -289,17 +289,9 @@ public class FollowPathAI
 		totalPathDistance = 0;
 		while (!current.equals(source))
 		{
-			// add to totalPathDistance
-			for (Waypoint.Edge e : current.connections)
-			{
-				if (e.connectedWaypoint.equals(current.previousVertex))
-				{
-					totalPathDistance += e.cost;
-				}
-			}
-
 			path.add(current);
-			current = current.previousVertex;
+			totalPathDistance += current.previousEdge.cost;
+			current = current.previousEdge.connectedWaypoint;
 		}
 
 		Collections.reverse(path);

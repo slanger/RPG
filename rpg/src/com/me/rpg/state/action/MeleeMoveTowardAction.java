@@ -11,8 +11,13 @@ public class MeleeMoveTowardAction implements Action {
 
 	private static final long serialVersionUID = -1027746630531574165L;
 
+	// update walk AI every UPDATE_INTERVAL seconds
+	private static final float UPDATE_INTERVAL = 1.0f; // in seconds
+
 	private GameCharacter character;
 	private WalkAI walkAI;
+	// start at UPDATE_INTERVAL so that we can initialize walkAI
+	private float timePassedSinceLastUpdate = UPDATE_INTERVAL; // in seconds
 	
 	// Assumes that this character has a rememberedTarget, and that the char
 	// is equipped with a melee weapon.
@@ -21,26 +26,54 @@ public class MeleeMoveTowardAction implements Action {
 	}
 	
 	@Override
-	public void doAction(float delta) {
+	public void doAction(float delta)
+	{
+		timePassedSinceLastUpdate += delta;
+		if (timePassedSinceLastUpdate < UPDATE_INTERVAL)
+		{
+			walkAI.update(delta);
+			return;
+		}
+
+		timePassedSinceLastUpdate -= UPDATE_INTERVAL;
+
+		Coordinate targetCoordinate;
 		GameCharacter target = character.getRememberedAttacker();
-		Coordinate tarCen = target.getCenter();
-		Coordinate[] shiftedTarget = new Coordinate[4];
-		float width = target.getSpriteWidth() + character.getSpriteWidth();
-		float height = target.getSpriteHeight() + character.getSpriteHeight();
-		for (int i = 0; i < 4; ++i) {
-			Direction d = Direction.getDirectionByIndex(i);
-			shiftedTarget[i] = tarCen.translate(d.getDx() * width / 2.0f, d.getDy() * height / 2.0f);
-		}
-		// for now, just go to the nearest one, by direct path
-		Coordinate myCen = character.getCenter();
-		int best = 0;
-		for (int i = 1; i < 4; ++i) {
-			if (shiftedTarget[best].distanceSquared(myCen) > shiftedTarget[i].distanceSquared(myCen)) {
-				best = i;
+
+		if (character.getCurrentMap().equals(target.getCurrentMap()))
+		{
+			Coordinate tarCen = target.getCenter();
+			Coordinate[] shiftedTarget = new Coordinate[4];
+			float width = target.getSpriteWidth() + character.getSpriteWidth();
+			float height = target.getSpriteHeight()
+					+ character.getSpriteHeight();
+			for (int i = 0; i < 4; ++i)
+			{
+				Direction d = Direction.getDirectionByIndex(i);
+				shiftedTarget[i] = tarCen.translate(d.getDx() * width / 2.0f,
+						d.getDy() * height / 2.0f);
 			}
+			// TODO for now, just go to the nearest one, by direct path
+			Coordinate myCen = character.getCenter();
+			int best = 0;
+			for (int i = 1; i < 4; ++i)
+			{
+				if (shiftedTarget[best].distanceSquared(myCen) > shiftedTarget[i]
+						.distanceSquared(myCen))
+				{
+					best = i;
+				}
+			}
+
+			targetCoordinate = shiftedTarget[best];
 		}
-		
-		Location targetLocation = new Location(target.getCurrentMap(), shiftedTarget[best].getSmallCenteredRectangle());
+		else
+		{
+			targetCoordinate = target.getCenter();
+		}
+
+		Location targetLocation = new Location(target.getCurrentMap(),
+				targetCoordinate.getSmallCenteredRectangle());
 		walkAI = new FollowPathAI(character, targetLocation);
 		walkAI.update(delta);
 	}
