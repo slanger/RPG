@@ -149,6 +149,10 @@ public abstract class GameCharacter
 		// start sprite facing downward
 		sprite = new Sprite(downIdle, 0, 0, width, height);
 		sprite.setRegion(downIdle);
+		if (currentLocation != null) {
+			Coordinate loc = currentLocation.getBottomLeftCorner();
+			sprite.setPosition(loc.getX(), loc.getY());
+		}
 	}
 
 	private void readObject(ObjectInputStream inputStream)
@@ -553,7 +557,7 @@ public abstract class GameCharacter
 	{
 		currentLocation = new Location(newLocation.getMap(), newLocation.getCenter(), width, height);
 		// update sprite position
-		setPosition(newLocation.getBottomLeftCorner());
+		setPosition(currentLocation.getBottomLeftCorner());
 	}
 
 	public void removedFromMap()

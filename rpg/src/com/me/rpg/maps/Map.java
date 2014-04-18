@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -863,10 +865,24 @@ public abstract class Map
 	}
 
 	public ArrayList<GameCharacter> canSeeOrHearCharacters(
-			GameCharacter mainChar)
+			final GameCharacter mainChar)
 	{
 		ArrayList<GameCharacter> chars = canSeeCharacters(mainChar);
 		chars.addAll(canHearCharacters(mainChar));
+		Collections.sort(chars, new Comparator<GameCharacter>() {
+
+			@Override
+			public int compare(GameCharacter o1, GameCharacter o2) {
+				float d1 = o1.getCenter().distanceSquared(mainChar.getCenter());
+				float d2 = o2.getCenter().distanceSquared(mainChar.getCenter());
+				if (d1 < d2)
+					return -1;
+				else if (d2 > d1)
+					return 1;
+				return 0;
+			}
+			
+		});
 		return chars;
 	}
 
