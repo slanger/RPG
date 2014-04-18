@@ -103,31 +103,6 @@ public class PlayerControlledWalkAI
 			Map currentMap = character.getCurrentMap();
 			boolean didMove = currentMap.checkCollision(newX, newY, oldX, oldY,
 					character, newCoordinate);
-			if (!didMove)
-			{
-				// check if we are stuck inside another character/object
-				Rectangle oldBoundingRectangle = character
-						.getBoundingRectangle();
-				// check characters
-				GameCharacter collidedChar = currentMap
-						.checkCollisionWithCharacters(oldBoundingRectangle,
-								character);
-				boolean areStuck = (collidedChar != null);
-				if (!areStuck)
-				{
-					// check objects
-					areStuck = currentMap.checkCollisionWithObjects(character
-							.getBoundingRectangle());
-				}
-
-				if (areStuck)
-				{
-					// we are stuck, so ignore collision detection
-					didMove = true;
-					newCoordinate.setX(newX);
-					newCoordinate.setY(newY);
-				}
-			}
 
 			moving = didMove;
 
