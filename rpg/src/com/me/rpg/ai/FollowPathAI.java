@@ -83,6 +83,8 @@ public class FollowPathAI
 		Coordinate currentCenter = currentLocation.getCenter();
 		Coordinate nextCenter = nextWaypoint.getCenter();
 
+		
+		
 		float xE = (float) (nextCenter.getX() - currentCenter.getX());
 		float yE = (float) (nextCenter.getY() - currentCenter.getY());
 		float hE = (float) Math.sqrt(xE * xE + yE * yE);
@@ -107,9 +109,35 @@ public class FollowPathAI
 			Coordinate newCoordinate = new Coordinate();
 			boolean didMove = character.getCurrentMap().checkCollision(x, y,
 					oldX, oldY, character, newCoordinate);
+			
+
+			
 			x = newCoordinate.getX();
 			y = newCoordinate.getY();
 
+			
+			if (!didMove)
+			{
+				// check if we are stuck inside another character/object
+				Rectangle oldBoundingRectangle = character
+						.getBoundingRectangle();
+				// check characters
+				GameCharacter collidedChar = currentMap
+						.checkCollisionWithCharacters(oldBoundingRectangle,
+								character);
+				boolean areStuck = (collidedChar != null);
+
+				if (areStuck)
+				{
+					System.err.println("WE ARE STUCK!!!");
+					// we are stuck, so ignore collision detection
+					newCoordinate.setX(newCoordinate.getX()*1.1f);
+					newCoordinate.setY(newCoordinate.getY()*1.1f);
+					didMove = true;
+				}
+			}
+
+			
 			Direction newDirection;
 			if (Math.abs(yE) >= Math.abs(xE))
 			{

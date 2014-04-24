@@ -104,6 +104,9 @@ public class PlayerControlledWalkAI
 			boolean didMove = currentMap.checkCollision(newX, newY, oldX, oldY,
 					character, newCoordinate);
 
+			
+			
+			
 			moving = didMove;
 
 			// check warp point collision
