@@ -32,10 +32,11 @@ public class PlayerControlledWalkAI
 	@Override
 	public void update(float deltaTime)
 	{
-		float spriteWidth = character.getSpriteWidth();
-		float spriteHeight = character.getSpriteHeight();
-		float oldX = character.getBottomLeftX();
-		float oldY = character.getBottomLeftY();
+		Rectangle oldBoundingRectangle = character.getBoundingRectangle();
+		float spriteWidth = oldBoundingRectangle.width;
+		float spriteHeight = oldBoundingRectangle.height;
+		float oldX = oldBoundingRectangle.x;
+		float oldY = oldBoundingRectangle.y;
 		float newX = oldX;
 		float newY = oldY;
 		float speed = character.getSpeed();
@@ -103,6 +104,30 @@ public class PlayerControlledWalkAI
 			Map currentMap = character.getCurrentMap();
 			boolean didMove = currentMap.checkCollision(newX, newY, oldX, oldY,
 					character, newCoordinate);
+
+			if (!didMove)
+			{
+				// check if we are stuck inside another character/object
+				// check characters
+				GameCharacter collidedChar = currentMap
+						.checkCollisionWithCharacters(oldBoundingRectangle,
+								character);
+				boolean areStuck = (collidedChar != null);
+				if (!areStuck)
+				{
+					// check objects
+					areStuck = !currentMap
+							.checkCollisionWithObjects(oldBoundingRectangle);
+				}
+
+				if (areStuck)
+				{
+					// we are stuck, so ignore collision detection
+					didMove = true;
+					newCoordinate.setX(newX);
+					newCoordinate.setY(newY);
+				}
+			}
 
 			moving = didMove;
 
