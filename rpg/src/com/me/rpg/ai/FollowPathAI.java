@@ -127,6 +127,7 @@ public class FollowPathAI
 								character);
 				boolean areStuck = (collidedChar != null);
 
+				
 				if (areStuck)
 				{
 					System.err.println("WE ARE STUCK!!!");

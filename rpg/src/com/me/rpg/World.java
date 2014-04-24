@@ -608,7 +608,8 @@ public final class World
 		player.addItemToInventory(shield);
 		player.addItemToInventory(shadowShield);
 		player.addItemToInventory(grayShield);
-
+		player.equipShield(shield);
+		
 		npc1.equipShield(npc_shield);
 		
 		//potions
