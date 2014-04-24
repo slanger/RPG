@@ -632,6 +632,9 @@ public final class World
 		final int initialNPCLocationX = 80;
 		final int initialNPCLocationY = 80;
 		int counter = 0;
+
+		float speed = 100f;
+
 		for(int i=0; i<5; i++)
 		{
 			for(int j=0; j<5; j++)
@@ -639,6 +642,8 @@ public final class World
 				NonplayableCharacter rep_test_npc = new NonplayableCharacter("repTest"+counter, "villager_group",
 						NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 				rep_test_npc.setSightDistance(0.0f);
+				rep_test_npc.setBaseSpeed(speed);
+				speed *= 1.01f;
 				ragnarokMap.addCharacterToMap(rep_test_npc, new Location(ragnarokMap, initialNPCLocationX + 120*i, initialNPCLocationY + 120*j));
 
 				Weapon rep_test_sword = new MeleeWeapon("NPC Sword", SWORD_PATH,
