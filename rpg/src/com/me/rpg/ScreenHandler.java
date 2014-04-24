@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.PathfindingExampleMap;
 import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.RagnarokMap;
 import com.me.rpg.maps.WestTownInsideHouse;
@@ -54,6 +55,7 @@ public class ScreenHandler extends Game
 		manager.load(WestTownMap.MAP_TMX_PATH, TiledMap.class);
 		manager.load(WestTownInsideHouse.MAP_TMX_PATH, TiledMap.class);
 		manager.load(RagnarokMap.MAP_TMX_PATH, TiledMap.class);
+		manager.load(PathfindingExampleMap.MAP_TMX_PATH, TiledMap.class);
 
 		// load textures
 		manager.load(World.PLAYER_TEXTURE_PATH, Texture.class);

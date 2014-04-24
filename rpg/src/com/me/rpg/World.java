@@ -35,6 +35,7 @@ import com.me.rpg.combat.Weapon;
 import com.me.rpg.inventory.InventoryMenu;
 import com.me.rpg.maps.ExampleMap;
 import com.me.rpg.maps.Map;
+import com.me.rpg.maps.PathfindingExampleMap;
 import com.me.rpg.maps.PrototypeMap;
 import com.me.rpg.maps.RagnarokMap;
 import com.me.rpg.maps.WestTownInsideHouse;
@@ -286,6 +287,8 @@ public final class World
 		maps.add(westTownInsideHouse);
 		Map ragnarokMap = new RagnarokMap(this);
 		maps.add(ragnarokMap);
+		Map pathfindingMap = new PathfindingExampleMap(this);
+		maps.add(pathfindingMap);
 
 		// WAYPOINTS SETUP
 

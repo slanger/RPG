@@ -7,7 +7,8 @@ public enum MapType
 	PROTOTYPE				("prototype_map", 1),
 	WEST_TOWN				("west_town", 2),
 	WEST_TOWN_INSIDE_HOUSE	("west_town_inside_house", 3), 
-	RAGNAROK				("ragnarok", 4);
+	RAGNAROK				("ragnarok", 4),
+	PATHFINDING				("pathfinding", 5);
 
 	private String mapName;
 	private int index;
