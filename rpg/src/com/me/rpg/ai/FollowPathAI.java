@@ -95,20 +95,43 @@ public class FollowPathAI
 		else
 		{
 			float speed = character.getSpeed();
-			float oldX = character.getBottomLeftX();
-			float oldY = character.getBottomLeftY();
 			float dx = (xE / hE) * speed * deltaTime;
 			float dy = (yE / hE) * speed * deltaTime;
 			dx = (Math.abs(xE) < Math.abs(dx)) ? xE : dx;
 			dy = (Math.abs(yE) < Math.abs(dy)) ? yE : dy;
-			float x = oldX + dx;
-			float y = oldY + dy;
+			Rectangle oldBoundingRectangle = character.getBoundingRectangle();
+			float oldX = oldBoundingRectangle.x;
+			float oldY = oldBoundingRectangle.y;
+			float newX = oldX + dx;
+			float newY = oldY + dy;
 
 			Coordinate newCoordinate = new Coordinate();
-			boolean didMove = character.getCurrentMap().checkCollision(x, y,
+			boolean didMove = character.getCurrentMap().checkCollision(newX, newY,
 					oldX, oldY, character, newCoordinate);
-			x = newCoordinate.getX();
-			y = newCoordinate.getY();
+
+			if (!didMove)
+			{
+				// check if we are stuck inside another character/object
+				// check characters
+				GameCharacter collidedChar = currentMap
+						.checkCollisionWithCharacters(oldBoundingRectangle,
+								character);
+				boolean areStuck = (collidedChar != null);
+				if (!areStuck)
+				{
+					// check objects
+					areStuck = !currentMap
+							.checkCollisionWithObjects(oldBoundingRectangle);
+				}
+
+				if (areStuck)
+				{
+					// we are stuck, so ignore collision detection
+					didMove = true;
+					newCoordinate.setX(newX);
+					newCoordinate.setY(newY);
+				}
+			}
 
 			Direction newDirection;
 			if (Math.abs(yE) >= Math.abs(xE))
