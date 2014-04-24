@@ -606,6 +606,7 @@ public final class World
 				weaponWidth, weaponHeight, 32, 32);
 
 		player.addItemToInventory(shield);
+		player.equipShield(shield);
 		player.addItemToInventory(shadowShield);
 		player.addItemToInventory(grayShield);
 

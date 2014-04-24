@@ -28,7 +28,17 @@ public class Shield extends Equippable implements IAttackable
 	
 	public void render(Rectangle charRectangle, Direction direction,
 			SpriteBatch batch) {
+		
 		Sprite sprite = getItemSprite(direction);
+
+		if(direction == Direction.LEFT)
+		{
+			sprite = getItemSprite(Direction.RIGHT);
+		}
+		if(direction == Direction.RIGHT)
+		{
+			sprite = getItemSprite(Direction.LEFT);
+		}
 		
 		float centerX = charRectangle.getX() + charRectangle.getWidth()/2;
 		float centerY = charRectangle.getY() + charRectangle.getHeight()/2;
