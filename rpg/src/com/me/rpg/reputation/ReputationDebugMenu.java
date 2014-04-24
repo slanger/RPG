@@ -131,8 +131,11 @@ public class ReputationDebugMenu implements Serializable
 			rowSelectionIndex = charactersInWorld.size()-1;
 		}
 		
-		selectedCharacter = charactersInWorld.get(rowSelectionIndex);
-		
+		if(charactersInWorld.size() > 0)
+		{
+			selectedCharacter = charactersInWorld.get(rowSelectionIndex);
+
+		}
 		//Set up MainTable, contains everything else
 		stage.addActor(mainTable);
 		mainTable.setFillParent(true);

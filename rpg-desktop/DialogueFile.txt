@@ -19,6 +19,61 @@ NPC repTest20 neutral
 NPC repTest19 neutral
 	responses 0 trigger repEvent_positiveConversation_large_repTest19 dialogue "Hi there, how are you?"	
 	
+NPC repTest18 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest18 dialogue "Good to see you again!"
+	
+NPC repTest17 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest17 dialogue "Good to see you again!"
+	
+NPC repTest16 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest16 dialogue "Good to see you again!"
+	
+NPC repTest15 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest15 dialogue "Good to see you again!"
+	
+NPC repTest14 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest14 dialogue "Good to see you again!"
+	
+NPC repTest13 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest13 dialogue "Good to see you again!"
+	
+NPC repTest12 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest12 dialogue "Good to see you again!"
+	
+NPC repTest11 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest11 dialogue "Good to see you again!"
+	
+NPC repTest10 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest10 dialogue "Good to see you again!"
+	
+NPC repTest9 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest9 dialogue "Good to see you again!"
+	
+NPC repTest8 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest8 dialogue "Good to see you again!"
+	
+NPC repTest7 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest7 dialogue "Good to see you again!"
+	
+NPC repTest6 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest6 dialogue "Good to see you again!"
+	
+NPC repTest5 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest5 dialogue "Good to see you again!"
+	
+NPC repTest4 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest4 dialogue "Good to see you again!"
+	
+NPC repTest3 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest3 dialogue "Good to see you again!"
+	
+NPC repTest2 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest2 dialogue "Good to see you again!"
+	
+NPC repTest1 neutral
+	responses 0 trigger repEvent_positiveConversation_large_repTest1 dialogue "Good to see you again!"	
+	
+	
 NPC repTest24 like
 	responses 0 trigger repEvent_positiveConversation_large_repTest24 dialogue "Good to see you again!"
 
@@ -36,6 +91,60 @@ NPC repTest20 like
 	
 NPC repTest19 like
 	responses 0 trigger repEvent_positiveConversation_large_repTest19 dialogue "Good to see you again!"
+	
+NPC repTest18 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest18 dialogue "Good to see you again!"
+	
+NPC repTest17 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest17 dialogue "Good to see you again!"
+	
+NPC repTest16 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest16 dialogue "Good to see you again!"
+	
+NPC repTest15 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest15 dialogue "Good to see you again!"
+	
+NPC repTest14 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest14 dialogue "Good to see you again!"
+	
+NPC repTest13 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest13 dialogue "Good to see you again!"
+	
+NPC repTest12 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest12 dialogue "Good to see you again!"
+	
+NPC repTest11 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest11 dialogue "Good to see you again!"
+	
+NPC repTest10 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest10 dialogue "Good to see you again!"
+	
+NPC repTest9 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest9 dialogue "Good to see you again!"
+	
+NPC repTest8 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest8 dialogue "Good to see you again!"
+	
+NPC repTest7 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest7 dialogue "Good to see you again!"
+	
+NPC repTest6 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest6 dialogue "Good to see you again!"
+	
+NPC repTest5 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest5 dialogue "Good to see you again!"
+	
+NPC repTest4 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest4 dialogue "Good to see you again!"
+	
+NPC repTest3 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest3 dialogue "Good to see you again!"
+	
+NPC repTest2 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest2 dialogue "Good to see you again!"
+	
+NPC repTest1 like
+	responses 0 trigger repEvent_positiveConversation_large_repTest1 dialogue "Good to see you again!"
 		
 NPC Coward like
 	responses 5 trigger repEvent_positiveConversation_medium_Coward dialogue "What would you like to buy"	

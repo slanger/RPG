@@ -324,6 +324,7 @@ public final class World
 		NonplayableCharacter npc2;
 		NonplayableCharacter npc3;
 		NonplayableCharacter npc4;
+		NonplayableCharacter npc5;
 		final int width = 28;
 		final int height = 28;
 
@@ -340,7 +341,8 @@ public final class World
 				NPC_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		npc4 = new NonplayableCharacter("AngryArcher", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
-
+		npc5 = new NonplayableCharacter("Citizen", "villager_group",
+				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
 		//testing reputation with these characters
 		NonplayableCharacter rep_npc1 = new NonplayableCharacter("rep_victim1", "villager_group",
 				RGUARD_TEXTURE_PATH, width, height, 16, 16, 0.15f, this);
@@ -359,7 +361,7 @@ public final class World
 		exampleMap.addCharacterToMap(npc2, new Location(exampleMap, 480, 128));
 		exampleMap.addCharacterToMap(npc3, new Location(exampleMap, 64, 64));
 		westTown.addCharacterToMap(npc4, new Location(westTown, 1000, 480));
-
+		exampleMap.addCharacterToMap(npc5, new Location (exampleMap, 400, 400));
 		// state machine for npc1
 		HierarchicalState parent1 = new HierarchicalState(null, npc1);
 
@@ -530,8 +532,17 @@ public final class World
 		
 		//state machine for rep_npc2
 		
-		//state machine for rep_npc3
-		
+		//state machine for rep_npc5
+		HierarchicalState parent5 = new HierarchicalState(null, npc5);
+
+		Location[] patrolLocations5 = new Location[] {
+				new Location(exampleMap, 400, 400),
+				new Location(ragnarokMap, 350, 100)};
+		PatrolState patrol5 = new PatrolState(parent5, npc5, patrolLocations5);
+
+		parent5.setInitialState(patrol5);
+
+		npc5.setStateMachine(parent5);
 		
 		//end state machines
 		
@@ -626,6 +637,7 @@ public final class World
 	
 	public void initializeRepTestNPCs(Map ragnarokMap)
 	{
+		
 		final int width = 28;
 		final int height = 28;
 		
